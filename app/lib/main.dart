@@ -143,19 +143,21 @@ class WorkerTabs extends StatefulWidget {
 
 class _WorkerTabsState extends State<WorkerTabs> {
   int _index = 0;
-  // Bumped every time "My jobs" is selected so MyJobsScreen gets a fresh key —
+  // Bumped every time a tab is (re)selected so that screen gets a fresh key —
   // otherwise its State (and the one-shot fetch in initState) persists across
-  // tab switches and never picks up a job applied to from the other tab.
+  // tab switches and never picks up e.g. a job posted elsewhere while this tab sat idle.
+  int _nearbyGen = 0;
   int _myJobsGen = 0;
 
   @override
   Widget build(BuildContext context) {
-    final pages = [const WorkerHomeScreen(), MyJobsScreen(key: ValueKey(_myJobsGen))];
+    final pages = [WorkerHomeScreen(key: ValueKey(_nearbyGen)), MyJobsScreen(key: ValueKey(_myJobsGen))];
     return Scaffold(
       body: pages[_index],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() {
+          if (i == 0) _nearbyGen++;
           if (i == 1) _myJobsGen++;
           _index = i;
         }),
