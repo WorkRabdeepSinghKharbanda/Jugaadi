@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clarity_flutter/clarity_flutter.dart';
 import 'api_client.dart';
 import 'config.dart';
 import 'screens/auth/phone_auth_screen.dart';
@@ -8,14 +9,16 @@ import 'screens/owner/owner_home_screen.dart';
 import 'screens/worker/my_jobs_screen.dart';
 import 'screens/worker/worker_home_screen.dart';
 
+final _clarityConfig = ClarityConfig(projectId: "yv4w8c246m", logLevel: LogLevel.None);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Config.supabaseUrl.isEmpty || Config.supabaseAnonKey.isEmpty) {
-    runApp(const _NotConfiguredApp());
+    runApp(ClarityWidget(app: const _NotConfiguredApp(), clarityConfig: _clarityConfig));
     return;
   }
   await Supabase.initialize(url: Config.supabaseUrl, anonKey: Config.supabaseAnonKey);
-  runApp(const JugaadiApp());
+  runApp(ClarityWidget(app: const JugaadiApp(), clarityConfig: _clarityConfig));
 }
 
 class _NotConfiguredApp extends StatelessWidget {
