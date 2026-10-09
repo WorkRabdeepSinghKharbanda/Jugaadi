@@ -30,7 +30,7 @@ export async function postJob(req: Request, res: Response) {
   }
 
   const limitError = await planLimitError(req.userId, 'owner');
-  if (limitError) return res.status(409).json({ error: limitError });
+  if (limitError) return res.status(409).json({ error: limitError, code: 'plan_limit' });
 
   const { data, error } = await jobRepo.createJob(req.userId, {
     title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage, workers_needed,
@@ -92,6 +92,14 @@ export async function getJobDetail(req: Request, res: Response) {
 
   const myAcceptance = accepted?.find((a) => a.worker_id === req.userId);
 
+  // Lets the worker's UI show "Applied" (and disable the button) without them having to remember
+  // they already applied — null if they never did.
+  let myApplicationStatus: string | null = null;
+  if (!isOwner) {
+    const { data: myApp } = await jobRepo.myApplicationStatus(req.params.id, req.userId);
+    myApplicationStatus = myApp?.status ?? null;
+  }
+
   res.json({
     ...job,
     // Owner sees every hired worker's contact as soon as each is individually accepted —
@@ -99,15 +107,24 @@ export async function getJobDetail(req: Request, res: Response) {
     hired_workers: isOwner ? accepted?.map((a) => ({ worker_id: a.worker_id, ...revealContact(a.worker) })) ?? [] : undefined,
     // A hired worker sees the owner's contact the moment their own application is accepted.
     owner: myAcceptance ? revealContact(job.owner) : undefined,
+    my_application_status: myApplicationStatus,
   });
 }
 
 export async function applyToJob(req: Request, res: Response) {
   const limitError = await planLimitError(req.userId, 'worker');
-  if (limitError) return res.status(409).json({ error: limitError });
+  if (limitError) return res.status(409).json({ error: limitError, code: 'plan_limit' });
 
   const { data, error } = await jobRepo.applyToJob(req.params.id, req.userId);
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    // Postgres unique violation (job_id, worker_id) — the Flutter button should already be
+    // disabled once applied, but guard the race/stale-UI case with a clean message instead of
+    // leaking the raw constraint-violation text.
+    if ('code' in error && error.code === '23505') {
+      return res.status(409).json({ error: 'You already applied to this job', code: 'already_applied' });
+    }
+    return res.status(500).json({ error: error.message });
+  }
   res.status(201).json(data);
 }
 

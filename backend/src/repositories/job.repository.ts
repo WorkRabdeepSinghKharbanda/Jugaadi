@@ -55,6 +55,10 @@ export async function acceptedWorkersForJob(jobId: string) {
     .eq('status', 'accepted');
 }
 
+export async function myApplicationStatus(jobId: string, workerId: string) {
+  return supabase.from('job_applications').select('status').eq('job_id', jobId).eq('worker_id', workerId).maybeSingle();
+}
+
 export async function getJobOwnerAndStatus(jobId: string) {
   return supabase.from('jobs').select('owner_id, status').eq('id', jobId).maybeSingle();
 }

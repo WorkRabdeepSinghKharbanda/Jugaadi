@@ -3,6 +3,7 @@ import '../api_client.dart';
 import '../config.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
+import 'plans_screen.dart';
 
 /// Shared by owner and worker — the API response already includes hired_workers (owner view,
 /// one per accepted applicant on this job) / owner (worker view, once this worker is accepted),
@@ -36,6 +37,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   void initState() {
     super.initState();
     job = widget.job;
+    _refreshDetail();
+  }
+
+  // The map passed in on navigation is whatever partial row the caller had (nearby list, my
+  // applications, my jobs) — only a real GET /jobs/:id carries hired_workers/owner contact
+  // reveal and my_application_status, so fetch it once the screen opens instead of relying on
+  // stale/partial data for the whole screen lifetime.
+  Future<void> _refreshDetail() async {
+    try {
+      final fresh = await ApiClient(Config.apiBaseUrl).get('/jobs/${job['id']}') as Map<String, dynamic>;
+      if (mounted) setState(() => job = {...job, ...fresh});
+    } catch (_) {
+      // keep showing the partial data passed in — not worth surfacing an error for this
+    }
   }
 
   Future<void> _complete() async {
@@ -90,9 +105,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/apply');
       if (!mounted) return;
       showAppToast(context, 'Applied successfully');
-      Navigator.of(context).pop();
+      setState(() => job = {...job, 'my_application_status': 'pending'});
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'plan_limit') {
+        showAppToast(context, e.message, tone: ToastTone.error);
+        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen()));
+      } else if (e.code == 'already_applied') {
+        setState(() => job = {...job, 'my_application_status': 'pending'});
+      } else {
+        showAppToast(context, e.message, tone: ToastTone.error);
+      }
     } catch (e) {
-      if (mounted) showAppToast(context, e is ApiException ? e.message : '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -106,6 +131,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     final hiredWorkers = (job['hired_workers'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? const [];
     final ownerContact = job['owner'] as Map<String, dynamic>?;
     final isHiredAsWorker = !widget.isOwner && ownerContact != null;
+    final myApplicationStatus = job['my_application_status'] as String?;
     _reviewTargetWorkerId ??= hiredWorkers.isNotEmpty ? hiredWorkers.first['worker_id'] as String? : null;
 
     return AppScaffold(
@@ -243,7 +269,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ErrorStrip('You\'ve already reviewed this job', warning: true),
             ],
             const SizedBox(height: AppSpacing.xl),
-            if (!widget.isOwner && status == 'open') NeuButton(label: 'Apply', icon: Icons.send_rounded, loading: _loading, onPressed: _apply),
+            if (!widget.isOwner && status == 'open')
+              NeuButton(
+                label: myApplicationStatus == 'rejected'
+                    ? 'Not selected'
+                    : myApplicationStatus != null
+                        ? 'Applied'
+                        : 'Apply',
+                icon: myApplicationStatus != null ? Icons.check_rounded : Icons.send_rounded,
+                loading: _loading,
+                onPressed: myApplicationStatus != null ? null : _apply,
+              ),
             if (widget.isOwner && status == 'hired') NeuButton(label: 'Mark complete', icon: Icons.check_circle_outline_rounded, loading: _loading, onPressed: _complete),
           ],
         ),

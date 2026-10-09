@@ -71,6 +71,17 @@ class ApiException implements Exception {
     return body;
   }
 
+  /// The backend's `{"code": "..."}` field (e.g. 'plan_limit'), or null if absent/not JSON.
+  String? get code {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map && decoded['code'] is String) return decoded['code'] as String;
+    } catch (_) {
+      // not JSON
+    }
+    return null;
+  }
+
   @override
   String toString() => 'ApiException($statusCode): $body';
 }
