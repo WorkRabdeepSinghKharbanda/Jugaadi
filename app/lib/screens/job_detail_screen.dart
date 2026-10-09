@@ -61,15 +61,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     final status = job['status'] as String;
     final contact = widget.isOwner ? job['hired_worker'] as Map<String, dynamic>? : job['owner'] as Map<String, dynamic>?;
 
-    return Scaffold(
-      backgroundColor: c.bg,
-      appBar: AppBar(title: Text(job['title'] as String? ?? '')),
-      body: SingleChildScrollView(
-        padding: AppSpacing.screen,
-        child: Column(
+    return AppScaffold(
+      onBack: () => Navigator.of(context).pop(),
+      scroll: true,
+      body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: AppSpacing.md),
             Row(
               children: [
                 Expanded(child: Text(job['title'] as String? ?? '', style: AppText.headline)),
@@ -121,7 +118,6 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             if (widget.isOwner && status == 'hired') NeuButton(label: 'Mark complete', icon: Icons.check_circle_outline_rounded, loading: _loading, onPressed: _complete),
           ],
         ),
-      ),
     );
   }
 }
