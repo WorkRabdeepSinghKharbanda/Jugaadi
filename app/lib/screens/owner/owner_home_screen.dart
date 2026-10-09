@@ -126,10 +126,10 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   child: NeuCard(
                     onTap: () async {
                       if (job['status'] == 'open') {
-                        final hired = await Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => JobApplicantsScreen(jobId: job['id'])),
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => JobApplicantsScreen(job: job)),
                         );
-                        if (hired == true) _refresh();
+                        _refresh();
                       } else {
                         await Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => JobDetailScreen(job: job, isOwner: true)),
@@ -146,6 +146,13 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                               Text(job['title'] as String, style: AppText.title),
                               const SizedBox(height: 4),
                               Text(job['skill_needed'] as String, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                              if ((job['workers_needed'] as int? ?? 1) > 1) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${job['hired_count'] ?? 0}/${job['workers_needed']} hired',
+                                  style: AppText.bodySmall.copyWith(color: c.textTertiary),
+                                ),
+                              ],
                             ],
                           ),
                         ),

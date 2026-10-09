@@ -4,9 +4,9 @@ import '../config.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
 
-/// Shared by owner and worker — the API response already includes
-/// hired_worker/owner contact info once status is 'hired', so there's
-/// no separate "reveal contact" endpoint to call.
+/// Shared by owner and worker — the API response already includes hired_workers (owner view,
+/// one per accepted applicant on this job) / owner (worker view, once this worker is accepted),
+/// so there's no separate "reveal contact" endpoint to call.
 class JobDetailScreen extends StatefulWidget {
   const JobDetailScreen({super.key, required this.job, required this.isOwner});
 
@@ -24,6 +24,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   final _commentController = TextEditingController();
   bool _reviewSubmitting = false;
   bool _reviewDone = false;
+  String? _reviewTargetWorkerId;
 
   @override
   void dispose() {
@@ -56,11 +57,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       showAppToast(context, 'Pick a star rating first', tone: ToastTone.error);
       return;
     }
+    if (widget.isOwner && _reviewTargetWorkerId == null) {
+      showAppToast(context, 'Pick which worker to rate', tone: ToastTone.error);
+      return;
+    }
     setState(() => _reviewSubmitting = true);
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/review', {
         'rating': _rating,
         if (_commentController.text.trim().isNotEmpty) 'comment': _commentController.text.trim(),
+        if (widget.isOwner) 'worker_id': _reviewTargetWorkerId,
       });
       if (!mounted) return;
       showAppToast(context, 'Review submitted');
@@ -96,7 +102,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Widget build(BuildContext context) {
     final c = context.colors;
     final status = job['status'] as String;
-    final contact = widget.isOwner ? job['hired_worker'] as Map<String, dynamic>? : job['owner'] as Map<String, dynamic>?;
+    final hiredWorkers = (job['hired_workers'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? const [];
+    final ownerContact = job['owner'] as Map<String, dynamic>?;
+    final isHiredAsWorker = !widget.isOwner && ownerContact != null;
+    _reviewTargetWorkerId ??= hiredWorkers.isNotEmpty ? hiredWorkers.first['worker_id'] as String? : null;
 
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
@@ -127,9 +136,35 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ],
               ),
             ),
-            if (contact != null) ...[
+            if (widget.isOwner && hiredWorkers.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.lg),
-              SectionHeader(widget.isOwner ? 'Hired worker' : 'Owner contact'),
+              SectionHeader(hiredWorkers.length > 1 ? 'Hired workers' : 'Hired worker'),
+              for (final w in hiredWorkers) ...[
+                NeuCard(
+                  gradientBorder: true,
+                  child: Row(
+                    children: [
+                      Icon(Icons.phone_rounded, color: c.accent),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(w['full_name'] as String? ?? '-', style: AppText.title),
+                            const SizedBox(height: 4),
+                            Text(w['phone'] as String? ?? '-', style: AppText.body.copyWith(color: c.textSecondary)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
+            ],
+            if (isHiredAsWorker) ...[
+              const SizedBox(height: AppSpacing.lg),
+              SectionHeader('Owner contact'),
               NeuCard(
                 gradientBorder: true,
                 child: Row(
@@ -140,9 +175,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(contact['full_name'] as String? ?? '-', style: AppText.title),
+                          Text(ownerContact['full_name'] as String? ?? '-', style: AppText.title),
                           const SizedBox(height: 4),
-                          Text(contact['phone'] as String? ?? '-', style: AppText.body.copyWith(color: c.textSecondary)),
+                          Text(ownerContact['phone'] as String? ?? '-', style: AppText.body.copyWith(color: c.textSecondary)),
                         ],
                       ),
                     ),
@@ -150,13 +185,25 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
               ),
             ],
-            if (status == 'done' && contact != null && !_reviewDone) ...[
+            if (status == 'done' && (widget.isOwner ? hiredWorkers.isNotEmpty : isHiredAsWorker) && !_reviewDone) ...[
               const SizedBox(height: AppSpacing.lg),
-              SectionHeader(widget.isOwner ? 'Rate the worker' : 'Rate the owner'),
+              SectionHeader(widget.isOwner ? 'Rate a worker' : 'Rate the owner'),
               NeuCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (widget.isOwner && hiredWorkers.length > 1) ...[
+                      DropdownButton<String>(
+                        isExpanded: true,
+                        value: _reviewTargetWorkerId,
+                        dropdownColor: c.surfaceHigh,
+                        items: hiredWorkers
+                            .map((w) => DropdownMenuItem(value: w['worker_id'] as String, child: Text(w['full_name'] as String? ?? '-')))
+                            .toList(),
+                        onChanged: (v) => setState(() => _reviewTargetWorkerId = v),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(

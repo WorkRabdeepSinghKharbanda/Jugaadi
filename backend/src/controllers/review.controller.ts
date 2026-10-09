@@ -3,7 +3,7 @@ import * as reviewRepo from '../repositories/review.repository.js';
 import * as jobRepo from '../repositories/job.repository.js';
 
 export async function postReview(req: Request, res: Response) {
-  const { rating, comment } = req.body;
+  const { rating, comment, worker_id } = req.body;
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
     return res.status(400).json({ error: 'rating must be an integer 1-5' });
   }
@@ -13,16 +13,24 @@ export async function postReview(req: Request, res: Response) {
   if (!job) return res.status(404).json({ error: 'not found' });
   if (job.status !== 'done') return res.status(409).json({ error: 'job is not done yet' });
 
-  // Need hired_worker_id too — getJobOwnerAndStatus only selects owner_id/status.
-  const { data: full, error: fullError } = await jobRepo.getJobWithContacts(req.params.id);
-  if (fullError) return res.status(500).json({ error: fullError.message });
-  if (!full) return res.status(404).json({ error: 'not found' });
+  const isOwner = job.owner_id === req.userId;
 
-  const isOwner = full.owner_id === req.userId;
-  const isHiredWorker = full.hired_worker_id === req.userId;
+  const { data: accepted, error: acceptedError } = await jobRepo.acceptedWorkersForJob(req.params.id);
+  if (acceptedError) return res.status(500).json({ error: acceptedError.message });
+  const isHiredWorker = accepted?.some((a) => a.worker_id === req.userId) ?? false;
+
   if (!isOwner && !isHiredWorker) return res.status(403).json({ error: 'forbidden' });
 
-  const revieweeId = isOwner ? full.hired_worker_id : full.owner_id;
+  // A job can have more than one hired worker — an owner reviewing must say which one;
+  // a worker reviewing only ever has one owner to rate.
+  let revieweeId: string | undefined;
+  if (isOwner) {
+    if (!worker_id) return res.status(400).json({ error: 'worker_id is required when reviewing as the owner' });
+    if (!accepted?.some((a) => a.worker_id === worker_id)) return res.status(400).json({ error: 'that worker was not hired on this job' });
+    revieweeId = worker_id;
+  } else {
+    revieweeId = job.owner_id;
+  }
   if (!revieweeId) return res.status(409).json({ error: 'no counterpart to review' });
 
   const { data: existing, error: existingError } = await reviewRepo.hasReviewed(req.params.id, req.userId);

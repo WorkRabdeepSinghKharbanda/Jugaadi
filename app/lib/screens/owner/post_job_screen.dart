@@ -21,6 +21,7 @@ const _kOtherSkill = 'Other';
 class _PostJobScreenState extends State<PostJobScreen> {
   late final _titleController = TextEditingController(text: widget.existingJob?['title'] as String?);
   late final _wageController = TextEditingController(text: widget.existingJob?['daily_wage']?.toString());
+  late final _workersNeededController = TextEditingController(text: '${widget.existingJob?['workers_needed'] ?? 1}');
   late final _customSkillController = TextEditingController(
     text: _initialSkillIsCustom ? (widget.existingJob?['skill_needed'] as String?) : null,
   );
@@ -88,6 +89,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       'start_date': _range!.start.toIso8601String().split('T').first,
       'end_date': _range!.end.toIso8601String().split('T').first,
       if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
+      if (!_isEdit) 'workers_needed': int.tryParse(_workersNeededController.text.trim()) ?? 1,
     };
     try {
       final api = ApiClient(Config.apiBaseUrl);
@@ -152,6 +154,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           NeuTextField(label: 'Daily wage (optional)', controller: _wageController, icon: Icons.payments_outlined, keyboardType: TextInputType.number),
+          if (!_isEdit) ...[
+            const SizedBox(height: AppSpacing.md),
+            NeuTextField(
+              label: 'Workers needed',
+              controller: _workersNeededController,
+              icon: Icons.groups_outlined,
+              keyboardType: TextInputType.number,
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           NeuButton(
             label: _range == null

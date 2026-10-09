@@ -3,13 +3,16 @@ import * as jobRepo from '../repositories/job.repository.js';
 import '../types.js';
 
 export async function postJob(req: Request, res: Response) {
-  const { title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage } = req.body;
+  const { title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage, workers_needed } = req.body;
   if (!title || !skill_needed || lat == null || lng == null || !start_date || !end_date) {
     return res.status(400).json({ error: 'title, skill_needed, lat, lng, start_date, end_date are required' });
   }
+  if (workers_needed != null && (!Number.isInteger(workers_needed) || workers_needed < 1)) {
+    return res.status(400).json({ error: 'workers_needed must be a positive integer' });
+  }
 
   const { data, error } = await jobRepo.createJob(req.userId, {
-    title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage,
+    title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage, workers_needed,
   });
   if (error) return res.status(500).json({ error: error.message });
   res.status(201).json(data);
@@ -40,28 +43,34 @@ export async function getMyJobs(req: Request, res: Response) {
   res.json(data);
 }
 
+// contact_phone (set on the profile) wins over the login phone when the user chose to share a
+// different reach-out number; falls back to the login phone when they never set one.
+function revealContact(p: any) {
+  if (!p) return undefined;
+  return p.is_deleted
+    ? { full_name: 'Deleted user', phone: null, email: null }
+    : { full_name: p.full_name, phone: p.contact_phone ?? p.phone, email: p.email };
+}
+
 export async function getJobDetail(req: Request, res: Response) {
-  const { data: job, error } = await jobRepo.getJobWithContacts(req.params.id);
+  const { data: job, error } = await jobRepo.getJobWithOwner(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   if (!job) return res.status(404).json({ error: 'not found' });
 
   const isOwner = job.owner_id === req.userId;
-  const isHiredWorker = job.hired_worker_id === req.userId;
-  const contactRevealed = job.status !== 'open' && (isOwner || isHiredWorker);
 
-  // contact_phone (set on the profile) wins over the login phone when the user chose to share a
-  // different reach-out number; falls back to the login phone when they never set one.
-  const reveal = (p: { phone: string; contact_phone: string | null; email: string | null; full_name: string; is_deleted: boolean } | null) =>
-    p
-      ? p.is_deleted
-        ? { full_name: 'Deleted user', phone: null, email: null }
-        : { full_name: p.full_name, phone: p.contact_phone ?? p.phone, email: p.email }
-      : undefined;
+  const { data: accepted, error: acceptedError } = await jobRepo.acceptedWorkersForJob(req.params.id);
+  if (acceptedError) return res.status(500).json({ error: acceptedError.message });
+
+  const myAcceptance = accepted?.find((a) => a.worker_id === req.userId);
 
   res.json({
     ...job,
-    owner: isHiredWorker && contactRevealed ? reveal(job.owner) : undefined,
-    hired_worker: isOwner && contactRevealed ? reveal(job.hired_worker) : undefined,
+    // Owner sees every hired worker's contact as soon as each is individually accepted —
+    // independent of whether the job still has open slots (workers_needed > 1).
+    hired_workers: isOwner ? accepted?.map((a) => ({ worker_id: a.worker_id, ...revealContact(a.worker) })) ?? [] : undefined,
+    // A hired worker sees the owner's contact the moment their own application is accepted.
+    owner: myAcceptance ? revealContact(job.owner) : undefined,
   });
 }
 
@@ -107,6 +116,8 @@ export async function completeJob(req: Request, res: Response) {
 }
 
 const EDITABLE_FIELDS = ['title', 'description', 'skill_needed', 'lat', 'lng', 'address_text', 'start_date', 'end_date', 'daily_wage'] as const;
+// workers_needed is deliberately not editable once posted — it'd desync from hired_count,
+// which only ever increases via the atomic hire_worker RPC.
 
 export async function updateJob(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);

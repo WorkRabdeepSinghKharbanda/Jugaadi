@@ -10,6 +10,7 @@ export interface JobInput {
   start_date: string;
   end_date: string;
   daily_wage?: number;
+  workers_needed?: number;
 }
 
 export async function createJob(ownerId: string, job: JobInput) {
@@ -32,14 +33,23 @@ export async function applicationsByWorker(workerId: string) {
     .order('created_at', { ascending: false });
 }
 
-export async function getJobWithContacts(jobId: string) {
+export async function getJobWithOwner(jobId: string) {
   return supabase
     .from('jobs')
-    .select(
-      '*, owner:profiles!jobs_owner_id_fkey(phone, contact_phone, email, full_name, is_deleted), hired_worker:profiles!jobs_hired_worker_id_fkey(phone, contact_phone, email, full_name, is_deleted)'
-    )
+    .select('*, owner:profiles!jobs_owner_id_fkey(phone, contact_phone, email, full_name, is_deleted)')
     .eq('id', jobId)
     .maybeSingle();
+}
+
+// Every worker whose application on this job is 'accepted' — a job can have more than one
+// once workers_needed > 1. Each becomes contact-visible to the owner as soon as they're hired,
+// independent of whether the job still has open slots.
+export async function acceptedWorkersForJob(jobId: string) {
+  return supabase
+    .from('job_applications')
+    .select('worker_id, worker:profiles!job_applications_worker_id_fkey(phone, contact_phone, email, full_name, is_deleted)')
+    .eq('job_id', jobId)
+    .eq('status', 'accepted');
 }
 
 export async function getJobOwnerAndStatus(jobId: string) {
@@ -51,33 +61,26 @@ export async function applyToJob(jobId: string, workerId: string) {
 }
 
 export async function pendingApplicants(jobId: string) {
-  // Phone/email/contact_phone/lat/lng stay hidden until hire (matches getJobDetail's
-  // reveal-on-hire rule) — don't leak an applicant's contact info to the owner before they're
-  // chosen. Everything else about them (bio, city, skills, verification) is fine to show up
-  // front so the owner can actually judge who to hire.
+  // Owner explicitly wants to see applicant phone numbers before hiring (not just after) —
+  // contact_phone/email still wait until hire to keep at least the profile's secondary contact
+  // channels gated, but the primary phone is visible here now.
   return supabase
     .from('job_applications')
-    .select('*, worker:profiles!job_applications_worker_id_fkey(full_name, is_verified, bio, city, worker_skills(skill))')
+    .select('*, worker:profiles!job_applications_worker_id_fkey(full_name, phone, is_verified, bio, city, worker_skills(skill))')
     .eq('job_id', jobId)
     .eq('status', 'pending');
 }
 
 export async function hireWorker(jobId: string, workerId: string) {
-  // Guard on status='open' so two concurrent hire requests can't both succeed (second write
-  // would silently overwrite hired_worker_id from the first).
-  const { data: hired, error: hireError } = await supabase
-    .from('jobs')
-    .update({ status: 'hired', hired_worker_id: workerId })
-    .eq('id', jobId)
-    .eq('status', 'open')
-    .select()
-    .maybeSingle();
-  if (hireError) return { error: hireError, conflict: false };
-  if (!hired) return { error: { message: 'job is not open' }, conflict: true };
-
-  await supabase.from('job_applications').update({ status: 'accepted' }).eq('job_id', jobId).eq('worker_id', workerId);
-  await supabase.from('job_applications').update({ status: 'rejected' }).eq('job_id', jobId).neq('worker_id', workerId);
-  return { error: null, conflict: false };
+  // Atomic: the hired_count<workers_needed and status='open' guard plus the increment happen in
+  // one row-locked UPDATE inside the RPC, so two concurrent hire calls can't both succeed past
+  // the last open slot (a client-side read-then-write here could race when workers_needed > 1).
+  const { data, error } = await supabase.rpc('hire_worker', { p_job_id: jobId, p_worker_id: workerId });
+  if (error) {
+    const conflict = error.message.includes('job_not_open_or_full');
+    return { error: conflict ? { message: 'job is not open or has no slots left' } : error, conflict };
+  }
+  return { error: null, conflict: false, job: data };
 }
 
 export async function completeJob(jobId: string) {
