@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
 import '../../core/theme/tokens.dart';
+import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
 import 'job_applicants_screen.dart';
@@ -35,7 +36,12 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
     final c = context.colors;
     return Scaffold(
       backgroundColor: c.bg,
-      appBar: AppBar(title: const Text('My jobs')),
+      appBar: AppBar(
+        title: const Text('My jobs'),
+        actions: [
+          IconButton(icon: const Icon(Icons.location_on_outlined), tooltip: 'Update location', onPressed: () => editLocation(context)),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: c.accent,
         foregroundColor: c.onAccent,

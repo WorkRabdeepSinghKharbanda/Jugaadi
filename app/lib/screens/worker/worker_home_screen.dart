@@ -3,6 +3,7 @@ import '../../api_client.dart';
 import '../../config.dart';
 import '../../core/location.dart';
 import '../../core/theme/tokens.dart';
+import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
 
@@ -38,7 +39,19 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     final c = context.colors;
     return Scaffold(
       backgroundColor: c.bg,
-      appBar: AppBar(title: const Text('Nearby jobs')),
+      appBar: AppBar(
+        title: const Text('Nearby jobs'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.location_on_outlined),
+            tooltip: 'Update location',
+            onPressed: () async {
+              await editLocation(context);
+              _refresh();
+            },
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         color: c.accent,
         onRefresh: () async => _refresh(),
