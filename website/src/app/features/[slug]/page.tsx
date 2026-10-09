@@ -1,13 +1,9 @@
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllContent, getContent, pathFor } from "@/lib/content";
-import { JsonLd } from "@/components/JsonLd";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { Faqs } from "@/components/Faqs";
-import { breadcrumbList, faqPage } from "@/lib/jsonld";
+import { getAllContent, getContent } from "@/lib/content";
+import { ContentPageView } from "@/views/ContentPageView";
 
 export function generateStaticParams() {
-  return getAllContent("feature").map((m) => ({ slug: m.slug }));
+  return getAllContent("feature", "en").map((m) => ({ slug: m.slug }));
 }
 
 export async function generateMetadata({
@@ -16,30 +12,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const page = await getContent("feature", slug);
+  const page = await getContent("feature", slug, "en");
   if (!page) return {};
   return { title: page.title, description: page.description };
 }
 
 export default async function FeaturePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const page = await getContent("feature", slug);
-  if (!page) notFound();
-
-  const path = pathFor(page);
-  const crumbs = [
-    { name: "Home", path: "/" },
-    { name: "Features", path: "/features" },
-    { name: page.title, path },
-  ];
-
-  return (
-    <article>
-      <JsonLd data={[breadcrumbList(crumbs), faqPage(page.faqs)].filter((n) => n !== null)} />
-      <Breadcrumbs items={crumbs} />
-      <h1>{page.title}</h1>
-      <div dangerouslySetInnerHTML={{ __html: page.html }} />
-      <Faqs faqs={page.faqs} />
-    </article>
-  );
+  return <ContentPageView type="feature" slug={slug} locale="en" />;
 }

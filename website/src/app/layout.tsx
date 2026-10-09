@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { website } from "@/lib/jsonld";
 
@@ -21,9 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <JsonLd data={[website()]} />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {children}
         {/* AdSense + GA4 scripts go here once real IDs exist (see plan §5) */}
       </body>
     </html>

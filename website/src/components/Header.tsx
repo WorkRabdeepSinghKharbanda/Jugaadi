@@ -1,22 +1,33 @@
 import Link from "next/link";
-import { SITE_NAME } from "@/lib/site";
+import type { Locale } from "@/lib/locale";
+import { LOCALE_LABELS, LOCALES, localizedPath } from "@/lib/locale";
+import { ui } from "@/lib/i18n";
 
-export function Header() {
+export function Header({ locale, path = "/" }: { locale: Locale; path?: string }) {
+  const t = ui(locale);
+  const home = locale === "en" ? "/" : `/${locale}`;
   return (
     <header className="site-header">
       <div className="wrap row">
-        <Link href="/" className="brand">
+        <Link href={home} className="brand">
           <span className="bt">
             Jug<span>aadi</span>
           </span>
         </Link>
         <nav aria-label="Primary">
-          <Link href="/features">Features</Link>
-          <Link href="/alternatives">Alternatives</Link>
-          <Link href="/blog">Blog</Link>
+          <Link href={`${home === "/" ? "" : home}/features`}>{t.nav.features}</Link>
+          <Link href={`${home === "/" ? "" : home}/alternatives`}>{t.nav.alternatives}</Link>
+          <Link href={`${home === "/" ? "" : home}/blog`}>{t.nav.blog}</Link>
+          <span className="lang-switch">
+            {LOCALES.map((l) => (
+              <Link key={l} href={localizedPath(l, path)} className={l === locale ? "active" : ""}>
+                {LOCALE_LABELS[l]}
+              </Link>
+            ))}
+          </span>
         </nav>
-        <Link href="/#waitlist" className="btn sm">
-          Join waitlist
+        <Link href={`${home === "/" ? "" : home}/#waitlist`} className="btn sm">
+          {t.joinWaitlist}
         </Link>
       </div>
     </header>

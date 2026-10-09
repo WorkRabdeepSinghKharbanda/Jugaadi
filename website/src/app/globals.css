@@ -26,9 +26,12 @@ p { margin: 0 0 var(--s-md); color: var(--text-2); }
 .brand { display: flex; align-items: center; gap: var(--s-sm); font-weight: 700; font-size: 18px; color: var(--text); }
 .brand .mark { width: 28px; height: 28px; border-radius: var(--r-sm); }
 .brand .bt span { color: var(--accent); }
-.site-header nav { display: flex; gap: var(--s-lg); }
+.site-header nav { display: flex; align-items: center; gap: var(--s-lg); }
 .site-header nav a { color: var(--text-2); font-size: 14px; }
 .site-header nav a:hover { color: var(--text); }
+.lang-switch { display: flex; gap: var(--s-xs); border-left: 1px solid var(--outline); padding-left: var(--s-md); }
+.lang-switch a { font-size: 12px; padding: 4px 8px; border-radius: var(--r-pill); color: var(--text-3); }
+.lang-switch a.active { background: var(--surface-high); color: var(--text); }
 .btn {
   display: inline-block; padding: 10px 20px; border-radius: var(--r-pill);
   background: var(--grad); color: var(--on-accent); font-weight: 600; font-size: 14px;

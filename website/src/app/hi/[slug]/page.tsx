@@ -12,12 +12,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const page = await getContent("landing", slug, "en");
+  const page = await getContent("landing", slug, "hi");
   if (!page) return {};
   return { title: page.title, description: page.description };
 }
 
-export default async function LandingPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function LandingPageHi({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  return <ContentPageView type="landing" slug={slug} locale="en" />;
+  return <ContentPageView type="landing" slug={slug} locale="hi" />;
 }

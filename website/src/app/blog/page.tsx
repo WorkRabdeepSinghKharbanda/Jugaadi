@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { getAllContent, pathFor } from "@/lib/content";
-import { PageList } from "@/components/PageList";
+import { HubView } from "@/views/HubView";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -8,14 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function BlogIndexPage() {
-  const posts = getAllContent("blog")
-    .map((m) => ({ title: m.title, description: m.description, path: pathFor(m), date: m.date }))
-    .sort((a, b) => ((a.date ?? "") < (b.date ?? "") ? 1 : -1));
-
-  return (
-    <>
-      <h1>Blog</h1>
-      <PageList items={posts} />
-    </>
-  );
+  return <HubView type="blog" locale="en" />;
 }

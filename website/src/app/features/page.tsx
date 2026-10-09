@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { getAllContent, pathFor } from "@/lib/content";
-import { PageList } from "@/components/PageList";
+import { HubView } from "@/views/HubView";
 
 export const metadata: Metadata = {
   title: "Features",
@@ -8,11 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function FeaturesHubPage() {
-  const items = getAllContent("feature").map((m) => ({ title: m.title, description: m.description, path: pathFor(m) }));
-  return (
-    <>
-      <h1>Features</h1>
-      <PageList items={items} />
-    </>
-  );
+  return <HubView type="feature" locale="en" />;
 }
