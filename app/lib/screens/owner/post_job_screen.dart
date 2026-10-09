@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
-import '../../core/location.dart';
+import '../../core/services/place_gateway.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../auth/profile_setup_screen.dart';
@@ -15,10 +15,10 @@ class PostJobScreen extends StatefulWidget {
 
 class _PostJobScreenState extends State<PostJobScreen> {
   final _titleController = TextEditingController();
-  final _addressController = TextEditingController();
   final _wageController = TextEditingController();
   String _skill = kSkillOptions.first;
   DateTimeRange? _range;
+  PlaceHit? _place;
   bool _loading = false;
   String? _error;
 
@@ -32,9 +32,18 @@ class _PostJobScreenState extends State<PostJobScreen> {
     if (range != null) setState(() => _range = range);
   }
 
+  Future<void> _pickLocation() async {
+    final place = await LocationPickerSheet.show(context);
+    if (place != null && mounted) setState(() => _place = place);
+  }
+
   Future<void> _submit() async {
     if (_range == null) {
       setState(() => _error = 'Pick start and end dates');
+      return;
+    }
+    if (_place == null) {
+      setState(() => _error = 'Set the job location first');
       return;
     }
     setState(() {
@@ -42,13 +51,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
       _error = null;
     });
     try {
-      final position = await getCurrentPositionOrThrow();
       await ApiClient(Config.apiBaseUrl).post('/jobs', {
         'title': _titleController.text.trim(),
         'skill_needed': _skill,
-        'lat': position.latitude,
-        'lng': position.longitude,
-        'address_text': _addressController.text.trim(),
+        'lat': _place!.latitude,
+        'lng': _place!.longitude,
+        'address_text': _place!.label,
         'start_date': _range!.start.toIso8601String().split('T').first,
         'end_date': _range!.end.toIso8601String().split('T').first,
         if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
@@ -84,7 +92,24 @@ class _PostJobScreenState extends State<PostJobScreen> {
             dropdownColor: c.surfaceHigh,
           ),
           const SizedBox(height: AppSpacing.md),
-          NeuTextField(label: 'Address', controller: _addressController, icon: Icons.location_on_outlined),
+          Text('LOCATION', style: AppText.label.copyWith(color: c.textSecondary)),
+          const SizedBox(height: AppSpacing.sm),
+          NeuCard(
+            onTap: _pickLocation,
+            child: Row(
+              children: [
+                Icon(Icons.location_on_outlined, color: _place == null ? c.textSecondary : c.accent),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    _place?.label ?? 'Tap to set job location',
+                    style: AppText.body.copyWith(color: _place == null ? c.textTertiary : c.textPrimary),
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: c.textTertiary),
+              ],
+            ),
+          ),
           const SizedBox(height: AppSpacing.md),
           NeuTextField(label: 'Daily wage (optional)', controller: _wageController, icon: Icons.payments_outlined, keyboardType: TextInputType.number),
           const SizedBox(height: AppSpacing.lg),

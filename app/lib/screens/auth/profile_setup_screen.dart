@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
-import '../../core/location.dart';
+import '../../core/services/place_gateway.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../main.dart';
@@ -20,27 +20,34 @@ class ProfileSetupScreen extends StatefulWidget {
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _cityController = TextEditingController();
   final _selectedSkills = <String>{};
+  PlaceHit? _place;
   bool _loading = false;
   String? _error;
 
+  Future<void> _pickLocation() async {
+    final place = await LocationPickerSheet.show(context);
+    if (place != null && mounted) setState(() => _place = place);
+  }
+
   Future<void> _save() async {
+    if (_place == null) {
+      setState(() => _error = 'Set your location first');
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      var position = await getCurrentPositionOrThrow();
-
       final api = ApiClient(Config.apiBaseUrl);
       await api.post('/profile', {
         'role': widget.role,
         'full_name': _nameController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'city': _cityController.text.trim(),
-        'lat': position.latitude,
-        'lng': position.longitude,
+        'city': _place!.label,
+        'lat': _place!.latitude,
+        'lng': _place!.longitude,
         if (widget.role == 'worker') 'skills': _selectedSkills.toList(),
       });
 
@@ -58,6 +65,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
       title: 'Set up your profile',
@@ -70,7 +78,24 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           const SizedBox(height: AppSpacing.md),
           NeuTextField(label: 'Phone', controller: _phoneController, icon: Icons.phone_rounded, keyboardType: TextInputType.phone),
           const SizedBox(height: AppSpacing.md),
-          NeuTextField(label: 'City', controller: _cityController, icon: Icons.location_city_rounded),
+          Text('LOCATION', style: AppText.label.copyWith(color: c.textSecondary)),
+          const SizedBox(height: AppSpacing.sm),
+          NeuCard(
+            onTap: _pickLocation,
+            child: Row(
+              children: [
+                Icon(Icons.location_on_outlined, color: _place == null ? c.textSecondary : c.accent),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    _place?.label ?? 'Tap to set your location',
+                    style: AppText.body.copyWith(color: _place == null ? c.textTertiary : c.textPrimary),
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: c.textTertiary),
+              ],
+            ),
+          ),
           if (widget.role == 'worker') ...[
             const SizedBox(height: AppSpacing.lg),
             SectionHeader('Your skills'),
