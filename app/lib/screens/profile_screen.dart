@@ -62,6 +62,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  Future<void> _logout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Log out?'),
+        content: const Text('You\'ll need to verify your phone number again to sign back in.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Log out')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await Supabase.instance.client.auth.signOut();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const PhoneAuthScreen()),
+      (route) => false,
+    );
+  }
+
   Future<void> _deleteAccount() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -196,6 +217,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
                 const SizedBox(height: AppSpacing.xl),
                 NeuButton(label: 'Edit profile', icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
+                const SizedBox(height: AppSpacing.md),
+                NeuButton(label: 'Log out', icon: Icons.logout_rounded, variant: NeuButtonVariant.ghost, onPressed: _logout),
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(
                   label: 'Delete account',
