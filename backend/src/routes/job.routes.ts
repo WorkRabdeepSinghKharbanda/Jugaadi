@@ -10,6 +10,8 @@ import {
   getApplicants,
   hireApplicant,
   completeJob,
+  updateJob,
+  removeJob,
 } from '../controllers/job.controller.js';
 
 const router = Router();
@@ -18,9 +20,11 @@ router.get('/jobs/nearby', requireAuth, getNearbyJobs);
 router.get('/jobs/mine', requireAuth, getMyJobs);
 router.get('/applications/mine', requireAuth, getMyApplications);
 router.get('/jobs/:id', requireAuth, getJobDetail);
+router.patch('/jobs/:id', requireAuth, updateJob);
 router.post('/jobs/:id/apply', requireAuth, applyToJob);
 router.get('/jobs/:id/applicants', requireAuth, getApplicants);
 router.post('/jobs/:id/hire/:workerId', requireAuth, hireApplicant);
 router.post('/jobs/:id/complete', requireAuth, completeJob);
+router.post('/jobs/:id/remove', requireAuth, removeJob);
 
 export default router;

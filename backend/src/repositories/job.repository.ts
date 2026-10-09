@@ -77,5 +77,16 @@ export async function hireWorker(jobId: string, workerId: string) {
 }
 
 export async function completeJob(jobId: string) {
-  return supabase.from('jobs').update({ status: 'completed' }).eq('id', jobId);
+  return supabase.from('jobs').update({ status: 'done' }).eq('id', jobId);
+}
+
+export type JobUpdateInput = Partial<JobInput>;
+
+export async function updateOpenJob(jobId: string, patch: JobUpdateInput) {
+  // Guard on status='open': editing a hired/done job's terms after the fact doesn't make sense.
+  return supabase.from('jobs').update(patch).eq('id', jobId).eq('status', 'open').select().maybeSingle();
+}
+
+export async function removeOpenJob(jobId: string) {
+  return supabase.from('jobs').update({ status: 'removed' }).eq('id', jobId).eq('status', 'open').select().maybeSingle();
 }

@@ -31,6 +31,35 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
 
   void _refresh() => setState(() => _future = _load());
 
+  Future<void> _edit(Map<String, dynamic> job) async {
+    final updated = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => PostJobScreen(existingJob: job)),
+    );
+    if (updated == true) _refresh();
+  }
+
+  Future<void> _remove(dynamic jobId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Remove this job?'),
+        content: const Text('This can\'t be undone. Workers will no longer be able to see or apply to it.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Remove')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await ApiClient(Config.apiBaseUrl).post('/jobs/$jobId/remove');
+      if (mounted) showAppToast(context, 'Job removed');
+      _refresh();
+    } catch (e) {
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -115,6 +144,18 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                           ),
                         ),
                         PillBadge.status(job['status'] as String),
+                        if (job['status'] == 'open')
+                          PopupMenuButton<String>(
+                            icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
+                            onSelected: (action) {
+                              if (action == 'edit') _edit(job);
+                              if (action == 'remove') _remove(job['id']);
+                            },
+                            itemBuilder: (_) => const [
+                              PopupMenuItem(value: 'edit', child: Text('Edit')),
+                              PopupMenuItem(value: 'remove', child: Text('Remove')),
+                            ],
+                          ),
                       ],
                     ),
                   ),

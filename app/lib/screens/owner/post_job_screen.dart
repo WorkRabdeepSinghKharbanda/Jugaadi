@@ -6,21 +6,36 @@ import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../auth/profile_setup_screen.dart';
 
+/// Create mode when [existingJob] is null; edit mode (PATCH, open jobs only) otherwise.
 class PostJobScreen extends StatefulWidget {
-  const PostJobScreen({super.key});
+  const PostJobScreen({super.key, this.existingJob});
+
+  final Map<String, dynamic>? existingJob;
 
   @override
   State<PostJobScreen> createState() => _PostJobScreenState();
 }
 
 class _PostJobScreenState extends State<PostJobScreen> {
-  final _titleController = TextEditingController();
-  final _wageController = TextEditingController();
-  String _skill = kSkillOptions.first;
+  late final _titleController = TextEditingController(text: widget.existingJob?['title'] as String?);
+  late final _wageController = TextEditingController(text: widget.existingJob?['daily_wage']?.toString());
+  late String _skill = widget.existingJob?['skill_needed'] as String? ?? kSkillOptions.first;
   DateTimeRange? _range;
   PlaceHit? _place;
   bool _loading = false;
   String? _error;
+
+  bool get _isEdit => widget.existingJob != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final job = widget.existingJob;
+    if (job != null) {
+      _range = DateTimeRange(start: DateTime.parse(job['start_date'] as String), end: DateTime.parse(job['end_date'] as String));
+      _place = PlaceHit(label: job['address_text'] as String? ?? '', latitude: (job['lat'] as num).toDouble(), longitude: (job['lng'] as num).toDouble());
+    }
+  }
 
   Future<void> _pickDates() async {
     final now = DateTime.now();
@@ -50,19 +65,25 @@ class _PostJobScreenState extends State<PostJobScreen> {
       _loading = true;
       _error = null;
     });
+    final body = {
+      'title': _titleController.text.trim(),
+      'skill_needed': _skill,
+      'lat': _place!.latitude,
+      'lng': _place!.longitude,
+      'address_text': _place!.label,
+      'start_date': _range!.start.toIso8601String().split('T').first,
+      'end_date': _range!.end.toIso8601String().split('T').first,
+      if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
+    };
     try {
-      await ApiClient(Config.apiBaseUrl).post('/jobs', {
-        'title': _titleController.text.trim(),
-        'skill_needed': _skill,
-        'lat': _place!.latitude,
-        'lng': _place!.longitude,
-        'address_text': _place!.label,
-        'start_date': _range!.start.toIso8601String().split('T').first,
-        'end_date': _range!.end.toIso8601String().split('T').first,
-        if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
-      });
+      final api = ApiClient(Config.apiBaseUrl);
+      if (_isEdit) {
+        await api.patch('/jobs/${widget.existingJob!['id']}', body);
+      } else {
+        await api.post('/jobs', body);
+      }
       if (!mounted) return;
-      showAppToast(context, 'Job posted successfully');
+      showAppToast(context, _isEdit ? 'Job updated' : 'Job posted successfully');
       Navigator.of(context).pop(true);
     } catch (e) {
       setState(() => _error = '$e');
@@ -76,7 +97,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: 'Post a job',
+      title: _isEdit ? 'Edit job' : 'Post a job',
       scroll: true,
       resizeForKeyboard: true,
       body: Column(
@@ -127,7 +148,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
             ErrorStrip(_error!),
             const SizedBox(height: AppSpacing.lg),
           ],
-          NeuButton(label: 'Post job', icon: Icons.check_rounded, loading: _loading, onPressed: _submit),
+          NeuButton(label: _isEdit ? 'Save changes' : 'Post job', icon: Icons.check_rounded, loading: _loading, onPressed: _submit),
         ],
       ),
     );

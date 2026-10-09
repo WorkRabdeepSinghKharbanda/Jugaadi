@@ -33,7 +33,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/complete');
       if (!mounted) return;
       showAppToast(context, 'Job marked complete');
-      setState(() => job = {...job, 'status': 'completed'});
+      setState(() => job = {...job, 'status': 'done'});
     } catch (e) {
       if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
     } finally {

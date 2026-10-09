@@ -17,7 +17,7 @@ class PillBadge extends StatelessWidget {
     final tone = switch (status) {
       'open' => PillTone.accent,
       'hired' || 'accepted' => PillTone.live,
-      'rejected' || 'cancelled' => PillTone.danger,
+      'rejected' || 'removed' => PillTone.danger,
       _ => PillTone.neutral,
     };
     return PillBadge(label: status, tone: tone);

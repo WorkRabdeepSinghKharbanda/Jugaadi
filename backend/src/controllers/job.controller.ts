@@ -96,3 +96,35 @@ export async function completeJob(req: Request, res: Response) {
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 }
+
+const EDITABLE_FIELDS = ['title', 'description', 'skill_needed', 'lat', 'lng', 'address_text', 'start_date', 'end_date', 'daily_wage'] as const;
+
+export async function updateJob(req: Request, res: Response) {
+  const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
+  if (jobError) return res.status(500).json({ error: jobError.message });
+  if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
+  if (job.status !== 'open') return res.status(409).json({ error: 'only open jobs can be edited' });
+
+  const patch: Record<string, unknown> = {};
+  for (const key of EDITABLE_FIELDS) {
+    if (key in req.body) patch[key] = req.body[key];
+  }
+  if (Object.keys(patch).length === 0) return res.status(400).json({ error: 'no editable fields provided' });
+
+  const { data, error } = await jobRepo.updateOpenJob(req.params.id, patch);
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(409).json({ error: 'job is no longer open' });
+  res.json(data);
+}
+
+export async function removeJob(req: Request, res: Response) {
+  const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
+  if (jobError) return res.status(500).json({ error: jobError.message });
+  if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
+  if (job.status !== 'open') return res.status(409).json({ error: 'only open jobs can be removed' });
+
+  const { data, error } = await jobRepo.removeOpenJob(req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(409).json({ error: 'job is no longer open' });
+  res.json({ ok: true });
+}

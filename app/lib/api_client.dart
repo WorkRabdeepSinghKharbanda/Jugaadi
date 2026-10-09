@@ -39,6 +39,15 @@ class ApiClient {
     );
     return _decode(res);
   }
+
+  Future<dynamic> patch(String path, [Map<String, dynamic>? body]) async {
+    final res = await http.patch(
+      Uri.parse('$baseUrl$path'),
+      headers: await _headers(),
+      body: body == null ? null : jsonEncode(body),
+    );
+    return _decode(res);
+  }
 }
 
 class ApiException implements Exception {
