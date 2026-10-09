@@ -1,7 +1,7 @@
 import { getAllContent, pathFor } from "@/lib/content";
 import { homeCopy } from "@/lib/home-copy";
-import { ui } from "@/lib/i18n";
 import type { Locale } from "@/lib/locale";
+import { APK_DOWNLOAD_URL } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FeatureCard } from "@/components/FeatureCard";
@@ -35,10 +35,10 @@ export function HomeView({ locale }: { locale: Locale }) {
           <h1>{c.heroH1}</h1>
           <p className="lede">{c.heroLede}</p>
           <p className="cta-row">
-            <a href="#waitlist" className="btn">
+            <a href="#download" className="btn">
               {c.ctaOwner}
             </a>
-            <a href="#waitlist" className="btn ghost">
+            <a href="#download" className="btn ghost">
               {c.ctaWorker}
             </a>
           </p>
@@ -83,28 +83,15 @@ export function HomeView({ locale }: { locale: Locale }) {
 
         <Faqs faqs={c.faqs} locale={locale} />
 
-        <section id="waitlist">
+        <section id="download">
           <div className="cta-band">
             <h2>{c.pilotHeading}</h2>
             <p>{c.pilotText}</p>
-            <form style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-              <input
-                type="text"
-                name="contact"
-                placeholder={c.waitlistPlaceholder}
-                required
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "var(--r-pill)",
-                  border: "1px solid var(--outline)",
-                  background: "var(--surface)",
-                  color: "var(--text)",
-                }}
-              />
-              <button type="submit" disabled title="Coming soon" className="btn">
-                {ui(locale).joinWaitlist}
-              </button>
-            </form>
+            {APK_DOWNLOAD_URL ? (
+              <a href={APK_DOWNLOAD_URL} className="btn" target="_blank" rel="noopener noreferrer">
+                {c.downloadBtn}
+              </a>
+            ) : null}
           </div>
         </section>
 

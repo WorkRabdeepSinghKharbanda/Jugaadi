@@ -3,7 +3,7 @@ import type { Locale } from "./locale";
 export const UI = {
   en: {
     nav: { features: "Features", alternatives: "Alternatives", blog: "Blog" },
-    joinWaitlist: "Join waitlist",
+    downloadApp: "Download app",
     faqHeading: "Frequently asked questions",
     home: "Home",
     footer: { findWorkers: "Find workers", features: "Features", compare: "Compare", company: "Company" },
@@ -16,7 +16,7 @@ export const UI = {
   },
   hi: {
     nav: { features: "सुविधाएं", alternatives: "विकल्प", blog: "ब्लॉग" },
-    joinWaitlist: "वेटलिस्ट जॉइन करें",
+    downloadApp: "ऐप डाउनलोड करें",
     faqHeading: "अक्सर पूछे जाने वाले सवाल",
     home: "होम",
     footer: { findWorkers: "वर्कर खोजें", features: "सुविधाएं", compare: "तुलना करें", company: "कंपनी" },
@@ -29,7 +29,7 @@ export const UI = {
   },
   hinglish: {
     nav: { features: "Features", alternatives: "Alternatives", blog: "Blog" },
-    joinWaitlist: "Waitlist join karo",
+    downloadApp: "App download karo",
     faqHeading: "Aksar poochhe jaane waale sawaal",
     home: "Home",
     footer: { findWorkers: "Worker dhoondo", features: "Features", compare: "Compare karo", company: "Company" },

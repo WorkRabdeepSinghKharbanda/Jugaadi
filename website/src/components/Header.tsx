@@ -26,8 +26,8 @@ export function Header({ locale, path = "/" }: { locale: Locale; path?: string }
             ))}
           </span>
         </nav>
-        <Link href={`${home === "/" ? "" : home}/#waitlist`} className="btn sm">
-          {t.joinWaitlist}
+        <Link href={`${home === "/" ? "" : home}/#download`} className="btn sm">
+          {t.downloadApp}
         </Link>
       </div>
     </header>
