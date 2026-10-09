@@ -12,6 +12,8 @@ import {
   completeJob,
   updateJob,
   removeJob,
+  createPhotoUploadUrl,
+  addJobPhoto,
 } from '../controllers/job.controller.js';
 
 const router = Router();
@@ -26,5 +28,7 @@ router.get('/jobs/:id/applicants', requireAuth, getApplicants);
 router.post('/jobs/:id/hire/:workerId', requireAuth, hireApplicant);
 router.post('/jobs/:id/complete', requireAuth, completeJob);
 router.post('/jobs/:id/remove', requireAuth, removeJob);
+router.post('/jobs/:id/photos/upload-url', requireAuth, createPhotoUploadUrl);
+router.post('/jobs/:id/photos', requireAuth, addJobPhoto);
 
 export default router;

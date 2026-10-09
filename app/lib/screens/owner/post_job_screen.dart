@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/job_photos.dart';
 import '../../core/services/place_gateway.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../auth/profile_setup_screen.dart';
+
+const _kMaxJobPhotos = 6;
 
 /// Create mode when [existingJob] is null; edit mode (PATCH, open jobs only) otherwise.
 class PostJobScreen extends StatefulWidget {
@@ -30,6 +33,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
   PlaceHit? _place;
   bool _loading = false;
   String? _error;
+  late final _photoUrls = <String>[...(widget.existingJob?['photo_urls'] as List<dynamic>? ?? const [])];
+  bool _uploadingPhotos = false;
 
   bool get _isEdit => widget.existingJob != null;
   bool get _initialSkillIsCustom {
@@ -60,6 +65,21 @@ class _PostJobScreenState extends State<PostJobScreen> {
   Future<void> _pickLocation() async {
     final place = await LocationPickerSheet.show(context);
     if (place != null && mounted) setState(() => _place = place);
+  }
+
+  Future<void> _addPhotos() async {
+    setState(() => _uploadingPhotos = true);
+    try {
+      final uploaded = await pickAndUploadJobPhotos(
+        '${widget.existingJob!['id']}',
+        remaining: _kMaxJobPhotos - _photoUrls.length,
+      );
+      if (mounted) setState(() => _photoUrls.addAll(uploaded));
+    } catch (e) {
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+    } finally {
+      if (mounted) setState(() => _uploadingPhotos = false);
+    }
   }
 
   Future<void> _submit() async {
@@ -161,6 +181,35 @@ class _PostJobScreenState extends State<PostJobScreen> {
               controller: _workersNeededController,
               icon: Icons.groups_outlined,
               keyboardType: TextInputType.number,
+            ),
+          ],
+          if (!_isEdit) ...[
+            const SizedBox(height: AppSpacing.md),
+            Text('You can add photos after posting, from the job\'s edit screen.', style: AppText.bodySmall.copyWith(color: c.textTertiary)),
+          ],
+          if (_isEdit) ...[
+            const SizedBox(height: AppSpacing.lg),
+            SectionHeader('Photos (${_photoUrls.length}/$_kMaxJobPhotos)'),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                for (final url in _photoUrls)
+                  ClipRRect(
+                    borderRadius: AppRadius.smAll,
+                    child: Image.network(url, width: 88, height: 88, fit: BoxFit.cover),
+                  ),
+                if (_photoUrls.length < _kMaxJobPhotos)
+                  NeuButton(
+                    label: 'Add',
+                    icon: Icons.add_a_photo_outlined,
+                    variant: NeuButtonVariant.ghost,
+                    expand: false,
+                    height: 88,
+                    loading: _uploadingPhotos,
+                    onPressed: _addPhotos,
+                  ),
+              ],
             ),
           ],
           const SizedBox(height: AppSpacing.lg),

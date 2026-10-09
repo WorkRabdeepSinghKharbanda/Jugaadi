@@ -102,6 +102,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Widget build(BuildContext context) {
     final c = context.colors;
     final status = job['status'] as String;
+    final photoUrls = (job['photo_urls'] as List<dynamic>?)?.cast<String>() ?? const [];
     final hiredWorkers = (job['hired_workers'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? const [];
     final ownerContact = job['owner'] as Map<String, dynamic>?;
     final isHiredAsWorker = !widget.isOwner && ownerContact != null;
@@ -119,6 +120,21 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 PillBadge.status(status),
               ],
             ),
+            if (photoUrls.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.lg),
+              SizedBox(
+                height: 140,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: photoUrls.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+                  itemBuilder: (_, i) => ClipRRect(
+                    borderRadius: AppRadius.mdAll,
+                    child: Image.network(photoUrls[i], width: 140, height: 140, fit: BoxFit.cover),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.lg),
             NeuCard(
               child: Column(

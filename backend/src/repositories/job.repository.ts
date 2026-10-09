@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { supabase } from '../config/db.js';
 
 export interface JobInput {
@@ -98,4 +99,33 @@ export async function updateOpenJob(jobId: string, patch: JobUpdateInput) {
 
 export async function removeOpenJob(jobId: string) {
   return supabase.from('jobs').update({ status: 'removed' }).eq('id', jobId).eq('status', 'open').select().maybeSingle();
+}
+
+const PHOTOS_BUCKET = 'job-photos';
+
+export async function createPhotoUploadUrl(jobId: string, ext: string) {
+  const path = `${jobId}/${randomUUID()}.${ext}`;
+  const { data, error } = await supabase.storage.from(PHOTOS_BUCKET).createSignedUploadUrl(path);
+  if (error) return { error };
+  return {
+    error: null,
+    path,
+    token: data.token,
+    publicUrl: supabase.storage.from(PHOTOS_BUCKET).getPublicUrl(path).data.publicUrl,
+  };
+}
+
+export async function photoCount(jobId: string) {
+  const { data, error } = await supabase.from('jobs').select('photo_urls').eq('id', jobId).maybeSingle();
+  if (error) return { data: 0, error };
+  return { data: (data?.photo_urls as string[] | undefined)?.length ?? 0, error: null };
+}
+
+export async function addJobPhoto(jobId: string, photoUrl: string): Promise<{ data: unknown; error: { message: string } | null }> {
+  const { data: job, error: fetchError } = await supabase.from('jobs').select('photo_urls').eq('id', jobId).maybeSingle();
+  if (fetchError) return { data: null, error: fetchError };
+  if (!job) return { data: null, error: { message: 'not found' } };
+  const photo_urls = [...(job.photo_urls as string[]), photoUrl];
+  const { data, error } = await supabase.from('jobs').update({ photo_urls }).eq('id', jobId).select().maybeSingle();
+  return { data, error };
 }

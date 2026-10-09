@@ -155,3 +155,38 @@ export async function removeJob(req: Request, res: Response) {
   if (!data) return res.status(409).json({ error: 'job is no longer open' });
   res.json({ ok: true });
 }
+
+const ALLOWED_PHOTO_EXT = ['jpg', 'jpeg', 'png', 'webp'];
+const MAX_PHOTOS = 6;
+
+export async function createPhotoUploadUrl(req: Request, res: Response) {
+  const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
+  if (jobError) return res.status(500).json({ error: jobError.message });
+  if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
+
+  const ext = String(req.body.ext ?? '').toLowerCase().replace(/^\./, '');
+  if (!ALLOWED_PHOTO_EXT.includes(ext)) {
+    return res.status(400).json({ error: `ext must be one of ${ALLOWED_PHOTO_EXT.join(', ')}` });
+  }
+
+  const result = await jobRepo.createPhotoUploadUrl(req.params.id, ext);
+  if (result.error) return res.status(500).json({ error: result.error.message });
+  res.json({ path: result.path, token: result.token, publicUrl: result.publicUrl });
+}
+
+export async function addJobPhoto(req: Request, res: Response) {
+  const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
+  if (jobError) return res.status(500).json({ error: jobError.message });
+  if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
+
+  const photoUrl = req.body.photo_url;
+  if (typeof photoUrl !== 'string' || !photoUrl) return res.status(400).json({ error: 'photo_url is required' });
+
+  const { data: photoCount, error: countError } = await jobRepo.photoCount(req.params.id);
+  if (countError) return res.status(500).json({ error: countError.message });
+  if (photoCount >= MAX_PHOTOS) return res.status(400).json({ error: `a job can have at most ${MAX_PHOTOS} photos` });
+
+  const { data, error } = await jobRepo.addJobPhoto(req.params.id, photoUrl);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+}
