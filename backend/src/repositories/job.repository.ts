@@ -47,7 +47,9 @@ export async function getJobWithOwner(jobId: string) {
 export async function acceptedWorkersForJob(jobId: string) {
   return supabase
     .from('job_applications')
-    .select('worker_id, worker:profiles!job_applications_worker_id_fkey(phone, contact_phone, email, full_name, is_deleted)')
+    .select(
+      'worker_id, worker:profiles!job_applications_worker_id_fkey(phone, contact_phone, email, full_name, is_deleted, is_verified, bio, city, worker_skills(skill))'
+    )
     .eq('job_id', jobId)
     .eq('status', 'accepted');
 }

@@ -47,9 +47,16 @@ export async function getMyJobs(req: Request, res: Response) {
 // different reach-out number; falls back to the login phone when they never set one.
 function revealContact(p: any) {
   if (!p) return undefined;
-  return p.is_deleted
-    ? { full_name: 'Deleted user', phone: null, email: null }
-    : { full_name: p.full_name, phone: p.contact_phone ?? p.phone, email: p.email };
+  if (p.is_deleted) return { full_name: 'Deleted user', phone: null, email: null };
+  return {
+    full_name: p.full_name,
+    phone: p.contact_phone ?? p.phone,
+    email: p.email,
+    is_verified: p.is_verified,
+    bio: p.bio,
+    city: p.city,
+    worker_skills: p.worker_skills,
+  };
 }
 
 export async function getJobDetail(req: Request, res: Response) {

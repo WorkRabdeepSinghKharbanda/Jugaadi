@@ -111,24 +111,62 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       if (i < hiredSection) {
                         if (i == 0) return SectionHeader('Hired (${hiredWorkers.length})');
                         final w = hiredWorkers[i - 1] as Map<String, dynamic>;
+                        final wVerified = w['is_verified'] == true;
+                        final wSkills = (w['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String).toList() ?? const [];
+                        final wBio = w['bio'] as String?;
+                        final wCity = w['city'] as String?;
                         return Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.md),
                           child: NeuCard(
                             gradientBorder: true,
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(Icons.check_circle_rounded, color: c.live),
-                                const SizedBox(width: AppSpacing.md),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                Row(
+                                  children: [
+                                    Icon(Icons.check_circle_rounded, color: c.live),
+                                    const SizedBox(width: AppSpacing.md),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(w['full_name'] as String? ?? '-', style: AppText.title),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.phone_rounded, size: 14, color: c.textTertiary),
+                                              const SizedBox(width: 4),
+                                              Text(w['phone'] as String? ?? '-', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (wVerified) const PillBadge.verified(),
+                                  ],
+                                ),
+                                if (wCity != null && wCity.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Row(
                                     children: [
-                                      Text(w['full_name'] as String? ?? '-', style: AppText.title),
-                                      const SizedBox(height: 4),
-                                      Text(w['phone'] as String? ?? '-', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                      Icon(Icons.location_city_rounded, size: 16, color: c.textTertiary),
+                                      const SizedBox(width: 4),
+                                      Text(wCity, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                                     ],
                                   ),
-                                ),
+                                ],
+                                if (wBio != null && wBio.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Text(wBio, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                ],
+                                if (wSkills.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Wrap(
+                                    spacing: AppSpacing.xs,
+                                    runSpacing: AppSpacing.xs,
+                                    children: wSkills.map((s) => PillBadge(label: s)).toList(),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
