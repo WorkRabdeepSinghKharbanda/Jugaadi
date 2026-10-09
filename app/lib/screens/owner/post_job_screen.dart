@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/location.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../auth/profile_setup_screen.dart';
@@ -42,9 +42,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       _error = null;
     });
     try {
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-      );
+      final position = await getCurrentPositionOrThrow();
       await ApiClient(Config.apiBaseUrl).post('/jobs', {
         'title': _titleController.text.trim(),
         'skill_needed': _skill,

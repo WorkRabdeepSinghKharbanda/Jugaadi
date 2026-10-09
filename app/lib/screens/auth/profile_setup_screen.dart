@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/location.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../main.dart';
@@ -31,9 +31,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       _error = null;
     });
     try {
-      var position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-      );
+      var position = await getCurrentPositionOrThrow();
 
       final api = ApiClient(Config.apiBaseUrl);
       await api.post('/profile', {

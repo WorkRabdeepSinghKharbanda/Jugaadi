@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/location.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
@@ -23,9 +23,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Future<List<dynamic>> _load() async {
-    final position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-    );
+    final position = await getCurrentPositionOrThrow();
     final data = await ApiClient(Config.apiBaseUrl).get('/jobs/nearby', {
       'lat': position.latitude,
       'lng': position.longitude,
@@ -47,7 +45,24 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return Center(child: CircularProgressIndicator(color: c.accent));
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Center(child: CircularProgressIndicator(color: c.accent));
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: AppSpacing.screen,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ErrorStrip('${snapshot.error}'),
+                      const SizedBox(height: AppSpacing.md),
+                      NeuButton(label: 'Retry', expand: false, onPressed: _refresh),
+                    ],
+                  ),
+                ),
+              );
+            }
             final jobs = snapshot.data!;
             if (jobs.isEmpty) return const EmptyState(icon: Icons.search_off_rounded, text: 'No open jobs nearby');
             return ListView.builder(

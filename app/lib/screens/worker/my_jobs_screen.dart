@@ -38,7 +38,24 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return Center(child: CircularProgressIndicator(color: c.accent));
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Center(child: CircularProgressIndicator(color: c.accent));
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: AppSpacing.screen,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ErrorStrip('${snapshot.error}'),
+                      const SizedBox(height: AppSpacing.md),
+                      NeuButton(label: 'Retry', expand: false, onPressed: () => setState(() => _future = _load())),
+                    ],
+                  ),
+                ),
+              );
+            }
             final applications = snapshot.data!;
             if (applications.isEmpty) return const EmptyState(icon: Icons.inbox_outlined, text: 'No applications yet');
             return ListView.builder(

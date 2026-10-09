@@ -53,7 +53,24 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return Center(child: CircularProgressIndicator(color: c.accent));
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Center(child: CircularProgressIndicator(color: c.accent));
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: AppSpacing.screen,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ErrorStrip('${snapshot.error}'),
+                      const SizedBox(height: AppSpacing.md),
+                      NeuButton(label: 'Retry', expand: false, onPressed: _refresh),
+                    ],
+                  ),
+                ),
+              );
+            }
             final jobs = snapshot.data!;
             if (jobs.isEmpty) {
               return const EmptyState(icon: Icons.work_outline_rounded, text: 'No jobs posted yet');
