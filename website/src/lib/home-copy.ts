@@ -2,6 +2,8 @@ import type { Locale } from "./locale";
 
 export const HOME_COPY = {
   en: {
+    eyebrow: "Verified workers, same day",
+    statStrip: ["1 city, pilot stage", "Manually verified workers", "No agency commission"],
     heroH1: "Need a worker for a day? Or found one for the day?",
     heroLede:
       "Jugaadi connects shop owners and households with verified temporary workers nearby — for 1 day, 3 days, or a week.",
@@ -28,6 +30,8 @@ export const HOME_COPY = {
     ],
   },
   hi: {
+    eyebrow: "वेरिफाइड वर्कर, उसी दिन",
+    statStrip: ["1 शहर, पायलट स्टेज", "मैनुअली वेरिफाइड वर्कर", "कोई एजेंसी कमीशन नहीं"],
     heroH1: "एक दिन के लिए वर्कर चाहिए? या एक दिन के काम के लिए मिल गया?",
     heroLede: "Jugaadi दुकान मालिकों और घरों को पास के वेरिफाइड टेम्पररी वर्कर से जोड़ता है — 1 दिन, 3 दिन, या एक हफ्ते के लिए।",
     ctaOwner: "मुझे वर्कर चाहिए",
@@ -53,6 +57,8 @@ export const HOME_COPY = {
     ],
   },
   hinglish: {
+    eyebrow: "Verified workers, usi din",
+    statStrip: ["1 city, pilot stage", "Manually verified workers", "Koi agency commission nahi"],
     heroH1: "Ek din ke liye worker chahiye? Ya ek din ke kaam ke liye mil gaya?",
     heroLede: "Jugaadi shop owners aur gharon ko paas ke verified temporary workers se jodta hai — 1 din, 3 din, ya ek hafte ke liye.",
     ctaOwner: "Mujhe worker chahiye",

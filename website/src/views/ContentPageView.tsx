@@ -8,6 +8,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faqs } from "@/components/Faqs";
 import { CtaBand } from "@/components/CtaBand";
 import { JsonLd } from "@/components/JsonLd";
+import { TrustBadge } from "@/components/TrustBadge";
 import { breadcrumbList, faqPage, blogPosting } from "@/lib/jsonld";
 
 const HUB: Record<Exclude<ContentType, "landing">, string> = {
@@ -45,13 +46,16 @@ export async function ContentPageView({ type, slug, locale }: { type: ContentTyp
         <article>
           <JsonLd data={jsonld} />
           <Breadcrumbs items={crumbs} />
+          {type === "feature" && slug === "verified-workers" && (
+            <TrustBadge label={locale === "hi" ? "वेरिफाइड" : locale === "hinglish" ? "Verified" : "Verified"} />
+          )}
           <h1>{page.title}</h1>
           {page.date && (
             <p>
               <em>{page.date}</em>
             </p>
           )}
-          <div dangerouslySetInnerHTML={{ __html: page.html }} />
+          <div className="prose" dangerouslySetInnerHTML={{ __html: page.html }} />
           <Faqs faqs={page.faqs} locale={locale} />
           {page.competitor && (
             <p style={{ fontSize: 12, color: "var(--text-3)" }}>

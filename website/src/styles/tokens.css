@@ -33,5 +33,7 @@
   --fs-h1: clamp(30px, 5vw, 44px);
   --fs-h2: clamp(24px, 4vw, 34px);
   --fs-lede: clamp(17px, 1.6vw, 20px);
+  --fs-eyebrow: 13px;
+  --card-icon-size: 40px;
 }
 @media (prefers-reduced-motion: reduce) { :root { --dur: 0ms; } }
