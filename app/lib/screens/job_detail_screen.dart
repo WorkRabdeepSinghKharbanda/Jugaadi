@@ -20,6 +20,16 @@ class JobDetailScreen extends StatefulWidget {
 class _JobDetailScreenState extends State<JobDetailScreen> {
   late Map<String, dynamic> job;
   bool _loading = false;
+  int _rating = 0;
+  final _commentController = TextEditingController();
+  bool _reviewSubmitting = false;
+  bool _reviewDone = false;
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -38,6 +48,33 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _submitReview() async {
+    if (_rating == 0) {
+      showAppToast(context, 'Pick a star rating first', tone: ToastTone.error);
+      return;
+    }
+    setState(() => _reviewSubmitting = true);
+    try {
+      await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/review', {
+        'rating': _rating,
+        if (_commentController.text.trim().isNotEmpty) 'comment': _commentController.text.trim(),
+      });
+      if (!mounted) return;
+      showAppToast(context, 'Review submitted');
+      setState(() => _reviewDone = true);
+    } on ApiException catch (e) {
+      if (e.statusCode == 409) {
+        if (mounted) setState(() => _reviewDone = true);
+      } else if (mounted) {
+        showAppToast(context, '$e', tone: ToastTone.error);
+      }
+    } catch (e) {
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+    } finally {
+      if (mounted) setState(() => _reviewSubmitting = false);
     }
   }
 
@@ -112,6 +149,35 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ],
                 ),
               ),
+            ],
+            if (status == 'done' && contact != null && !_reviewDone) ...[
+              const SizedBox(height: AppSpacing.lg),
+              SectionHeader(widget.isOwner ? 'Rate the worker' : 'Rate the owner'),
+              NeuCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        5,
+                        (i) => IconButton(
+                          icon: Icon(i < _rating ? Icons.star_rounded : Icons.star_outline_rounded, color: c.accent, size: 32),
+                          onPressed: () => setState(() => _rating = i + 1),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    NeuTextField(label: 'Comment (optional)', controller: _commentController, icon: Icons.chat_bubble_outline_rounded),
+                    const SizedBox(height: AppSpacing.md),
+                    NeuButton(label: 'Submit review', loading: _reviewSubmitting, onPressed: _submitReview),
+                  ],
+                ),
+              ),
+            ],
+            if (status == 'done' && _reviewDone) ...[
+              const SizedBox(height: AppSpacing.lg),
+              ErrorStrip('You\'ve already reviewed this job', warning: true),
             ],
             const SizedBox(height: AppSpacing.xl),
             if (!widget.isOwner && status == 'open') NeuButton(label: 'Apply', icon: Icons.send_rounded, loading: _loading, onPressed: _apply),
