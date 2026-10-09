@@ -35,8 +35,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
   String? _error;
   late final _photoUrls = <String>[...(widget.existingJob?['photo_urls'] as List<dynamic>? ?? const [])];
   bool _uploadingPhotos = false;
+  // Set once a brand-new job gets silently created (first "Add photos" tap needs a job id to
+  // attach to) — from then on this screen behaves like edit mode even though it started as create.
+  Map<String, dynamic>? _createdJob;
 
+  // Whether this screen started in edit mode (controls title/copy — "workers needed" stays
+  // create-only regardless of whether a job got silently created via the photo flow below).
   bool get _isEdit => widget.existingJob != null;
+  Map<String, dynamic>? get _job => widget.existingJob ?? _createdJob;
+  bool get _hasJobId => _job != null;
   bool get _initialSkillIsCustom {
     final existing = widget.existingJob?['skill_needed'] as String?;
     return existing != null && !kSkillOptions.contains(existing);
@@ -67,40 +74,23 @@ class _PostJobScreenState extends State<PostJobScreen> {
     if (place != null && mounted) setState(() => _place = place);
   }
 
-  Future<void> _addPhotos() async {
-    setState(() => _uploadingPhotos = true);
-    try {
-      final uploaded = await pickAndUploadJobPhotos(
-        '${widget.existingJob!['id']}',
-        remaining: _kMaxJobPhotos - _photoUrls.length,
-      );
-      if (mounted) setState(() => _photoUrls.addAll(uploaded));
-    } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
-    } finally {
-      if (mounted) setState(() => _uploadingPhotos = false);
-    }
-  }
-
-  Future<void> _submit() async {
+  /// Validates the form same as a real submit, and returns the field body — used both by the
+  /// final submit and by the "silently create so photos have somewhere to attach" path.
+  Map<String, dynamic>? _buildBodyOrShowError() {
     if (_range == null) {
       setState(() => _error = 'Pick start and end dates');
-      return;
+      return null;
     }
     if (_place == null) {
       setState(() => _error = 'Set the job location first');
-      return;
+      return null;
     }
     final skillNeeded = _skill == _kOtherSkill ? _customSkillController.text.trim() : _skill;
     if (skillNeeded.isEmpty) {
       setState(() => _error = 'Type the skill needed');
-      return;
+      return null;
     }
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    final body = {
+    return {
       'title': _titleController.text.trim(),
       'skill_needed': skillNeeded,
       'lat': _place!.latitude,
@@ -111,15 +101,50 @@ class _PostJobScreenState extends State<PostJobScreen> {
       if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
       if (!_isEdit) 'workers_needed': int.tryParse(_workersNeededController.text.trim()) ?? 1,
     };
+  }
+
+  Future<void> _addPhotos() async {
+    if (!_hasJobId) {
+      final body = _buildBodyOrShowError();
+      if (body == null) return;
+      setState(() => _uploadingPhotos = true);
+      try {
+        final created = await ApiClient(Config.apiBaseUrl).post('/jobs', body) as Map<String, dynamic>;
+        setState(() => _createdJob = created);
+      } catch (e) {
+        if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+        if (mounted) setState(() => _uploadingPhotos = false);
+        return;
+      }
+    } else {
+      setState(() => _uploadingPhotos = true);
+    }
+    try {
+      final uploaded = await pickAndUploadJobPhotos('${_job!['id']}', remaining: _kMaxJobPhotos - _photoUrls.length);
+      if (mounted) setState(() => _photoUrls.addAll(uploaded));
+    } catch (e) {
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+    } finally {
+      if (mounted) setState(() => _uploadingPhotos = false);
+    }
+  }
+
+  Future<void> _submit() async {
+    final body = _buildBodyOrShowError();
+    if (body == null) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final api = ApiClient(Config.apiBaseUrl);
-      if (_isEdit) {
-        await api.patch('/jobs/${widget.existingJob!['id']}', body);
+      if (_hasJobId) {
+        await api.patch('/jobs/${_job!['id']}', body);
       } else {
         await api.post('/jobs', body);
       }
       if (!mounted) return;
-      showAppToast(context, _isEdit ? 'Job updated' : 'Job posted successfully');
+      showAppToast(context, _hasJobId ? 'Job updated' : 'Job posted successfully');
       Navigator.of(context).pop(true);
     } catch (e) {
       setState(() => _error = '$e');
@@ -183,35 +208,29 @@ class _PostJobScreenState extends State<PostJobScreen> {
               keyboardType: TextInputType.number,
             ),
           ],
-          if (!_isEdit) ...[
-            const SizedBox(height: AppSpacing.md),
-            Text('You can add photos after posting, from the job\'s edit screen.', style: AppText.bodySmall.copyWith(color: c.textTertiary)),
-          ],
-          if (_isEdit) ...[
-            const SizedBox(height: AppSpacing.lg),
-            SectionHeader('Photos (${_photoUrls.length}/$_kMaxJobPhotos)'),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: [
-                for (final url in _photoUrls)
-                  ClipRRect(
-                    borderRadius: AppRadius.smAll,
-                    child: Image.network(url, width: 88, height: 88, fit: BoxFit.cover),
-                  ),
-                if (_photoUrls.length < _kMaxJobPhotos)
-                  NeuButton(
-                    label: 'Add',
-                    icon: Icons.add_a_photo_outlined,
-                    variant: NeuButtonVariant.ghost,
-                    expand: false,
-                    height: 88,
-                    loading: _uploadingPhotos,
-                    onPressed: _addPhotos,
-                  ),
-              ],
-            ),
-          ],
+          const SizedBox(height: AppSpacing.lg),
+          SectionHeader('Photos (${_photoUrls.length}/$_kMaxJobPhotos)'),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              for (final url in _photoUrls)
+                ClipRRect(
+                  borderRadius: AppRadius.smAll,
+                  child: Image.network(url, width: 88, height: 88, fit: BoxFit.cover),
+                ),
+              if (_photoUrls.length < _kMaxJobPhotos)
+                NeuButton(
+                  label: 'Add',
+                  icon: Icons.add_a_photo_outlined,
+                  variant: NeuButtonVariant.ghost,
+                  expand: false,
+                  height: 88,
+                  loading: _uploadingPhotos,
+                  onPressed: _addPhotos,
+                ),
+            ],
+          ),
           const SizedBox(height: AppSpacing.lg),
           NeuButton(
             label: _range == null
@@ -226,7 +245,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
             ErrorStrip(_error!),
             const SizedBox(height: AppSpacing.lg),
           ],
-          NeuButton(label: _isEdit ? 'Save changes' : 'Post job', icon: Icons.check_rounded, loading: _loading, onPressed: _submit),
+          NeuButton(label: _hasJobId ? 'Save changes' : 'Post job', icon: Icons.check_rounded, loading: _loading, onPressed: _submit),
         ],
       ),
     );
