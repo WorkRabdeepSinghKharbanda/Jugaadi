@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+
+# Flutter
+app/.dart_tool/
+app/build/
+app/.flutter-plugin-dependencies
+
+# Astro
+website/.astro/
+website/dist/
+website/node_modules/
