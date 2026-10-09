@@ -5,6 +5,7 @@ import '../../core/location.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
+import '../admin/admin_home_screen.dart';
 import '../job_detail_screen.dart';
 import '../owner/owner_home_screen.dart';
 import '../plans_screen.dart';
@@ -19,11 +20,22 @@ class WorkerHomeScreen extends StatefulWidget {
 
 class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   late Future<List<dynamic>> _future;
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _future = _load();
+    _checkAdmin();
+  }
+
+  Future<void> _checkAdmin() async {
+    try {
+      final profile = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
+      if (mounted) setState(() => _isAdmin = profile['is_admin'] == true);
+    } catch (_) {
+      // not critical — the admin icon just stays hidden
+    }
   }
 
   Future<List<dynamic>> _load() async {
@@ -54,6 +66,12 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       appBar: AppBar(
         title: const Text('Nearby jobs'),
         actions: [
+          if (_isAdmin)
+            IconButton(
+              icon: const Icon(Icons.admin_panel_settings_outlined),
+              tooltip: 'Admin console',
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
+            ),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
             tooltip: 'Post a job instead',
