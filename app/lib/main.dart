@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clarity_flutter/clarity_flutter.dart';
 import 'api_client.dart';
 import 'config.dart';
+import 'theme.dart';
 import 'screens/auth/phone_auth_screen.dart';
 import 'screens/auth/role_select_screen.dart';
 import 'screens/owner/owner_home_screen.dart';
@@ -26,8 +27,9 @@ class _NotConfiguredApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
+    return MaterialApp(
+      theme: jugaadiTheme(),
+      home: const Scaffold(
         body: Center(
           child: Padding(
             padding: EdgeInsets.all(24),
@@ -53,7 +55,7 @@ class JugaadiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Jugaadi',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange)),
+      theme: jugaadiTheme(),
       home: const RootRouter(),
     );
   }
