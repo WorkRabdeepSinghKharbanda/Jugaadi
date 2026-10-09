@@ -52,6 +52,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       });
 
       if (!mounted) return;
+      showAppToast(context, 'Profile saved');
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const RootRouter()),
         (route) => false,

@@ -32,9 +32,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/complete');
       if (!mounted) return;
+      showAppToast(context, 'Job marked complete');
       setState(() => job = {...job, 'status': 'completed'});
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -45,10 +46,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/apply');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Applied')));
+      showAppToast(context, 'Applied successfully');
       Navigator.of(context).pop();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }

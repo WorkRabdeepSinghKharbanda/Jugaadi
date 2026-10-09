@@ -31,9 +31,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${widget.jobId}/hire/$workerId');
       if (!mounted) return;
+      showAppToast(context, 'Worker hired');
       Navigator.of(context).pop(true);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
     }
   }
 

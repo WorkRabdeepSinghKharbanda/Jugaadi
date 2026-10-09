@@ -62,6 +62,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
       });
       if (!mounted) return;
+      showAppToast(context, 'Job posted successfully');
       Navigator.of(context).pop(true);
     } catch (e) {
       setState(() => _error = '$e');
