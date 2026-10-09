@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   },
   description:
     "Jugaadi connects shop owners and households with verified nearby workers for 1 day to 1 week gigs.",
+  verification: {
+    google: "kCnHcd-bJBBVDMlmVNxSUX0BeGjeyEf17j31SsQBwP8",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
