@@ -10,6 +10,9 @@ app/build/
 app/.flutter-plugin-dependencies
 app/.env.production
 
+# Backend (TypeScript)
+backend/dist/
+
 # Astro
 website/.astro/
 website/dist/

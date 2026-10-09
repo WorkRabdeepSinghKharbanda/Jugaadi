@@ -1,6 +1,8 @@
+import type { Request, Response } from 'express';
 import * as profileRepo from '../repositories/profile.repository.js';
+import '../types.js';
 
-export async function createOrUpdateProfile(req, res) {
+export async function createOrUpdateProfile(req: Request, res: Response) {
   const { role, full_name, phone, photo_url, city, lat, lng, skills } = req.body;
   if (!role || !full_name || !phone) {
     return res.status(400).json({ error: 'role, full_name, phone are required' });
@@ -19,7 +21,7 @@ export async function createOrUpdateProfile(req, res) {
   res.json({ ok: true });
 }
 
-export async function getMyProfile(req, res) {
+export async function getMyProfile(req: Request, res: Response) {
   const { data, error } = await profileRepo.getProfile(req.userId);
   if (error) return res.status(500).json({ error: error.message });
   if (!data) return res.status(404).json({ error: 'profile not found' });

@@ -98,6 +98,22 @@ class _RootRouterState extends State<RootRouter> {
         if (!snapshot.hasData && snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Couldn\'t load your profile. Check your connection.'),
+                  TextButton(
+                    onPressed: () => setState(() => _profileFuture = _loadProfile()),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         final profile = snapshot.data;
         if (profile == null || profile.isEmpty) return const RoleSelectScreen();
         return profile['role'] == 'owner' ? const OwnerHomeScreen() : const WorkerTabs();

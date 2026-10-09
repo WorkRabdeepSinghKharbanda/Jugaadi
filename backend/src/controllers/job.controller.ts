@@ -1,6 +1,8 @@
+import type { Request, Response } from 'express';
 import * as jobRepo from '../repositories/job.repository.js';
+import '../types.js';
 
-export async function postJob(req, res) {
+export async function postJob(req: Request, res: Response) {
   const { title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage } = req.body;
   if (!title || !skill_needed || lat == null || lng == null || !start_date || !end_date) {
     return res.status(400).json({ error: 'title, skill_needed, lat, lng, start_date, end_date are required' });
@@ -13,7 +15,7 @@ export async function postJob(req, res) {
   res.status(201).json(data);
 }
 
-export async function getNearbyJobs(req, res) {
+export async function getNearbyJobs(req: Request, res: Response) {
   const lat = Number(req.query.lat);
   const lng = Number(req.query.lng);
   const radius = req.query.radius ? Number(req.query.radius) : 5000;
@@ -26,19 +28,19 @@ export async function getNearbyJobs(req, res) {
   res.json(data);
 }
 
-export async function getMyApplications(req, res) {
+export async function getMyApplications(req: Request, res: Response) {
   const { data, error } = await jobRepo.applicationsByWorker(req.userId);
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 }
 
-export async function getMyJobs(req, res) {
+export async function getMyJobs(req: Request, res: Response) {
   const { data, error } = await jobRepo.jobsByOwner(req.userId);
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 }
 
-export async function getJobDetail(req, res) {
+export async function getJobDetail(req: Request, res: Response) {
   const { data: job, error } = await jobRepo.getJobWithContacts(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   if (!job) return res.status(404).json({ error: 'not found' });
@@ -54,13 +56,13 @@ export async function getJobDetail(req, res) {
   });
 }
 
-export async function applyToJob(req, res) {
+export async function applyToJob(req: Request, res: Response) {
   const { data, error } = await jobRepo.applyToJob(req.params.id, req.userId);
   if (error) return res.status(500).json({ error: error.message });
   res.status(201).json(data);
 }
 
-export async function getApplicants(req, res) {
+export async function getApplicants(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
   if (jobError) return res.status(500).json({ error: jobError.message });
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
@@ -70,7 +72,7 @@ export async function getApplicants(req, res) {
   res.json(data);
 }
 
-export async function hireApplicant(req, res) {
+export async function hireApplicant(req: Request, res: Response) {
   const { id, workerId } = req.params;
 
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(id);
@@ -78,12 +80,13 @@ export async function hireApplicant(req, res) {
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
   if (job.status !== 'open') return res.status(409).json({ error: 'job is not open' });
 
-  const { error } = await jobRepo.hireWorker(id, workerId);
+  const { error, conflict } = await jobRepo.hireWorker(id, workerId);
+  if (conflict) return res.status(409).json({ error: error!.message });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 }
 
-export async function completeJob(req, res) {
+export async function completeJob(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
   if (jobError) return res.status(500).json({ error: jobError.message });
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
