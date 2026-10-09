@@ -19,6 +19,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _editing = false;
   final _contactController = TextEditingController();
   final _bioController = TextEditingController();
+  final _customSkillController = TextEditingController();
   final _selectedSkills = <String>{};
   bool _saving = false;
   String? _error;
@@ -45,7 +46,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void dispose() {
     _contactController.dispose();
     _bioController.dispose();
+    _customSkillController.dispose();
     super.dispose();
+  }
+
+  void _addCustomSkill() {
+    final skill = _customSkillController.text.trim();
+    if (skill.isEmpty) return;
+    setState(() {
+      _selectedSkills.add(skill);
+      _customSkillController.clear();
+    });
   }
 
   Future<void> _deleteAccount() async {
@@ -215,6 +226,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             }),
                           ))
                       .toList(),
+                ),
+                if (_selectedSkills.any((s) => !kSkillOptions.contains(s))) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
+                    children: _selectedSkills
+                        .where((s) => !kSkillOptions.contains(s))
+                        .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _selectedSkills.remove(s))))
+                        .toList(),
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    Expanded(
+                      child: NeuTextField(
+                        label: 'Other skill',
+                        controller: _customSkillController,
+                        hint: 'Type a skill not listed above',
+                        onSubmitted: (_) => _addCustomSkill(),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    NeuButton(label: 'Add', expand: false, height: 48, onPressed: _addCustomSkill),
+                  ],
                 ),
               ],
               const SizedBox(height: AppSpacing.lg),

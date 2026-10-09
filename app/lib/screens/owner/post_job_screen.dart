@@ -16,16 +16,25 @@ class PostJobScreen extends StatefulWidget {
   State<PostJobScreen> createState() => _PostJobScreenState();
 }
 
+const _kOtherSkill = 'Other';
+
 class _PostJobScreenState extends State<PostJobScreen> {
   late final _titleController = TextEditingController(text: widget.existingJob?['title'] as String?);
   late final _wageController = TextEditingController(text: widget.existingJob?['daily_wage']?.toString());
-  late String _skill = widget.existingJob?['skill_needed'] as String? ?? kSkillOptions.first;
+  late final _customSkillController = TextEditingController(
+    text: _initialSkillIsCustom ? (widget.existingJob?['skill_needed'] as String?) : null,
+  );
+  late String _skill = _initialSkillIsCustom ? _kOtherSkill : (widget.existingJob?['skill_needed'] as String? ?? kSkillOptions.first);
   DateTimeRange? _range;
   PlaceHit? _place;
   bool _loading = false;
   String? _error;
 
   bool get _isEdit => widget.existingJob != null;
+  bool get _initialSkillIsCustom {
+    final existing = widget.existingJob?['skill_needed'] as String?;
+    return existing != null && !kSkillOptions.contains(existing);
+  }
 
   @override
   void initState() {
@@ -61,13 +70,18 @@ class _PostJobScreenState extends State<PostJobScreen> {
       setState(() => _error = 'Set the job location first');
       return;
     }
+    final skillNeeded = _skill == _kOtherSkill ? _customSkillController.text.trim() : _skill;
+    if (skillNeeded.isEmpty) {
+      setState(() => _error = 'Type the skill needed');
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
     });
     final body = {
       'title': _titleController.text.trim(),
-      'skill_needed': _skill,
+      'skill_needed': skillNeeded,
       'lat': _place!.latitude,
       'lng': _place!.longitude,
       'address_text': _place!.label,
@@ -109,10 +123,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
             initialValue: _skill,
-            items: kSkillOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            items: [...kSkillOptions, _kOtherSkill].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
             onChanged: (v) => setState(() => _skill = v!),
             dropdownColor: c.surfaceHigh,
           ),
+          if (_skill == _kOtherSkill) ...[
+            const SizedBox(height: AppSpacing.md),
+            NeuTextField(label: 'Specify skill', controller: _customSkillController, hint: 'Type the skill needed'),
+          ],
           const SizedBox(height: AppSpacing.md),
           Text('LOCATION', style: AppText.label.copyWith(color: c.textSecondary)),
           const SizedBox(height: AppSpacing.sm),

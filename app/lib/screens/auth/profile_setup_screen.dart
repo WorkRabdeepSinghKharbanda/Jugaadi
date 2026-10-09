@@ -6,7 +6,26 @@ import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../main.dart';
 
-const kSkillOptions = ['loading-unloading', 'helper', 'cleaning', 'cook', 'delivery', 'packing'];
+const kSkillOptions = [
+  'loading-unloading',
+  'helper',
+  'cleaning',
+  'cook',
+  'delivery',
+  'packing',
+  'driver',
+  'electrician',
+  'plumber',
+  'carpenter',
+  'painter',
+  'security-guard',
+  'gardener',
+  'mason',
+  'welder',
+  'babysitter/caretaker',
+  'event-staff',
+  'warehouse-labour',
+];
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key, required this.role});
@@ -20,10 +39,20 @@ class ProfileSetupScreen extends StatefulWidget {
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _customSkillController = TextEditingController();
   final _selectedSkills = <String>{};
   PlaceHit? _place;
   bool _loading = false;
   String? _error;
+
+  void _addCustomSkill() {
+    final skill = _customSkillController.text.trim();
+    if (skill.isEmpty) return;
+    setState(() {
+      _selectedSkills.add(skill);
+      _customSkillController.clear();
+    });
+  }
 
   Future<void> _pickLocation() async {
     final place = await LocationPickerSheet.show(context);
@@ -112,6 +141,32 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         }),
                       ))
                   .toList(),
+            ),
+            if (_selectedSkills.any((s) => !kSkillOptions.contains(s))) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: _selectedSkills
+                    .where((s) => !kSkillOptions.contains(s))
+                    .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _selectedSkills.remove(s))))
+                    .toList(),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: NeuTextField(
+                    label: 'Other skill',
+                    controller: _customSkillController,
+                    hint: 'Type a skill not listed above',
+                    onSubmitted: (_) => _addCustomSkill(),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                NeuButton(label: 'Add', expand: false, height: 48, onPressed: _addCustomSkill),
+              ],
             ),
           ],
           const SizedBox(height: AppSpacing.lg),
