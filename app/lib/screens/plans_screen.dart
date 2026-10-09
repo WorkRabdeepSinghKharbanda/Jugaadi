@@ -72,7 +72,9 @@ class _PlansScreenState extends State<PlansScreen> {
       });
       if (!mounted) return;
       showAppToast(context, 'Upgraded to Pro!');
-      setState(() => _future = _load());
+      // Whoever opened this screen (home, or a plan-limit redirect from apply/post) is right
+      // below on the stack — pop back to them instead of leaving the user stranded here.
+      Navigator.of(context).pop();
     } catch (e) {
       if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
     } finally {
@@ -122,49 +124,78 @@ class _PlansScreenState extends State<PlansScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NeuCard(
-                gradientBorder: isPro,
+                gradientBorder: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(child: Text(isPro ? 'Pro' : 'Free', style: AppText.headline)),
-                        PillBadge(label: status, tone: isPro ? PillTone.live : PillTone.neutral),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    if (status == 'trialing' && daysLeft != null)
-                      Text(
-                        daysLeft > 0 ? 'Trial: $daysLeft day${daysLeft == 1 ? '' : 's'} left' : 'Trial ended',
-                        style: AppText.body.copyWith(color: c.textSecondary),
-                      )
-                    else if (!isPro)
-                      Text(
-                        'Owner: ${billing['usageThisMonth']['owner']}/3 job posts this month\nWorker: ${billing['usageThisMonth']['worker']}/3 applications this month',
-                        style: AppText.body.copyWith(color: c.textSecondary),
-                      )
-                    else
-                      Text('Unlimited job posts and applications', style: AppText.body.copyWith(color: c.textSecondary)),
+                    Text(isPro ? 'Pro — ₹199/month' : '₹199/month', style: AppText.headline),
+                    const SizedBox(height: AppSpacing.xs),
+                    if (!isPro) Text('7-day free trial, then ₹199/month', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                    const SizedBox(height: AppSpacing.lg),
+                    const _Benefit(Icons.post_add_rounded, 'Unlimited job posts'),
+                    const _Benefit(Icons.send_rounded, 'Unlimited applications'),
+                    if (!isPro) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      NeuButton(label: 'Upgrade to Pro', icon: Icons.bolt_rounded, loading: _checkingOut, onPressed: _upgrade),
+                    ],
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              if (!isPro) ...[
-                SectionHeader('Pro — ₹199/month'),
-                NeuCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Unlimited job posts and applications.', style: AppText.body),
-                      const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: 'Upgrade to Pro', icon: Icons.bolt_rounded, loading: _checkingOut, onPressed: _upgrade),
-                    ],
-                  ),
+              SectionHeader('Your status'),
+              NeuCard(
+                variant: NeuVariant.pressed,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(isPro ? 'Pro' : 'Free', style: AppText.body.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          if (status == 'trialing' && daysLeft != null)
+                            Text(
+                              daysLeft > 0 ? 'Trial: $daysLeft day${daysLeft == 1 ? '' : 's'} left' : 'Trial ended',
+                              style: AppText.bodySmall.copyWith(color: c.textSecondary),
+                            )
+                          else if (!isPro)
+                            Text(
+                              'Owner: ${billing['usageThisMonth']['owner']}/3 job posts this month\nWorker: ${billing['usageThisMonth']['worker']}/3 applications this month',
+                              style: AppText.bodySmall.copyWith(color: c.textSecondary),
+                            )
+                          else
+                            Text('Unlimited job posts and applications', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                        ],
+                      ),
+                    ),
+                    PillBadge(label: status, tone: isPro ? PillTone.live : PillTone.neutral),
+                  ],
                 ),
-              ],
+              ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _Benefit extends StatelessWidget {
+  const _Benefit(this.icon, this.text);
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        children: [
+          Icon(icon, color: c.accent, size: 20),
+          const SizedBox(width: AppSpacing.sm + 2),
+          Expanded(child: Text(text, style: AppText.body.copyWith(color: c.textPrimary))),
+        ],
       ),
     );
   }

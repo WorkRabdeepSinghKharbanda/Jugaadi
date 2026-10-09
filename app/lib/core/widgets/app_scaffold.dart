@@ -16,6 +16,7 @@ class AppScaffold extends StatelessWidget {
     this.scroll = false,
     this.bottom,
     this.resizeForKeyboard = false,
+    this.floatingActionButton,
   });
 
   final Widget body;
@@ -27,6 +28,7 @@ class AppScaffold extends StatelessWidget {
   final bool scroll;
   final Widget? bottom;
   final bool resizeForKeyboard;
+  final Widget? floatingActionButton;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +66,7 @@ class AppScaffold extends StatelessWidget {
     return Scaffold(
       backgroundColor: c.bg,
       resizeToAvoidBottomInset: resizeForKeyboard,
+      floatingActionButton: floatingActionButton,
       body: SafeArea(
         bottom: bottom == null,
         child: Column(

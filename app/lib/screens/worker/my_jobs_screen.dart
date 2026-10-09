@@ -29,9 +29,9 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Scaffold(
-      backgroundColor: c.bg,
-      appBar: AppBar(title: const Text('My applications')),
+    return AppScaffold(
+      title: 'My applications',
+      fullBleed: true,
       body: RefreshIndicator(
         color: c.accent,
         onRefresh: () async => setState(() { _future = _load(); }),

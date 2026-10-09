@@ -25,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _saving = false;
   String? _error;
   Map<String, dynamic>? _profile;
+  List<dynamic> _reviews = [];
 
   @override
   void initState() {
@@ -41,6 +42,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _selectedSkills
       ..clear()
       ..addAll((data['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String) ?? const []);
+    try {
+      final userId = Supabase.instance.client.auth.currentUser!.id;
+      _reviews = await ApiClient(Config.apiBaseUrl).get('/profiles/$userId/reviews') as List<dynamic>;
+    } catch (_) {
+      // not critical — the reviews section just stays empty
+    }
     return data;
   }
 
@@ -167,6 +174,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
           final profile = snapshot.data!;
           final verified = profile['is_verified'] == true;
+          final avgRating = _reviews.isEmpty
+              ? null
+              : _reviews.map((r) => (r as Map<String, dynamic>)['rating'] as int).reduce((a, b) => a + b) / _reviews.length;
 
           if (!_editing) {
             return Column(
@@ -178,6 +188,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (verified) const PillBadge.verified(),
                   ],
                 ),
+                if (avgRating != null) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    children: [
+                      Icon(Icons.star_rounded, color: c.accent, size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${avgRating.toStringAsFixed(1)} · ${_reviews.length} review${_reviews.length == 1 ? '' : 's'}',
+                        style: AppText.bodySmall.copyWith(color: c.textSecondary),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.lg),
                 NeuCard(
                   child: Column(
@@ -212,7 +235,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ? [Text('No skills added yet', style: AppText.bodySmall.copyWith(color: c.textTertiary))]
                       : _selectedSkills.map((s) => Chip(label: Text(s))).toList(),
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.lg),
+                SectionHeader('Reviews'),
+                if (_reviews.isEmpty)
+                  Text('No reviews yet', style: AppText.bodySmall.copyWith(color: c.textTertiary))
+                else
+                  for (final r in _reviews.cast<Map<String, dynamic>>()) ...[
+                    NeuCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Row(
+                                children: List.generate(
+                                  5,
+                                  (i) => Icon(
+                                    i < (r['rating'] as int) ? Icons.star_rounded : Icons.star_outline_rounded,
+                                    color: c.accent,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                (r['reviewer'] as Map<String, dynamic>?)?['full_name'] as String? ?? '-',
+                                style: AppText.bodySmall.copyWith(color: c.textSecondary),
+                              ),
+                            ],
+                          ),
+                          if ((r['comment'] as String?)?.isNotEmpty ?? false) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(r['comment'] as String, style: AppText.body),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                const SizedBox(height: AppSpacing.md),
                 NeuButton(label: 'Edit profile', icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(label: 'Log out', icon: Icons.logout_rounded, variant: NeuButtonVariant.ghost, onPressed: _logout),

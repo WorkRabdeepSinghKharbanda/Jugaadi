@@ -78,35 +78,33 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Scaffold(
-      backgroundColor: c.bg,
-      appBar: AppBar(
-        title: const Text('My jobs'),
-        actions: [
-          if (_isAdmin)
-            IconButton(
-              icon: const Icon(Icons.admin_panel_settings_outlined),
-              tooltip: 'Admin console',
-              onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
-            ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded),
-            tooltip: 'Find work instead',
-            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const WorkerTabs())),
+    return AppScaffold(
+      title: 'My jobs',
+      fullBleed: true,
+      actions: [
+        if (_isAdmin)
+          NeuIconButton(
+            icon: Icons.admin_panel_settings_outlined,
+            semanticLabel: 'Admin console',
+            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
           ),
-          IconButton(
-            icon: const Icon(Icons.bolt_outlined),
-            tooltip: 'Plan',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
-          ),
-          IconButton(icon: const Icon(Icons.location_on_outlined), tooltip: 'Update location', onPressed: () => editLocation(context)),
-          IconButton(
-            icon: const Icon(Icons.person_outline_rounded),
-            tooltip: 'Profile',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
-          ),
-        ],
-      ),
+        NeuIconButton(
+          icon: Icons.swap_horiz_rounded,
+          semanticLabel: 'Find work instead',
+          onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const WorkerTabs())),
+        ),
+        NeuIconButton(
+          icon: Icons.bolt_outlined,
+          semanticLabel: 'Plan',
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
+        ),
+        NeuIconButton(icon: Icons.location_on_outlined, semanticLabel: 'Update location', onPressed: () => editLocation(context)),
+        NeuIconButton(
+          icon: Icons.person_outline_rounded,
+          semanticLabel: 'Profile',
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
+        ),
+      ],
       floatingActionButton: FloatingActionButton(
         backgroundColor: c.accent,
         foregroundColor: c.onAccent,

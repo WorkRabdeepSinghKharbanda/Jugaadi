@@ -61,42 +61,40 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Scaffold(
-      backgroundColor: c.bg,
-      appBar: AppBar(
-        title: const Text('Nearby jobs'),
-        actions: [
-          if (_isAdmin)
-            IconButton(
-              icon: const Icon(Icons.admin_panel_settings_outlined),
-              tooltip: 'Admin console',
-              onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
-            ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded),
-            tooltip: 'Post a job instead',
-            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
+    return AppScaffold(
+      title: 'Nearby jobs',
+      fullBleed: true,
+      actions: [
+        if (_isAdmin)
+          NeuIconButton(
+            icon: Icons.admin_panel_settings_outlined,
+            semanticLabel: 'Admin console',
+            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
           ),
-          IconButton(
-            icon: const Icon(Icons.bolt_outlined),
-            tooltip: 'Plan',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
-          ),
-          IconButton(
-            icon: const Icon(Icons.location_on_outlined),
-            tooltip: 'Update location',
-            onPressed: () async {
-              await editLocation(context);
-              _refresh();
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline_rounded),
-            tooltip: 'Profile',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
-          ),
-        ],
-      ),
+        NeuIconButton(
+          icon: Icons.swap_horiz_rounded,
+          semanticLabel: 'Post a job instead',
+          onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
+        ),
+        NeuIconButton(
+          icon: Icons.bolt_outlined,
+          semanticLabel: 'Plan',
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
+        ),
+        NeuIconButton(
+          icon: Icons.location_on_outlined,
+          semanticLabel: 'Update location',
+          onPressed: () async {
+            await editLocation(context);
+            _refresh();
+          },
+        ),
+        NeuIconButton(
+          icon: Icons.person_outline_rounded,
+          semanticLabel: 'Profile',
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
+        ),
+      ],
       body: RefreshIndicator(
         color: c.accent,
         onRefresh: () async => _refresh(),

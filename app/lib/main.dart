@@ -153,6 +153,7 @@ class _WorkerTabsState extends State<WorkerTabs> {
   Widget build(BuildContext context) {
     final pages = [WorkerHomeScreen(key: ValueKey(_nearbyGen)), MyJobsScreen(key: ValueKey(_myJobsGen))];
     return Scaffold(
+      backgroundColor: context.colors.bg,
       body: pages[_index],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
