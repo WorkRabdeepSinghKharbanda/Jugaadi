@@ -24,11 +24,20 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Future<List<dynamic>> _load() async {
-    final position = await getCurrentPositionOrThrow();
-    final data = await ApiClient(Config.apiBaseUrl).get('/jobs/nearby', {
-      'lat': position.latitude,
-      'lng': position.longitude,
-    });
+    final api = ApiClient(Config.apiBaseUrl);
+    double lat, lng;
+    try {
+      final profile = await api.get('/profile/me') as Map<String, dynamic>;
+      if (profile['lat'] == null || profile['lng'] == null) throw Exception('no saved location');
+      lat = (profile['lat'] as num).toDouble();
+      lng = (profile['lng'] as num).toDouble();
+    } catch (_) {
+      // No saved location yet (shouldn't normally happen post-setup) — fall back to a live GPS fix.
+      final position = await getCurrentPositionOrThrow();
+      lat = position.latitude;
+      lng = position.longitude;
+    }
+    final data = await api.get('/jobs/nearby', {'lat': lat, 'lng': lng});
     return data as List<dynamic>;
   }
 
