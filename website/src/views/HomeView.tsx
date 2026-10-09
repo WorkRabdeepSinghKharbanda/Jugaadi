@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { getAllContent, pathFor } from "@/lib/content";
 import { homeCopy } from "@/lib/home-copy";
 import type { Locale } from "@/lib/locale";
-import { APK_DOWNLOAD_URL } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FeatureCard } from "@/components/FeatureCard";
@@ -35,12 +35,12 @@ export function HomeView({ locale }: { locale: Locale }) {
           <h1>{c.heroH1}</h1>
           <p className="lede">{c.heroLede}</p>
           <p className="cta-row">
-            <a href="#download" className="btn">
+            <Link href={`${prefix}/download`} className="btn">
               {c.ctaOwner}
-            </a>
-            <a href="#download" className="btn ghost">
+            </Link>
+            <Link href={`${prefix}/download`} className="btn ghost">
               {c.ctaWorker}
-            </a>
+            </Link>
           </p>
           <div className="stat-strip">
             {c.statStrip.map((s) => (
@@ -83,15 +83,13 @@ export function HomeView({ locale }: { locale: Locale }) {
 
         <Faqs faqs={c.faqs} locale={locale} />
 
-        <section id="download">
+        <section>
           <div className="cta-band">
             <h2>{c.pilotHeading}</h2>
             <p>{c.pilotText}</p>
-            {APK_DOWNLOAD_URL ? (
-              <a href={APK_DOWNLOAD_URL} className="btn" target="_blank" rel="noopener noreferrer">
-                {c.downloadBtn}
-              </a>
-            ) : null}
+            <Link href={`${prefix}/download`} className="btn">
+              {c.downloadBtn}
+            </Link>
           </div>
         </section>
 

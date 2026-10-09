@@ -17,6 +17,7 @@ Jugaadi is a two-sided marketplace: owners post a job and hire from nearby verif
 - [Features](${SITE_URL}/features): verification, direct hiring
 - [Alternatives](${SITE_URL}/alternatives): how Jugaadi compares to the usual ways of finding temp help
 - [Blog](${SITE_URL}/blog): guides and updates
+- [Download](${SITE_URL}/download): Android APK, early access while the Play Store listing is pending
 
 ## Find workers
 ${linksFor("landing") || "(none yet)"}

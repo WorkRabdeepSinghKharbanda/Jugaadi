@@ -26,7 +26,7 @@ export function Header({ locale, path = "/" }: { locale: Locale; path?: string }
             ))}
           </span>
         </nav>
-        <Link href={`${home === "/" ? "" : home}/#download`} className="btn sm">
+        <Link href={`${home === "/" ? "" : home}/download`} className="btn sm">
           {t.downloadApp}
         </Link>
       </div>

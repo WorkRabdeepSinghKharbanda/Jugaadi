@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = LOCALES.flatMap((locale) => {
     const prefix = locale === "en" ? "" : `/${locale}`;
-    return ["", "/blog", "/features", "/alternatives"].map((path) => ({
+    return ["", "/blog", "/features", "/alternatives", "/download"].map((path) => ({
       url: path === "" ? `${SITE_URL}${prefix || "/"}` : `${SITE_URL}${prefix}${path}`,
       lastModified: new Date(),
     }));

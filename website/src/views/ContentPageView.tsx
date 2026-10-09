@@ -67,7 +67,7 @@ export async function ContentPageView({ type, slug, locale }: { type: ContentTyp
             <CtaBand
               title={locale === "en" ? "Need a worker, or looking for work?" : t.downloadApp}
               text={locale === "en" ? "Download the app and try it out." : ""}
-              primary={{ href: `${prefix}/#download`, label: t.downloadApp }}
+              primary={{ href: `${prefix}/download`, label: t.downloadApp }}
             />
           )}
         </article>
