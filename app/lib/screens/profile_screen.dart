@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../api_client.dart';
 import '../config.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
+import 'auth/phone_auth_screen.dart';
 import 'auth/profile_setup_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -44,6 +46,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _contactController.dispose();
     _bioController.dispose();
     super.dispose();
+  }
+
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete account?'),
+        content: const Text('This can\'t be undone. Your profile will be deactivated and you won\'t be able to log in again with this number.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await ApiClient(Config.apiBaseUrl).post('/profile/delete');
+      await Supabase.instance.client.auth.signOut();
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const PhoneAuthScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+    }
   }
 
   Future<void> _save() async {
@@ -149,6 +177,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
                 const SizedBox(height: AppSpacing.xl),
                 NeuButton(label: 'Edit profile', icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
+                const SizedBox(height: AppSpacing.md),
+                NeuButton(
+                  label: 'Delete account',
+                  icon: Icons.delete_outline_rounded,
+                  variant: NeuButtonVariant.danger,
+                  onPressed: _deleteAccount,
+                ),
               ],
             );
           }

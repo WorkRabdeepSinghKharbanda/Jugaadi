@@ -30,3 +30,19 @@ export async function getProfile(userId: string) {
 export async function verifyProfile(userId: string) {
   return supabase.from('profiles').update({ is_verified: true }).eq('id', userId);
 }
+
+// Soft delete: scrub personal fields but keep the row so hired_worker_id/reviewee_id on past
+// jobs don't dangle — the UI shows "Deleted user" via is_deleted instead.
+export async function softDeleteProfile(userId: string) {
+  return supabase
+    .from('profiles')
+    .update({
+      full_name: 'Deleted user',
+      phone: `deleted-${userId}`,
+      contact_phone: null,
+      photo_url: null,
+      bio: null,
+      is_deleted: true,
+    })
+    .eq('id', userId);
+}

@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import * as profileRepo from '../repositories/profile.repository.js';
+import { supabase } from '../config/db.js';
 import '../types.js';
 
 export async function createOrUpdateProfile(req: Request, res: Response) {
@@ -26,4 +27,16 @@ export async function getMyProfile(req: Request, res: Response) {
   if (error) return res.status(500).json({ error: error.message });
   if (!data) return res.status(404).json({ error: 'profile not found' });
   res.json(data);
+}
+
+export async function deleteMyProfile(req: Request, res: Response) {
+  const { error } = await profileRepo.softDeleteProfile(req.userId);
+  if (error) return res.status(500).json({ error: error.message });
+
+  // Blocks future logins with this identity; scrubbing above already happened, so this is
+  // best-effort cleanup — if it fails the account is still fully deactivated.
+  const { error: authError } = await supabase.auth.admin.deleteUser(req.userId);
+  if (authError) console.warn('[profile] auth.admin.deleteUser failed after soft delete:', authError.message);
+
+  res.json({ ok: true });
 }
