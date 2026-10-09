@@ -41,6 +41,25 @@ export async function effectivePlan(profileId: string): Promise<{ data: PlanLimi
   };
 }
 
+const PRO_PERIOD_DAYS = 30;
+
+/// Activates (or renews) Pro for `profileId` after a verified payment. Idempotent to call twice
+/// for the same payment (webhook + client-side verify both call this) — just overwrites with the
+/// same period end either way.
+export async function activateProPlan(profileId: string, razorpayPaymentId: string) {
+  const currentPeriodEnd = new Date(Date.now() + PRO_PERIOD_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  return supabase.from('subscriptions').upsert(
+    {
+      profile_id: profileId,
+      plan_id: 'pro',
+      status: 'active',
+      current_period_end: currentPeriodEnd,
+      razorpay_subscription_id: razorpayPaymentId,
+    },
+    { onConflict: 'profile_id' }
+  );
+}
+
 export async function usageThisMonth(profileId: string, role: 'owner' | 'worker') {
   const monthStart = new Date();
   monthStart.setDate(1);
