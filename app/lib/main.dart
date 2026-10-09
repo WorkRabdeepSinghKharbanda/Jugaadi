@@ -6,6 +6,7 @@ import 'config.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/tokens.dart';
 import 'core/widgets/widgets.dart';
+import 'screens/admin/admin_home_screen.dart';
 import 'screens/auth/phone_auth_screen.dart';
 import 'screens/auth/role_select_screen.dart';
 import 'screens/owner/owner_home_screen.dart';
@@ -126,6 +127,7 @@ class _RootRouterState extends State<RootRouter> {
         }
         final profile = snapshot.data;
         if (profile == null || profile.isEmpty) return const RoleSelectScreen();
+        if (profile['is_admin'] == true) return const AdminHomeScreen();
         return profile['role'] == 'owner' ? const OwnerHomeScreen() : const WorkerTabs();
       },
     );

@@ -48,6 +48,11 @@ class ApiClient {
     );
     return _decode(res);
   }
+
+  Future<dynamic> delete(String path) async {
+    final res = await http.delete(Uri.parse('$baseUrl$path'), headers: await _headers());
+    return _decode(res);
+  }
 }
 
 class ApiException implements Exception {
