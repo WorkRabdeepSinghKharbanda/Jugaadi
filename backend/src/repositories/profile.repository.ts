@@ -8,6 +8,8 @@ export interface ProfileInput {
   city?: string;
   lat?: number;
   lng?: number;
+  contact_phone?: string | null;
+  bio?: string | null;
 }
 
 export async function upsertProfile(userId: string, profile: ProfileInput) {

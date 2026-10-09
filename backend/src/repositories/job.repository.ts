@@ -35,7 +35,9 @@ export async function applicationsByWorker(workerId: string) {
 export async function getJobWithContacts(jobId: string) {
   return supabase
     .from('jobs')
-    .select('*, owner:profiles!jobs_owner_id_fkey(phone, full_name), hired_worker:profiles!jobs_hired_worker_id_fkey(phone, full_name)')
+    .select(
+      '*, owner:profiles!jobs_owner_id_fkey(phone, contact_phone, full_name), hired_worker:profiles!jobs_hired_worker_id_fkey(phone, contact_phone, full_name)'
+    )
     .eq('id', jobId)
     .maybeSingle();
 }

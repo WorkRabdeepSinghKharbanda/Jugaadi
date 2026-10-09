@@ -3,13 +3,13 @@ import * as profileRepo from '../repositories/profile.repository.js';
 import '../types.js';
 
 export async function createOrUpdateProfile(req: Request, res: Response) {
-  const { role, full_name, phone, photo_url, city, lat, lng, skills } = req.body;
+  const { role, full_name, phone, photo_url, city, lat, lng, skills, contact_phone, bio } = req.body;
   if (!role || !full_name || !phone) {
     return res.status(400).json({ error: 'role, full_name, phone are required' });
   }
 
   const { error: profileError } = await profileRepo.upsertProfile(req.userId, {
-    role, full_name, phone, photo_url, city, lat, lng,
+    role, full_name, phone, photo_url, city, lat, lng, contact_phone, bio,
   });
   if (profileError) return res.status(500).json({ error: profileError.message });
 

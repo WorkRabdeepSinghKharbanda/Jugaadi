@@ -6,6 +6,7 @@ import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
+import '../profile_screen.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
   const WorkerHomeScreen({super.key});
@@ -58,6 +59,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               await editLocation(context);
               _refresh();
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded),
+            tooltip: 'Profile',
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
           ),
         ],
       ),

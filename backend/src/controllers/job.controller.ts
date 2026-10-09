@@ -49,10 +49,15 @@ export async function getJobDetail(req: Request, res: Response) {
   const isHiredWorker = job.hired_worker_id === req.userId;
   const contactRevealed = job.status !== 'open' && (isOwner || isHiredWorker);
 
+  // contact_phone (set on the profile) wins over the login phone when the user chose to share a
+  // different reach-out number; falls back to the login phone when they never set one.
+  const reveal = (p: { phone: string; contact_phone: string | null; full_name: string } | null) =>
+    p ? { full_name: p.full_name, phone: p.contact_phone ?? p.phone } : undefined;
+
   res.json({
     ...job,
-    owner: isHiredWorker && contactRevealed ? job.owner : undefined,
-    hired_worker: isOwner && contactRevealed ? job.hired_worker : undefined,
+    owner: isHiredWorker && contactRevealed ? reveal(job.owner) : undefined,
+    hired_worker: isOwner && contactRevealed ? reveal(job.hired_worker) : undefined,
   });
 }
 
