@@ -22,7 +22,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       final profile = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
       if (!mounted) return;
       final isOwner = profile['role'] == 'owner';
-      await Navigator.of(context).push(
+      await Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => isOwner ? const OwnerHomeScreen() : const WorkerTabs()),
       );
     } catch (e) {

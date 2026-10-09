@@ -87,12 +87,12 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
             IconButton(
               icon: const Icon(Icons.admin_panel_settings_outlined),
               tooltip: 'Admin console',
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
+              onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
             ),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
             tooltip: 'Find work instead',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WorkerTabs())),
+            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const WorkerTabs())),
           ),
           IconButton(
             icon: const Icon(Icons.bolt_outlined),

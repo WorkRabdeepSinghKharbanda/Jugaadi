@@ -70,12 +70,12 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             IconButton(
               icon: const Icon(Icons.admin_panel_settings_outlined),
               tooltip: 'Admin console',
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
+              onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
             ),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
             tooltip: 'Post a job instead',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
+            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
           ),
           IconButton(
             icon: const Icon(Icons.bolt_outlined),
