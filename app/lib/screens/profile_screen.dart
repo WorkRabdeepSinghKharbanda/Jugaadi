@@ -18,6 +18,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late Future<Map<String, dynamic>> _future;
   bool _editing = false;
   final _contactController = TextEditingController();
+  final _emailController = TextEditingController();
   final _bioController = TextEditingController();
   final _customSkillController = TextEditingController();
   final _selectedSkills = <String>{};
@@ -35,6 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final data = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
     _profile = data;
     _contactController.text = (data['contact_phone'] as String?) ?? '';
+    _emailController.text = (data['email'] as String?) ?? '';
     _bioController.text = (data['bio'] as String?) ?? '';
     _selectedSkills
       ..clear()
@@ -45,6 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _contactController.dispose();
+    _emailController.dispose();
     _bioController.dispose();
     _customSkillController.dispose();
     super.dispose();
@@ -100,6 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'lat': profile['lat'],
         'lng': profile['lng'],
         'contact_phone': _contactController.text.trim().isEmpty ? null : _contactController.text.trim(),
+        'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
         'bio': _bioController.text.trim().isEmpty ? null : _bioController.text.trim(),
         if (profile['role'] == 'worker') 'skills': _selectedSkills.toList(),
       });
@@ -166,6 +170,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: 'Contact number',
                         value: (profile['contact_phone'] as String?) ?? 'Same as login number',
                       ),
+                      if ((profile['email'] as String?)?.isNotEmpty ?? false) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        _Row(icon: Icons.email_outlined, label: 'Email', value: profile['email'] as String),
+                      ],
                       const SizedBox(height: AppSpacing.md),
                       _Row(icon: Icons.location_city_rounded, label: 'City', value: profile['city'] as String? ?? '-'),
                       if ((profile['bio'] as String?)?.isNotEmpty ?? false) ...[
@@ -209,6 +217,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: Icons.call_outlined,
                 keyboardType: TextInputType.phone,
               ),
+              const SizedBox(height: AppSpacing.md),
+              NeuTextField(label: 'Email', controller: _emailController, icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
               const SizedBox(height: AppSpacing.md),
               NeuTextField(label: 'About', controller: _bioController, icon: Icons.info_outline_rounded, maxLines: 3),
               if (isWorker) ...[

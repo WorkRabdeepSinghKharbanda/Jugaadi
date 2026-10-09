@@ -39,6 +39,7 @@ class ProfileSetupScreen extends StatefulWidget {
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
   final _customSkillController = TextEditingController();
   final _selectedSkills = <String>{};
   PlaceHit? _place;
@@ -77,6 +78,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         'city': _place!.label,
         'lat': _place!.latitude,
         'lng': _place!.longitude,
+        if (_emailController.text.trim().isNotEmpty) 'email': _emailController.text.trim(),
         if (widget.role == 'worker') 'skills': _selectedSkills.toList(),
       });
 
@@ -107,6 +109,13 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           NeuTextField(label: 'Full name', controller: _nameController, icon: Icons.person_outline_rounded),
           const SizedBox(height: AppSpacing.md),
           NeuTextField(label: 'Phone', controller: _phoneController, icon: Icons.phone_rounded, keyboardType: TextInputType.phone),
+          const SizedBox(height: AppSpacing.md),
+          NeuTextField(
+            label: 'Email (optional)',
+            controller: _emailController,
+            icon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+          ),
           const SizedBox(height: AppSpacing.md),
           Text('LOCATION', style: AppText.label.copyWith(color: c.textSecondary)),
           const SizedBox(height: AppSpacing.sm),

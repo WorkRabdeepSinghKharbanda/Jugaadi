@@ -10,6 +10,7 @@ export interface ProfileInput {
   lng?: number;
   contact_phone?: string | null;
   bio?: string | null;
+  email?: string | null;
 }
 
 export async function upsertProfile(userId: string, profile: ProfileInput) {
@@ -42,6 +43,7 @@ export async function softDeleteProfile(userId: string) {
       contact_phone: null,
       photo_url: null,
       bio: null,
+      email: null,
       is_deleted: true,
     })
     .eq('id', userId);

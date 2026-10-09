@@ -36,7 +36,7 @@ export async function getJobWithContacts(jobId: string) {
   return supabase
     .from('jobs')
     .select(
-      '*, owner:profiles!jobs_owner_id_fkey(phone, contact_phone, full_name, is_deleted), hired_worker:profiles!jobs_hired_worker_id_fkey(phone, contact_phone, full_name, is_deleted)'
+      '*, owner:profiles!jobs_owner_id_fkey(phone, contact_phone, email, full_name, is_deleted), hired_worker:profiles!jobs_hired_worker_id_fkey(phone, contact_phone, email, full_name, is_deleted)'
     )
     .eq('id', jobId)
     .maybeSingle();
@@ -51,11 +51,13 @@ export async function applyToJob(jobId: string, workerId: string) {
 }
 
 export async function pendingApplicants(jobId: string) {
-  // Phone/location stay hidden until hire (matches getJobDetail's reveal-on-hire rule) —
-  // don't leak an applicant's contact info to the owner before they're chosen.
+  // Phone/email/contact_phone/lat/lng stay hidden until hire (matches getJobDetail's
+  // reveal-on-hire rule) — don't leak an applicant's contact info to the owner before they're
+  // chosen. Everything else about them (bio, city, skills, verification) is fine to show up
+  // front so the owner can actually judge who to hire.
   return supabase
     .from('job_applications')
-    .select('*, worker:profiles!job_applications_worker_id_fkey(full_name, is_verified)')
+    .select('*, worker:profiles!job_applications_worker_id_fkey(full_name, is_verified, bio, city, worker_skills(skill))')
     .eq('job_id', jobId)
     .eq('status', 'pending');
 }

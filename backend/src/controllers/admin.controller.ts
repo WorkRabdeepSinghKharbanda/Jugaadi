@@ -10,7 +10,7 @@ export async function verifyWorker(req: Request, res: Response) {
 
 // --- In-app admin panel (requireAdminUser-gated) ---
 
-const USER_EDITABLE_FIELDS = ['full_name', 'phone', 'contact_phone', 'city', 'bio', 'is_verified', 'is_admin'] as const;
+const USER_EDITABLE_FIELDS = ['full_name', 'phone', 'contact_phone', 'city', 'bio', 'email', 'is_verified', 'is_admin'] as const;
 
 export async function listUsers(_req: Request, res: Response) {
   const { data, error } = await adminRepo.listUsers();

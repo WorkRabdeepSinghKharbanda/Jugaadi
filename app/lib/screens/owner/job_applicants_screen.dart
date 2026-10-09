@@ -94,42 +94,59 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 final a = applicants[i] as Map<String, dynamic>;
                 final worker = a['worker'] as Map<String, dynamic>?;
                 final verified = worker?['is_verified'] == true;
+                final skills = (worker?['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String).toList() ?? const [];
+                final bio = worker?['bio'] as String?;
+                final city = worker?['city'] as String?;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),
                   child: NeuCard(
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundColor: c.surfaceHigh,
-                          child: Icon(
-                            Icons.person_rounded,
-                            color: c.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                worker?['full_name'] as String? ?? 'Unknown',
-                                style: AppText.title,
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 22,
+                              backgroundColor: c.surfaceHigh,
+                              child: Icon(Icons.person_rounded, color: c.textSecondary),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(worker?['full_name'] as String? ?? 'Unknown', style: AppText.title),
+                                  const SizedBox(height: 4),
+                                  verified ? const PillBadge.verified() : PillBadge(label: 'Pending verification'),
+                                ],
                               ),
-                              const SizedBox(height: 4),
-                              verified
-                                  ? const PillBadge.verified()
-                                  : PillBadge(label: 'Pending verification'),
+                            ),
+                          ],
+                        ),
+                        if (city != null && city.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Row(
+                            children: [
+                              Icon(Icons.location_city_rounded, size: 16, color: c.textTertiary),
+                              const SizedBox(width: 4),
+                              Text(city, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        NeuButton(
-                          label: 'Hire',
-                          expand: false,
-                          height: 44,
-                          onPressed: () => _hire(a['worker_id'] as String),
-                        ),
+                        ],
+                        if (bio != null && bio.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(bio, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                        ],
+                        if (skills.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Wrap(
+                            spacing: AppSpacing.xs,
+                            runSpacing: AppSpacing.xs,
+                            children: skills.map((s) => PillBadge(label: s)).toList(),
+                          ),
+                        ],
+                        const SizedBox(height: AppSpacing.md),
+                        NeuButton(label: 'Hire', height: 44, onPressed: () => _hire(a['worker_id'] as String)),
                       ],
                     ),
                   ),
