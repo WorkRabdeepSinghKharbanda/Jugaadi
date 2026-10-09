@@ -42,7 +42,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     return data as List<dynamic>;
   }
 
-  void _refresh() => setState(() => _future = _load());
+  void _refresh() => setState(() { _future = _load(); });
 
   @override
   Widget build(BuildContext context) {

@@ -34,7 +34,7 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
       appBar: AppBar(title: const Text('My applications')),
       body: RefreshIndicator(
         color: c.accent,
-        onRefresh: () async => setState(() => _future = _load()),
+        onRefresh: () async => setState(() { _future = _load(); }),
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
@@ -50,7 +50,7 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
                     children: [
                       ErrorStrip('${snapshot.error}'),
                       const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: 'Retry', expand: false, onPressed: () => setState(() => _future = _load())),
+                      NeuButton(label: 'Retry', expand: false, onPressed: () => setState(() { _future = _load(); })),
                     ],
                   ),
                 ),

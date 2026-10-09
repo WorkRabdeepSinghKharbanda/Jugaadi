@@ -30,7 +30,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
     return data as List<dynamic>;
   }
 
-  void _refresh() => setState(() => _future = _load());
+  void _refresh() => setState(() { _future = _load(); });
 
   Future<void> _edit(Map<String, dynamic> job) async {
     final updated = await Navigator.of(context).push(

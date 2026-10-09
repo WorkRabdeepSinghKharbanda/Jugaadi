@@ -50,7 +50,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       appBar: AppBar(title: const Text('Applicants')),
       body: RefreshIndicator(
         color: c.accent,
-        onRefresh: () async => setState(() => _future = _load()),
+        onRefresh: () async => setState(() { _future = _load(); }),
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
@@ -69,7 +69,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       NeuButton(
                         label: 'Retry',
                         expand: false,
-                        onPressed: () => setState(() => _future = _load()),
+                        onPressed: () => setState(() { _future = _load(); }),
                       ),
                     ],
                   ),

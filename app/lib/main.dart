@@ -117,7 +117,7 @@ class _RootRouterState extends State<RootRouter> {
                     NeuButton(
                       label: 'Retry',
                       expand: false,
-                      onPressed: () => setState(() => _profileFuture = _loadProfile()),
+                      onPressed: () => setState(() { _profileFuture = _loadProfile(); }),
                     ),
                   ],
                 ),

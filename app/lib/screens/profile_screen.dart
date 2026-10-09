@@ -136,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 ErrorStrip('${snapshot.error}'),
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: 'Retry', expand: false, onPressed: () => setState(() => _future = _load())),
+                NeuButton(label: 'Retry', expand: false, onPressed: () => setState(() { _future = _load(); })),
               ],
             );
           }

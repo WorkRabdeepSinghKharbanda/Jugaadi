@@ -25,7 +25,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     return data as List<dynamic>;
   }
 
-  void _refresh() => setState(() => _future = _load());
+  void _refresh() => setState(() { _future = _load(); });
 
   Future<void> _toggleVerified(Map<String, dynamic> user) async {
     try {
