@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import * as profileRepo from '../repositories/profile.repository.js';
+import * as planRepo from '../repositories/plan.repository.js';
 import { supabase } from '../config/db.js';
 import '../types.js';
 
@@ -18,6 +19,11 @@ export async function createOrUpdateProfile(req: Request, res: Response) {
     const { error: skillsError } = await profileRepo.replaceWorkerSkills(req.userId, skills);
     if (skillsError) return res.status(500).json({ error: skillsError.message });
   }
+
+  // No-ops after the first call (upsert on the unique profile_id, ignoreDuplicates) — safe to
+  // call on every profile save, not just the first, without resetting an existing trial/plan.
+  const { error: trialError } = await planRepo.startTrialSubscription(req.userId);
+  if (trialError) console.warn('[profile] startTrialSubscription failed:', trialError.message);
 
   res.json({ ok: true });
 }

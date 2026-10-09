@@ -147,7 +147,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       showAppToast(context, _hasJobId ? 'Job updated' : 'Job posted successfully');
       Navigator.of(context).pop(true);
     } catch (e) {
-      setState(() => _error = '$e');
+      setState(() => _error = e is ApiException ? e.message : '$e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

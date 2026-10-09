@@ -1,6 +1,24 @@
 import type { Request, Response } from 'express';
 import * as jobRepo from '../repositories/job.repository.js';
+import * as planRepo from '../repositories/plan.repository.js';
 import '../types.js';
+
+/// Returns an error message if the caller is over their plan's monthly limit, else null.
+/// Fails open (null = allowed) on a plan/usage lookup error — a billing-state hiccup shouldn't
+/// block someone from posting a job or applying.
+async function planLimitError(profileId: string, role: 'owner' | 'worker'): Promise<string | null> {
+  const { data: plan, error: planError } = await planRepo.effectivePlan(profileId);
+  if (planError || !plan || plan.unlimited) return null;
+
+  const { data: used, error: usageError } = await planRepo.usageThisMonth(profileId, role);
+  if (usageError) return null;
+
+  if (used >= plan.limit!) {
+    const noun = role === 'owner' ? 'job posts' : 'applications';
+    return `Free plan limit reached (${plan.limit} ${noun}/month). Upgrade to Pro for unlimited.`;
+  }
+  return null;
+}
 
 export async function postJob(req: Request, res: Response) {
   const { title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage, workers_needed } = req.body;
@@ -10,6 +28,9 @@ export async function postJob(req: Request, res: Response) {
   if (workers_needed != null && (!Number.isInteger(workers_needed) || workers_needed < 1)) {
     return res.status(400).json({ error: 'workers_needed must be a positive integer' });
   }
+
+  const limitError = await planLimitError(req.userId, 'owner');
+  if (limitError) return res.status(409).json({ error: limitError });
 
   const { data, error } = await jobRepo.createJob(req.userId, {
     title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage, workers_needed,
@@ -82,6 +103,9 @@ export async function getJobDetail(req: Request, res: Response) {
 }
 
 export async function applyToJob(req: Request, res: Response) {
+  const limitError = await planLimitError(req.userId, 'worker');
+  if (limitError) return res.status(409).json({ error: limitError });
+
   const { data, error } = await jobRepo.applyToJob(req.params.id, req.userId);
   if (error) return res.status(500).json({ error: error.message });
   res.status(201).json(data);

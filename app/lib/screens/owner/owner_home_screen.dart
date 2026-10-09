@@ -5,6 +5,7 @@ import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
+import '../plans_screen.dart';
 import '../profile_screen.dart';
 import 'job_applicants_screen.dart';
 import 'post_job_screen.dart';
@@ -69,6 +70,11 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
       appBar: AppBar(
         title: const Text('My jobs'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bolt_outlined),
+            tooltip: 'Plan',
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
+          ),
           IconButton(icon: const Icon(Icons.location_on_outlined), tooltip: 'Update location', onPressed: () => editLocation(context)),
           IconButton(
             icon: const Icon(Icons.person_outline_rounded),

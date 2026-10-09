@@ -59,6 +59,18 @@ class ApiException implements Exception {
   ApiException(this.statusCode, this.body);
   final int statusCode;
   final String body;
+
+  /// The backend's `{"error": "..."}` message, or the raw body if it isn't that shape.
+  String get message {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map && decoded['error'] is String) return decoded['error'] as String;
+    } catch (_) {
+      // not JSON — fall through to the raw body
+    }
+    return body;
+  }
+
   @override
   String toString() => 'ApiException($statusCode): $body';
 }

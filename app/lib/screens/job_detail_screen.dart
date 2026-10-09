@@ -92,7 +92,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       showAppToast(context, 'Applied successfully');
       Navigator.of(context).pop();
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, e is ApiException ? e.message : '$e', tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }

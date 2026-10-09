@@ -6,6 +6,7 @@ import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
+import '../plans_screen.dart';
 import '../profile_screen.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
@@ -52,6 +53,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       appBar: AppBar(
         title: const Text('Nearby jobs'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bolt_outlined),
+            tooltip: 'Plan',
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
+          ),
           IconButton(
             icon: const Icon(Icons.location_on_outlined),
             tooltip: 'Update location',
