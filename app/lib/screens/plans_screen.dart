@@ -6,7 +6,12 @@ import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
 
 class PlansScreen extends StatefulWidget {
-  const PlansScreen({super.key});
+  /// Which side of the marketplace this upgrade is priced for — owner (job posting, pricier)
+  /// or worker (applying, cheaper). Null when opened generically (e.g. an admin viewing their
+  /// own plan icon before picking a role); falls back to the profile's default role.
+  const PlansScreen({super.key, this.role});
+
+  final String? role;
 
   @override
   State<PlansScreen> createState() => _PlansScreenState();
@@ -16,10 +21,12 @@ class _PlansScreenState extends State<PlansScreen> {
   late Future<Map<String, dynamic>> _future;
   bool _checkingOut = false;
   late final Razorpay _razorpay;
+  String? _role;
 
   @override
   void initState() {
     super.initState();
+    _role = widget.role;
     _future = _load();
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _onPaymentSuccess);
@@ -34,14 +41,19 @@ class _PlansScreenState extends State<PlansScreen> {
   }
 
   Future<Map<String, dynamic>> _load() async {
-    final data = await ApiClient(Config.apiBaseUrl).get('/billing/me') as Map<String, dynamic>;
+    final api = ApiClient(Config.apiBaseUrl);
+    final data = await api.get('/billing/me') as Map<String, dynamic>;
+    if (_role == null) {
+      final profile = await api.get('/profile/me') as Map<String, dynamic>;
+      _role = profile['role'] as String? ?? 'worker';
+    }
     return data;
   }
 
   Future<void> _upgrade() async {
     setState(() => _checkingOut = true);
     try {
-      final order = await ApiClient(Config.apiBaseUrl).post('/billing/checkout') as Map<String, dynamic>;
+      final order = await ApiClient(Config.apiBaseUrl).post('/billing/checkout', {'role': _role}) as Map<String, dynamic>;
       _razorpay.open({
         'key': order['keyId'],
         'amount': order['amount'],
@@ -119,6 +131,8 @@ class _PlansScreenState extends State<PlansScreen> {
           final status = billing['status'] as String;
           final trialEndsAt = billing['trial_ends_at'] as String?;
           final daysLeft = trialEndsAt != null ? DateTime.parse(trialEndsAt).difference(DateTime.now()).inDays : null;
+          final price = (billing['priceByRole'] as Map<String, dynamic>?)?[_role ?? 'worker'];
+          final priceLabel = price == null ? '' : '₹$price/month';
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,9 +142,9 @@ class _PlansScreenState extends State<PlansScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(isPro ? 'Pro — ₹199/month' : '₹199/month', style: AppText.headline),
+                    Text(isPro ? 'Pro — $priceLabel' : priceLabel, style: AppText.headline),
                     const SizedBox(height: AppSpacing.xs),
-                    if (!isPro) Text('7-day free trial, then ₹199/month', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                    if (!isPro) Text('7-day free trial, then $priceLabel', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                     const SizedBox(height: AppSpacing.lg),
                     const _Benefit(Icons.post_add_rounded, 'Unlimited job posts'),
                     const _Benefit(Icons.send_rounded, 'Unlimited applications'),

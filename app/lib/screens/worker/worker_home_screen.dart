@@ -79,7 +79,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         NeuIconButton(
           icon: Icons.bolt_outlined,
           semanticLabel: 'Plan',
-          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'worker'))),
         ),
         NeuIconButton(
           icon: Icons.location_on_outlined,

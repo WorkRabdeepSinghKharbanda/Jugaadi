@@ -110,7 +110,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       if (!mounted) return;
       if (e.code == 'plan_limit') {
         showAppToast(context, e.message, tone: ToastTone.error);
-        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen()));
+        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'worker')));
       } else if (e.code == 'already_applied') {
         setState(() => job = {...job, 'my_application_status': 'pending'});
       } else {

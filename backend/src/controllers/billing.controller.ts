@@ -3,7 +3,9 @@ import type { Request, Response } from 'express';
 import Razorpay from 'razorpay';
 import * as planRepo from '../repositories/plan.repository.js';
 
-const PRO_AMOUNT_PAISE = 19900;
+// Owners (posting jobs) pay more than workers (applying) — same Pro unlock either way, priced
+// by which side of the marketplace the account is upgrading from.
+const PRO_AMOUNT_PAISE: Record<'owner' | 'worker', number> = { owner: 39900, worker: 19900 };
 
 function razorpayClient() {
   const keyId = process.env.RAZORPAY_KEY_ID;
@@ -21,7 +23,11 @@ export async function getMyBilling(req: Request, res: Response) {
     planRepo.usageThisMonth(req.userId, 'owner'),
     planRepo.usageThisMonth(req.userId, 'worker'),
   ]);
-  res.json({ ...data, usageThisMonth: { owner: owner.data, worker: worker.data } });
+  res.json({
+    ...data,
+    usageThisMonth: { owner: owner.data, worker: worker.data },
+    priceByRole: { owner: PRO_AMOUNT_PAISE.owner / 100, worker: PRO_AMOUNT_PAISE.worker / 100 },
+  });
 }
 
 // One-time ₹199 order per 30-day Pro period (not a Razorpay "Subscription" entity — that needs a
@@ -31,8 +37,11 @@ export async function createCheckout(req: Request, res: Response) {
   const razorpay = razorpayClient();
   if (!razorpay) return res.status(501).json({ error: 'Billing is not configured yet' });
 
+  const role: unknown = req.body.role;
+  if (role !== 'owner' && role !== 'worker') return res.status(400).json({ error: "role must be 'owner' or 'worker'" });
+
   const order = await razorpay.orders.create({
-    amount: PRO_AMOUNT_PAISE,
+    amount: PRO_AMOUNT_PAISE[role],
     currency: 'INR',
     receipt: `pro_${req.userId}_${Date.now()}`,
     notes: { profile_id: req.userId },

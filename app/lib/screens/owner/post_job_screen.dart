@@ -6,6 +6,7 @@ import '../../core/services/place_gateway.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../auth/profile_setup_screen.dart';
+import '../plans_screen.dart';
 
 const _kMaxJobPhotos = 6;
 
@@ -146,8 +147,16 @@ class _PostJobScreenState extends State<PostJobScreen> {
       if (!mounted) return;
       showAppToast(context, _hasJobId ? 'Job updated' : 'Job posted successfully');
       Navigator.of(context).pop(true);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'plan_limit') {
+        showAppToast(context, e.message, tone: ToastTone.error);
+        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'owner')));
+      } else {
+        setState(() => _error = e.message);
+      }
     } catch (e) {
-      setState(() => _error = e is ApiException ? e.message : '$e');
+      setState(() => _error = '$e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

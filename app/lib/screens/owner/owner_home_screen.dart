@@ -96,7 +96,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         NeuIconButton(
           icon: Icons.bolt_outlined,
           semanticLabel: 'Plan',
-          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen())),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'owner'))),
         ),
         NeuIconButton(icon: Icons.location_on_outlined, semanticLabel: 'Update location', onPressed: () => editLocation(context)),
         NeuIconButton(
