@@ -9,6 +9,7 @@ app/.dart_tool/
 app/build/
 app/.flutter-plugin-dependencies
 app/dart_define.json
+app/.env.production
 
 # Astro
 website/.astro/
