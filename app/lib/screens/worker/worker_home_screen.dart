@@ -6,6 +6,7 @@ import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
+import '../owner/owner_home_screen.dart';
 import '../plans_screen.dart';
 import '../profile_screen.dart';
 
@@ -53,6 +54,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       appBar: AppBar(
         title: const Text('Nearby jobs'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.swap_horiz_rounded),
+            tooltip: 'Post a job instead',
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
+          ),
           IconButton(
             icon: const Icon(Icons.bolt_outlined),
             tooltip: 'Plan',

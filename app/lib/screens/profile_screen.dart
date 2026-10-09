@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'contact_phone': _contactController.text.trim().isEmpty ? null : _contactController.text.trim(),
         'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
         'bio': _bioController.text.trim().isEmpty ? null : _bioController.text.trim(),
-        if (profile['role'] == 'worker') 'skills': _selectedSkills.toList(),
+        'skills': _selectedSkills.toList(),
       });
       if (!mounted) return;
       showAppToast(context, 'Profile updated');
@@ -166,7 +166,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }
           final profile = snapshot.data!;
-          final isWorker = profile['role'] == 'worker';
           final verified = profile['is_verified'] == true;
 
           if (!_editing) {
@@ -204,17 +203,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-                if (isWorker) ...[
-                  const SizedBox(height: AppSpacing.lg),
-                  SectionHeader('Skills'),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: _selectedSkills.isEmpty
-                        ? [Text('No skills added yet', style: AppText.bodySmall.copyWith(color: c.textTertiary))]
-                        : _selectedSkills.map((s) => Chip(label: Text(s))).toList(),
-                  ),
-                ],
+                const SizedBox(height: AppSpacing.lg),
+                SectionHeader('Skills'),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: _selectedSkills.isEmpty
+                      ? [Text('No skills added yet', style: AppText.bodySmall.copyWith(color: c.textTertiary))]
+                      : _selectedSkills.map((s) => Chip(label: Text(s))).toList(),
+                ),
                 const SizedBox(height: AppSpacing.xl),
                 NeuButton(label: 'Edit profile', icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
                 const SizedBox(height: AppSpacing.md),
@@ -244,49 +241,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
               NeuTextField(label: 'Email', controller: _emailController, icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
               const SizedBox(height: AppSpacing.md),
               NeuTextField(label: 'About', controller: _bioController, icon: Icons.info_outline_rounded, maxLines: 3),
-              if (isWorker) ...[
-                const SizedBox(height: AppSpacing.lg),
-                SectionHeader('Skills'),
+              const SizedBox(height: AppSpacing.lg),
+              SectionHeader('Skills'),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: kSkillOptions
+                    .map((skill) => FilterChip(
+                          label: Text(skill),
+                          selected: _selectedSkills.contains(skill),
+                          onSelected: (selected) => setState(() {
+                            selected ? _selectedSkills.add(skill) : _selectedSkills.remove(skill);
+                          }),
+                        ))
+                    .toList(),
+              ),
+              if (_selectedSkills.any((s) => !kSkillOptions.contains(s))) ...[
+                const SizedBox(height: AppSpacing.sm),
                 Wrap(
                   spacing: AppSpacing.sm,
                   runSpacing: AppSpacing.sm,
-                  children: kSkillOptions
-                      .map((skill) => FilterChip(
-                            label: Text(skill),
-                            selected: _selectedSkills.contains(skill),
-                            onSelected: (selected) => setState(() {
-                              selected ? _selectedSkills.add(skill) : _selectedSkills.remove(skill);
-                            }),
-                          ))
+                  children: _selectedSkills
+                      .where((s) => !kSkillOptions.contains(s))
+                      .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _selectedSkills.remove(s))))
                       .toList(),
                 ),
-                if (_selectedSkills.any((s) => !kSkillOptions.contains(s))) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: _selectedSkills
-                        .where((s) => !kSkillOptions.contains(s))
-                        .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _selectedSkills.remove(s))))
-                        .toList(),
-                  ),
-                ],
-                const SizedBox(height: AppSpacing.sm),
-                Row(
-                  children: [
-                    Expanded(
-                      child: NeuTextField(
-                        label: 'Other skill',
-                        controller: _customSkillController,
-                        hint: 'Type a skill not listed above',
-                        onSubmitted: (_) => _addCustomSkill(),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    NeuButton(label: 'Add', expand: false, height: 48, onPressed: _addCustomSkill),
-                  ],
-                ),
               ],
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                children: [
+                  Expanded(
+                    child: NeuTextField(
+                      label: 'Other skill',
+                      controller: _customSkillController,
+                      hint: 'Type a skill not listed above',
+                      onSubmitted: (_) => _addCustomSkill(),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  NeuButton(label: 'Add', expand: false, height: 48, onPressed: _addCustomSkill),
+                ],
+              ),
               const SizedBox(height: AppSpacing.lg),
               if (_error != null) ...[
                 ErrorStrip(_error!),

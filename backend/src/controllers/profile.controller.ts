@@ -15,7 +15,9 @@ export async function createOrUpdateProfile(req: Request, res: Response) {
   });
   if (profileError) return res.status(500).json({ error: profileError.message });
 
-  if (role === 'worker' && Array.isArray(skills)) {
+  // Not gated on role — an account can act as both owner and worker (dual role, switchable
+  // in-app), so skills are useful regardless of which role was chosen at signup.
+  if (Array.isArray(skills)) {
     const { error: skillsError } = await profileRepo.replaceWorkerSkills(req.userId, skills);
     if (skillsError) return res.status(500).json({ error: skillsError.message });
   }
