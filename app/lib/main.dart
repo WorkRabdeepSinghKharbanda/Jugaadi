@@ -3,7 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clarity_flutter/clarity_flutter.dart';
 import 'api_client.dart';
 import 'config.dart';
-import 'theme.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/tokens.dart';
+import 'core/widgets/widgets.dart';
 import 'screens/auth/phone_auth_screen.dart';
 import 'screens/auth/role_select_screen.dart';
 import 'screens/owner/owner_home_screen.dart';
@@ -28,19 +30,17 @@ class _NotConfiguredApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: jugaadiTheme(),
-      home: const Scaffold(
+      theme: AppTheme.dark,
+      home: AppScaffold(
         body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'Supabase isn\'t configured yet.\n\n'
-              'Run with:\n'
-              '--dart-define=SUPABASE_URL=...\n'
-              '--dart-define=SUPABASE_ANON_KEY=...\n'
-              '--dart-define=API_BASE_URL=...',
-              textAlign: TextAlign.center,
-            ),
+          child: Text(
+            'Supabase isn\'t configured yet.\n\n'
+            'Run with:\n'
+            '--dart-define=SUPABASE_URL=...\n'
+            '--dart-define=SUPABASE_ANON_KEY=...\n'
+            '--dart-define=API_BASE_URL=...',
+            textAlign: TextAlign.center,
+            style: AppText.body,
           ),
         ),
       ),
@@ -55,7 +55,7 @@ class JugaadiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Jugaadi',
-      theme: jugaadiTheme(),
+      theme: AppTheme.dark,
       home: const RootRouter(),
     );
   }
@@ -98,20 +98,28 @@ class _RootRouterState extends State<RootRouter> {
       future: _profileFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData && snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          final c = context.colors;
+          return Scaffold(backgroundColor: c.bg, body: Center(child: CircularProgressIndicator(color: c.accent)));
         }
         if (snapshot.hasError) {
+          final c = context.colors;
           return Scaffold(
+            backgroundColor: c.bg,
             body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Couldn\'t load your profile. Check your connection.'),
-                  TextButton(
-                    onPressed: () => setState(() => _profileFuture = _loadProfile()),
-                    child: const Text('Retry'),
-                  ),
-                ],
+              child: Padding(
+                padding: AppSpacing.screen,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ErrorStrip('Couldn\'t load your profile. Check your connection.'),
+                    const SizedBox(height: AppSpacing.md),
+                    NeuButton(
+                      label: 'Retry',
+                      expand: false,
+                      onPressed: () => setState(() => _profileFuture = _loadProfile()),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -143,8 +151,8 @@ class _WorkerTabsState extends State<WorkerTabs> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.search), label: 'Nearby'),
-          NavigationDestination(icon: Icon(Icons.work), label: 'My jobs'),
+          NavigationDestination(icon: Icon(Icons.search_rounded), label: 'Nearby'),
+          NavigationDestination(icon: Icon(Icons.work_outline_rounded), label: 'My jobs'),
         ],
       ),
     );

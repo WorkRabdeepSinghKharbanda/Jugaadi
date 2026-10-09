@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/theme/tokens.dart';
+import '../../core/widgets/widgets.dart';
 import '../auth/profile_setup_screen.dart';
 
 class PostJobScreen extends StatefulWidget {
@@ -64,40 +66,45 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Post a job')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            TextField(controller: _titleController, decoration: const InputDecoration(labelText: 'Title')),
-            DropdownButtonFormField<String>(
-              value: _skill,
-              items: kSkillOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (v) => setState(() => _skill = v!),
-              decoration: const InputDecoration(labelText: 'Skill needed'),
-            ),
-            TextField(controller: _addressController, decoration: const InputDecoration(labelText: 'Address')),
-            TextField(
-              controller: _wageController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Daily wage (optional)'),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: _pickDates,
-              child: Text(_range == null
-                  ? 'Pick dates'
-                  : '${_range!.start.toIso8601String().split('T').first} → ${_range!.end.toIso8601String().split('T').first}'),
-            ),
-            const SizedBox(height: 16),
-            if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: _loading ? null : _submit,
-              child: _loading ? const CircularProgressIndicator() : const Text('Post job'),
-            ),
+    final c = context.colors;
+    return AppScaffold(
+      onBack: () => Navigator.of(context).pop(),
+      title: 'Post a job',
+      scroll: true,
+      resizeForKeyboard: true,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NeuTextField(label: 'Title', controller: _titleController, icon: Icons.title_rounded),
+          const SizedBox(height: AppSpacing.md),
+          Text('SKILL NEEDED', style: AppText.label.copyWith(color: c.textSecondary)),
+          const SizedBox(height: AppSpacing.sm),
+          DropdownButtonFormField<String>(
+            initialValue: _skill,
+            items: kSkillOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            onChanged: (v) => setState(() => _skill = v!),
+            dropdownColor: c.surfaceHigh,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          NeuTextField(label: 'Address', controller: _addressController, icon: Icons.location_on_outlined),
+          const SizedBox(height: AppSpacing.md),
+          NeuTextField(label: 'Daily wage (optional)', controller: _wageController, icon: Icons.payments_outlined, keyboardType: TextInputType.number),
+          const SizedBox(height: AppSpacing.lg),
+          NeuButton(
+            label: _range == null
+                ? 'Pick dates'
+                : '${_range!.start.toIso8601String().split('T').first} → ${_range!.end.toIso8601String().split('T').first}',
+            icon: Icons.date_range_rounded,
+            variant: NeuButtonVariant.ghost,
+            onPressed: _pickDates,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          if (_error != null) ...[
+            ErrorStrip(_error!),
+            const SizedBox(height: AppSpacing.lg),
           ],
-        ),
+          NeuButton(label: 'Post job', icon: Icons.check_rounded, loading: _loading, onPressed: _submit),
+        ],
       ),
     );
   }

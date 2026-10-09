@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../api_client.dart';
 import '../config.dart';
+import '../core/theme/tokens.dart';
+import '../core/widgets/widgets.dart';
 
 /// Shared by owner and worker — the API response already includes
 /// hired_worker/owner contact info once status is 'hired', so there's
@@ -54,33 +56,100 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.colors;
     final status = job['status'] as String;
+    final contact = widget.isOwner ? job['hired_worker'] as Map<String, dynamic>? : job['owner'] as Map<String, dynamic>?;
+
     return Scaffold(
-      appBar: AppBar(title: Text(job['title'] ?? '')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      backgroundColor: c.bg,
+      appBar: AppBar(title: Text(job['title'] as String? ?? '')),
+      body: SingleChildScrollView(
+        padding: AppSpacing.screen,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Skill: ${job['skill_needed']}'),
-            Text('Dates: ${job['start_date']} → ${job['end_date']}'),
-            if (job['daily_wage'] != null) Text('Wage: ${job['daily_wage']}/day'),
-            Text('Address: ${job['address_text'] ?? '-'}'),
-            Text('Status: $status'),
-            const SizedBox(height: 16),
-            if (!widget.isOwner && status == 'open')
-              ElevatedButton(
-                onPressed: _loading ? null : _apply,
-                child: const Text('Apply'),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(child: Text(job['title'] as String? ?? '', style: AppText.headline)),
+                PillBadge.status(status),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            NeuCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _DetailRow(icon: Icons.build_outlined, label: 'Skill', value: job['skill_needed'] as String? ?? '-'),
+                  const SizedBox(height: AppSpacing.md),
+                  _DetailRow(icon: Icons.date_range_rounded, label: 'Dates', value: '${job['start_date']} → ${job['end_date']}'),
+                  if (job['daily_wage'] != null) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    _DetailRow(icon: Icons.payments_outlined, label: 'Wage', value: '${job['daily_wage']}/day'),
+                  ],
+                  const SizedBox(height: AppSpacing.md),
+                  _DetailRow(icon: Icons.location_on_outlined, label: 'Address', value: job['address_text'] as String? ?? '-'),
+                ],
               ),
-            if (widget.isOwner && status == 'hired')
-              ElevatedButton(
-                onPressed: _loading ? null : _complete,
-                child: const Text('Mark Complete'),
+            ),
+            if (contact != null) ...[
+              const SizedBox(height: AppSpacing.lg),
+              SectionHeader(widget.isOwner ? 'Hired worker' : 'Owner contact'),
+              NeuCard(
+                gradientBorder: true,
+                child: Row(
+                  children: [
+                    Icon(Icons.phone_rounded, color: c.accent),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(contact['full_name'] as String? ?? '-', style: AppText.title),
+                          const SizedBox(height: 4),
+                          Text(contact['phone'] as String? ?? '-', style: AppText.body.copyWith(color: c.textSecondary)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            ],
+            const SizedBox(height: AppSpacing.xl),
+            if (!widget.isOwner && status == 'open') NeuButton(label: 'Apply', icon: Icons.send_rounded, loading: _loading, onPressed: _apply),
+            if (widget.isOwner && status == 'hired') NeuButton(label: 'Mark complete', icon: Icons.check_circle_outline_rounded, loading: _loading, onPressed: _complete),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.icon, required this.label, required this.value});
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: c.textSecondary),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label.toUpperCase(), style: AppText.label.copyWith(color: c.textTertiary)),
+              const SizedBox(height: 2),
+              Text(value, style: AppText.body),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

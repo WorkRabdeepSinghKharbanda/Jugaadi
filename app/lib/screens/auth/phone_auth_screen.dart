@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/theme/tokens.dart';
+import '../../core/widgets/widgets.dart';
 import 'otp_verify_screen.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
@@ -39,24 +41,31 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Jugaadi — sign in')),
+    return AppScaffold(
+      scroll: true,
+      resizeForKeyboard: true,
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
+            Text('Jugaadi', style: AppText.display.copyWith(color: context.colors.accent)),
+            const SizedBox(height: AppSpacing.sm),
+            Text('Find help, or find work — same day.', style: AppText.body.copyWith(color: context.colors.textSecondary)),
+            const SizedBox(height: AppSpacing.xxl),
+            NeuTextField(
+              label: 'Phone number',
               controller: _phoneController,
+              hint: '98765 43210',
+              icon: Icons.phone_rounded,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: 'Phone number (e.g. +91XXXXXXXXXX)'),
             ),
-            const SizedBox(height: 16),
-            if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: _loading ? null : _sendOtp,
-              child: _loading ? const CircularProgressIndicator() : const Text('Send OTP'),
-            ),
+            const SizedBox(height: AppSpacing.lg),
+            if (_error != null) ...[
+              ErrorStrip(_error!),
+              const SizedBox(height: AppSpacing.lg),
+            ],
+            NeuButton(label: 'Send OTP', icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _sendOtp),
           ],
         ),
       ),

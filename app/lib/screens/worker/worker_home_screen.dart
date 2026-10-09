@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/theme/tokens.dart';
+import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
@@ -35,29 +37,51 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.colors;
     return Scaffold(
+      backgroundColor: c.bg,
       appBar: AppBar(title: const Text('Nearby jobs')),
       body: RefreshIndicator(
+        color: c.accent,
         onRefresh: () async => _refresh(),
         child: FutureBuilder<List<dynamic>>(
           future: _future,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+            if (!snapshot.hasData) return Center(child: CircularProgressIndicator(color: c.accent));
             final jobs = snapshot.data!;
-            if (jobs.isEmpty) return const Center(child: Text('No open jobs nearby'));
+            if (jobs.isEmpty) return const EmptyState(icon: Icons.search_off_rounded, text: 'No open jobs nearby');
             return ListView.builder(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
               itemCount: jobs.length,
               itemBuilder: (context, i) {
                 final job = jobs[i] as Map<String, dynamic>;
-                return ListTile(
-                  title: Text(job['title']),
-                  subtitle: Text('${job['skill_needed']} · ${job['start_date']} → ${job['end_date']}'),
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => JobDetailScreen(job: job, isOwner: false)),
-                    );
-                    _refresh();
-                  },
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: NeuCard(
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => JobDetailScreen(job: job, isOwner: false)),
+                      );
+                      _refresh();
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(job['title'] as String, style: AppText.title),
+                              const SizedBox(height: 4),
+                              Text(job['skill_needed'] as String, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                              const SizedBox(height: 4),
+                              Text('${job['start_date']} → ${job['end_date']}', style: AppText.bodySmall.copyWith(color: c.textTertiary)),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios_rounded, size: 16, color: c.textTertiary),
+                      ],
+                    ),
+                  ),
                 );
               },
             );

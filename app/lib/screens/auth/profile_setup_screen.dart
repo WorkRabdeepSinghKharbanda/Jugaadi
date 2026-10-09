@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/theme/tokens.dart';
+import '../../core/widgets/widgets.dart';
 import '../../main.dart';
 
 const kSkillOptions = ['loading-unloading', 'helper', 'cleaning', 'cook', 'delivery', 'packing'];
@@ -58,39 +60,43 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Set up your profile')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Full name')),
-            TextField(controller: _phoneController, decoration: const InputDecoration(labelText: 'Phone')),
-            TextField(controller: _cityController, decoration: const InputDecoration(labelText: 'City')),
-            if (widget.role == 'worker') ...[
-              const SizedBox(height: 16),
-              const Align(alignment: Alignment.centerLeft, child: Text('Your skills')),
-              Wrap(
-                spacing: 8,
-                children: kSkillOptions
-                    .map((skill) => FilterChip(
-                          label: Text(skill),
-                          selected: _selectedSkills.contains(skill),
-                          onSelected: (selected) => setState(() {
-                            selected ? _selectedSkills.add(skill) : _selectedSkills.remove(skill);
-                          }),
-                        ))
-                    .toList(),
-              ),
-            ],
-            const SizedBox(height: 16),
-            if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: _loading ? null : _save,
-              child: _loading ? const CircularProgressIndicator() : const Text('Continue'),
+    return AppScaffold(
+      onBack: () => Navigator.of(context).pop(),
+      title: 'Set up your profile',
+      scroll: true,
+      resizeForKeyboard: true,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NeuTextField(label: 'Full name', controller: _nameController, icon: Icons.person_outline_rounded),
+          const SizedBox(height: AppSpacing.md),
+          NeuTextField(label: 'Phone', controller: _phoneController, icon: Icons.phone_rounded, keyboardType: TextInputType.phone),
+          const SizedBox(height: AppSpacing.md),
+          NeuTextField(label: 'City', controller: _cityController, icon: Icons.location_city_rounded),
+          if (widget.role == 'worker') ...[
+            const SizedBox(height: AppSpacing.lg),
+            SectionHeader('Your skills'),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: kSkillOptions
+                  .map((skill) => FilterChip(
+                        label: Text(skill),
+                        selected: _selectedSkills.contains(skill),
+                        onSelected: (selected) => setState(() {
+                          selected ? _selectedSkills.add(skill) : _selectedSkills.remove(skill);
+                        }),
+                      ))
+                  .toList(),
             ),
           ],
-        ),
+          const SizedBox(height: AppSpacing.lg),
+          if (_error != null) ...[
+            ErrorStrip(_error!),
+            const SizedBox(height: AppSpacing.lg),
+          ],
+          NeuButton(label: 'Continue', icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _save),
+        ],
       ),
     );
   }

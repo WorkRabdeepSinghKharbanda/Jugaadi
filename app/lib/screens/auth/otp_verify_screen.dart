@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/theme/tokens.dart';
+import '../../core/widgets/widgets.dart';
 import '../../main.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
@@ -41,26 +43,30 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Enter OTP')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _otpController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'OTP code'),
-            ),
-            const SizedBox(height: 16),
-            if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: _loading ? null : _verify,
-              child: _loading ? const CircularProgressIndicator() : const Text('Verify'),
-            ),
+    return AppScaffold(
+      onBack: () => Navigator.of(context).pop(),
+      title: 'Enter OTP',
+      subtitle: 'Sent to ${widget.phone}',
+      scroll: true,
+      resizeForKeyboard: true,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NeuTextField(
+            label: 'OTP code',
+            controller: _otpController,
+            hint: '······',
+            icon: Icons.password_rounded,
+            keyboardType: TextInputType.number,
+            autofocus: true,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          if (_error != null) ...[
+            ErrorStrip(_error!),
+            const SizedBox(height: AppSpacing.lg),
           ],
-        ),
+          NeuButton(label: 'Verify', icon: Icons.check_rounded, loading: _loading, onPressed: _verify),
+        ],
       ),
     );
   }
