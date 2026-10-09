@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js';
+import { supabase } from '../config/db.js';
 
 // Verifies the Supabase session JWT sent by the Flutter app and attaches req.userId.
 export async function requireAuth(req, res, next) {

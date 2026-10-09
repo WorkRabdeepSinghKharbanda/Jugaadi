@@ -9,7 +9,7 @@ import 'screens/owner/owner_home_screen.dart';
 import 'screens/worker/my_jobs_screen.dart';
 import 'screens/worker/worker_home_screen.dart';
 
-final _clarityConfig = ClarityConfig(projectId: "yv4w8c246m", logLevel: LogLevel.None);
+final _clarityConfig = ClarityConfig(projectId: Config.clarityProjectId, logLevel: LogLevel.None);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

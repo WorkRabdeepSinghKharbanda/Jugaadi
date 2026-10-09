@@ -1,0 +1,95 @@
+import * as jobRepo from '../repositories/job.repository.js';
+
+export async function postJob(req, res) {
+  const { title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage } = req.body;
+  if (!title || !skill_needed || lat == null || lng == null || !start_date || !end_date) {
+    return res.status(400).json({ error: 'title, skill_needed, lat, lng, start_date, end_date are required' });
+  }
+
+  const { data, error } = await jobRepo.createJob(req.userId, {
+    title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage,
+  });
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json(data);
+}
+
+export async function getNearbyJobs(req, res) {
+  const lat = Number(req.query.lat);
+  const lng = Number(req.query.lng);
+  const radius = req.query.radius ? Number(req.query.radius) : 5000;
+  if (Number.isNaN(lat) || Number.isNaN(lng)) {
+    return res.status(400).json({ error: 'lat and lng query params are required' });
+  }
+
+  const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+}
+
+export async function getMyApplications(req, res) {
+  const { data, error } = await jobRepo.applicationsByWorker(req.userId);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+}
+
+export async function getMyJobs(req, res) {
+  const { data, error } = await jobRepo.jobsByOwner(req.userId);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+}
+
+export async function getJobDetail(req, res) {
+  const { data: job, error } = await jobRepo.getJobWithContacts(req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  if (!job) return res.status(404).json({ error: 'not found' });
+
+  const isOwner = job.owner_id === req.userId;
+  const isHiredWorker = job.hired_worker_id === req.userId;
+  const contactRevealed = job.status !== 'open' && (isOwner || isHiredWorker);
+
+  res.json({
+    ...job,
+    owner: isHiredWorker && contactRevealed ? job.owner : undefined,
+    hired_worker: isOwner && contactRevealed ? job.hired_worker : undefined,
+  });
+}
+
+export async function applyToJob(req, res) {
+  const { data, error } = await jobRepo.applyToJob(req.params.id, req.userId);
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json(data);
+}
+
+export async function getApplicants(req, res) {
+  const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
+  if (jobError) return res.status(500).json({ error: jobError.message });
+  if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
+
+  const { data, error } = await jobRepo.pendingApplicants(req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+}
+
+export async function hireApplicant(req, res) {
+  const { id, workerId } = req.params;
+
+  const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(id);
+  if (jobError) return res.status(500).json({ error: jobError.message });
+  if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
+  if (job.status !== 'open') return res.status(409).json({ error: 'job is not open' });
+
+  const { error } = await jobRepo.hireWorker(id, workerId);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+}
+
+export async function completeJob(req, res) {
+  const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
+  if (jobError) return res.status(500).json({ error: jobError.message });
+  if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
+  if (job.status !== 'hired') return res.status(409).json({ error: 'job is not hired' });
+
+  const { error } = await jobRepo.completeJob(req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+}
