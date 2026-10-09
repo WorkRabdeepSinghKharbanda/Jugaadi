@@ -108,7 +108,7 @@ class _PlansScreenState extends State<PlansScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: 'Plan',
+      title: widget.role == 'owner' ? 'Plan — Posting jobs' : widget.role == 'worker' ? 'Plan — Finding work' : 'Plan',
       scroll: true,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _future,
@@ -131,8 +131,13 @@ class _PlansScreenState extends State<PlansScreen> {
           final status = billing['status'] as String;
           final trialEndsAt = billing['trial_ends_at'] as String?;
           final daysLeft = trialEndsAt != null ? DateTime.parse(trialEndsAt).difference(DateTime.now()).inDays : null;
+          final isOwner = _role == 'owner';
           final price = (billing['priceByRole'] as Map<String, dynamic>?)?[_role ?? 'worker'];
           final priceLabel = price == null ? '' : '₹$price/month';
+          final benefit = isOwner ? 'Unlimited job posts' : 'Unlimited applications';
+          final freeLimitLine = isOwner
+              ? '${billing['usageThisMonth']['owner']}/3 job posts this month'
+              : '${billing['usageThisMonth']['worker']}/3 applications this month';
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,8 +151,7 @@ class _PlansScreenState extends State<PlansScreen> {
                     const SizedBox(height: AppSpacing.xs),
                     if (!isPro) Text('7-day free trial, then $priceLabel', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                     const SizedBox(height: AppSpacing.lg),
-                    const _Benefit(Icons.post_add_rounded, 'Unlimited job posts'),
-                    const _Benefit(Icons.send_rounded, 'Unlimited applications'),
+                    _Benefit(isOwner ? Icons.post_add_rounded : Icons.send_rounded, benefit),
                     if (!isPro) ...[
                       const SizedBox(height: AppSpacing.md),
                       NeuButton(label: 'Upgrade to Pro', icon: Icons.bolt_rounded, loading: _checkingOut, onPressed: _upgrade),
@@ -173,12 +177,9 @@ class _PlansScreenState extends State<PlansScreen> {
                               style: AppText.bodySmall.copyWith(color: c.textSecondary),
                             )
                           else if (!isPro)
-                            Text(
-                              'Owner: ${billing['usageThisMonth']['owner']}/3 job posts this month\nWorker: ${billing['usageThisMonth']['worker']}/3 applications this month',
-                              style: AppText.bodySmall.copyWith(color: c.textSecondary),
-                            )
+                            Text(freeLimitLine, style: AppText.bodySmall.copyWith(color: c.textSecondary))
                           else
-                            Text('Unlimited job posts and applications', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                            Text(isOwner ? 'Unlimited job posts' : 'Unlimited applications', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                         ],
                       ),
                     ),
