@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllPosts } from "@/lib/blog";
+import { getAllContent, pathFor } from "@/lib/content";
+import { PageList } from "@/components/PageList";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -8,18 +8,14 @@ export const metadata: Metadata = {
 };
 
 export default function BlogIndexPage() {
-  const posts = getAllPosts();
+  const posts = getAllContent("blog")
+    .map((m) => ({ title: m.title, description: m.description, path: pathFor(m), date: m.date }))
+    .sort((a, b) => ((a.date ?? "") < (b.date ?? "") ? 1 : -1));
+
   return (
     <>
       <h1>Blog</h1>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.slug}>
-            <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-            <p>{post.description}</p>
-          </li>
-        ))}
-      </ul>
+      <PageList items={posts} />
     </>
   );
 }

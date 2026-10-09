@@ -1,17 +1,19 @@
 import type { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/blog";
+import { getAllContent, pathFor } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ["", "/blog", "/privacy", "/terms"].map((path) => ({
+  const staticPages = ["", "/blog", "/features", "/alternatives", "/privacy", "/terms"].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
   }));
 
-  const posts = getAllPosts().map((post) => ({
-    url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.date),
-  }));
+  const content = (["landing", "feature", "alternative", "blog"] as const).flatMap((type) =>
+    getAllContent(type).map((m) => ({
+      url: `${SITE_URL}${pathFor(m)}`,
+      lastModified: m.date ? new Date(m.date) : new Date(),
+    })),
+  );
 
-  return [...staticPages, ...posts];
+  return [...staticPages, ...content];
 }
