@@ -14,7 +14,7 @@ class JobApplicantsScreen extends StatefulWidget {
 }
 
 class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
-  late Future<List<dynamic>> _future;
+  late Future<(List<dynamic>, List<dynamic>)> _future;
   late int _hiredCount = widget.job['hired_count'] as int? ?? 0;
   late final int _workersNeeded = widget.job['workers_needed'] as int? ?? 1;
 
@@ -24,9 +24,15 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     _future = _load();
   }
 
-  Future<List<dynamic>> _load() async {
-    final data = await ApiClient(Config.apiBaseUrl).get('/jobs/${widget.job['id']}/applicants');
-    return data as List<dynamic>;
+  Future<(List<dynamic>, List<dynamic>)> _load() async {
+    final api = ApiClient(Config.apiBaseUrl);
+    final results = await Future.wait([
+      api.get('/jobs/${widget.job['id']}/applicants'),
+      api.get('/jobs/${widget.job['id']}'),
+    ]);
+    final applicants = results[0] as List<dynamic>;
+    final hiredWorkers = (results[1] as Map<String, dynamic>)['hired_workers'] as List<dynamic>? ?? const [];
+    return (applicants, hiredWorkers);
   }
 
   Future<void> _hire(String workerId) async {
@@ -65,7 +71,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               onRefresh: () async => setState(() {
                 _future = _load();
               }),
-              child: FutureBuilder<List<dynamic>>(
+              child: FutureBuilder<(List<dynamic>, List<dynamic>)>(
                 future: _future,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
@@ -92,15 +98,48 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       ),
                     );
                   }
-                  final applicants = snapshot.data!;
-                  if (applicants.isEmpty) {
+                  final (applicants, hiredWorkers) = snapshot.data!;
+                  if (applicants.isEmpty && hiredWorkers.isEmpty) {
                     return const EmptyState(icon: Icons.people_outline_rounded, text: 'No applicants yet');
                   }
+                  final hiredSection = hiredWorkers.isNotEmpty ? hiredWorkers.length + 1 : 0;
+                  final pendingSection = applicants.isNotEmpty ? 1 : 0;
                   return ListView.builder(
                     padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
-                    itemCount: applicants.length,
+                    itemCount: hiredSection + pendingSection + applicants.length,
                     itemBuilder: (context, i) {
-                      final a = applicants[i] as Map<String, dynamic>;
+                      if (i < hiredSection) {
+                        if (i == 0) return SectionHeader('Hired (${hiredWorkers.length})');
+                        final w = hiredWorkers[i - 1] as Map<String, dynamic>;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                          child: NeuCard(
+                            gradientBorder: true,
+                            child: Row(
+                              children: [
+                                Icon(Icons.check_circle_rounded, color: c.live),
+                                const SizedBox(width: AppSpacing.md),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(w['full_name'] as String? ?? '-', style: AppText.title),
+                                      const SizedBox(height: 4),
+                                      Text(w['phone'] as String? ?? '-', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                      var i2 = i - hiredSection;
+                      if (pendingSection == 1) {
+                        if (i2 == 0) return SectionHeader('Pending (${applicants.length})');
+                        i2 -= 1;
+                      }
+                      final a = applicants[i2] as Map<String, dynamic>;
                       final worker = a['worker'] as Map<String, dynamic>?;
                       final verified = worker?['is_verified'] == true;
                       final skills = (worker?['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String).toList() ?? const [];
