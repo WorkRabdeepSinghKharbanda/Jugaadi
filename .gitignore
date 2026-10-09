@@ -8,6 +8,7 @@ node_modules/
 app/.dart_tool/
 app/build/
 app/.flutter-plugin-dependencies
+app/dart_define.json
 
 # Astro
 website/.astro/
