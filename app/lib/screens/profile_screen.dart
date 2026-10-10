@@ -112,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         (route) => false,
       );
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     }
   }
 

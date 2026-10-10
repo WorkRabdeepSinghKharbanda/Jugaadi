@@ -46,6 +46,15 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   bool _loading = false;
   String? _error;
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _customSkillController.dispose();
+    super.dispose();
+  }
+
   void _addCustomSkill() {
     final skill = _customSkillController.text.trim();
     if (skill.isEmpty) return;

@@ -70,7 +70,7 @@ class _PlansScreenState extends State<PlansScreen> {
       }
       if (mounted) setState(() => _checkingOut = false);
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
       if (mounted) setState(() => _checkingOut = false);
     }
   }
@@ -88,7 +88,7 @@ class _PlansScreenState extends State<PlansScreen> {
       // below on the stack — pop back to them instead of leaving the user stranded here.
       Navigator.of(context).pop();
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _checkingOut = false);
     }
@@ -108,7 +108,7 @@ class _PlansScreenState extends State<PlansScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: widget.role == 'owner' ? 'Plan — Posting jobs' : widget.role == 'worker' ? 'Plan — Finding work' : 'Plan',
+      title: _role == 'owner' ? 'Plan — Posting jobs' : _role == 'worker' ? 'Plan — Finding work' : 'Plan',
       scroll: true,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _future,

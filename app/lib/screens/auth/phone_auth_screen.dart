@@ -16,6 +16,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   bool _loading = false;
   String? _error;
 
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
   String get _e164Phone {
     final raw = _phoneController.text.trim();
     return raw.startsWith('+') ? raw : '+91$raw';

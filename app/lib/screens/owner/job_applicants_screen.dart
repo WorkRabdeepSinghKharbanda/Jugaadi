@@ -45,7 +45,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         _future = _load();
       });
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     }
   }
 
@@ -53,11 +53,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   Widget build(BuildContext context) {
     final c = context.colors;
     final full = _hiredCount >= _workersNeeded;
-    return Scaffold(
-      backgroundColor: c.bg,
-      appBar: AppBar(
-        title: Text(_workersNeeded > 1 ? 'Applicants ($_hiredCount/$_workersNeeded hired)' : 'Applicants'),
-      ),
+    return AppScaffold(
+      onBack: () => Navigator.of(context).pop(),
+      title: _workersNeeded > 1 ? 'Applicants ($_hiredCount/$_workersNeeded hired)' : 'Applicants',
+      fullBleed: true,
       body: Column(
         children: [
           if (full)

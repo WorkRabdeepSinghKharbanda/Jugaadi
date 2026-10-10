@@ -32,7 +32,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       await ApiClient(Config.apiBaseUrl).patch('/admin/users/${user['id']}', {'is_verified': !(user['is_verified'] == true)});
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     }
   }
 
@@ -54,7 +54,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       if (mounted) showAppToast(context, 'User deactivated');
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     }
   }
 

@@ -26,7 +26,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         MaterialPageRoute(builder: (_) => isOwner ? const OwnerHomeScreen() : const WorkerTabs()),
       );
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(apiErrorMessage(e))));
     }
   }
 

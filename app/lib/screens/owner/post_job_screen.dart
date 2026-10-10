@@ -51,6 +51,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   @override
+  void dispose() {
+    _titleController.dispose();
+    _wageController.dispose();
+    _workersNeededController.dispose();
+    _customSkillController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     final job = widget.existingJob;
@@ -113,7 +122,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         final created = await ApiClient(Config.apiBaseUrl).post('/jobs', body) as Map<String, dynamic>;
         setState(() => _createdJob = created);
       } catch (e) {
-        if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+        if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
         if (mounted) setState(() => _uploadingPhotos = false);
         return;
       }
@@ -124,7 +133,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       final uploaded = await pickAndUploadJobPhotos('${_job!['id']}', remaining: _kMaxJobPhotos - _photoUrls.length);
       if (mounted) setState(() => _photoUrls.addAll(uploaded));
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _uploadingPhotos = false);
     }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/job_status.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
-
-const _kJobStatuses = ['open', 'hired', 'done', 'removed'];
 
 class AdminJobsScreen extends StatefulWidget {
   const AdminJobsScreen({super.key});
@@ -35,7 +34,7 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
       if (mounted) showAppToast(context, 'Status set to $status');
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     }
   }
 
@@ -57,7 +56,7 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
       if (mounted) showAppToast(context, 'Job deleted');
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     }
   }
 
@@ -103,7 +102,7 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
                               isExpanded: true,
                               value: job['status'] as String,
                               dropdownColor: c.surfaceHigh,
-                              items: _kJobStatuses.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                              items: JobStatus.values.map((s) => DropdownMenuItem(value: s.name, child: Text(s.name))).toList(),
                               onChanged: (v) {
                                 if (v != null && v != job['status']) _forceStatus(job, v);
                               },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../job_status.dart';
 import '../theme/tokens.dart';
 
 enum PillTone { accent, live, neutral, danger }
@@ -12,13 +13,20 @@ class PillBadge extends StatelessWidget {
         tone = PillTone.live,
         icon = Icons.verified_rounded;
 
-  /// Maps a jobs/job_applications `status` column value to a styled pill.
+  /// Maps a jobs/job_applications `status` column value to a styled pill. Accepts either a
+  /// [JobStatus] or [ApplicationStatus] name — they're the only two status concepts this is
+  /// ever called with.
   factory PillBadge.status(String status) {
-    final tone = switch (status) {
-      'open' => PillTone.accent,
-      'hired' || 'accepted' => PillTone.live,
-      'rejected' || 'removed' => PillTone.danger,
-      _ => PillTone.neutral,
+    final tone = switch (JobStatus.fromString(status)) {
+      JobStatus.open => PillTone.accent,
+      JobStatus.hired => PillTone.live,
+      JobStatus.removed => PillTone.danger,
+      JobStatus.done => PillTone.neutral,
+      null => switch (ApplicationStatus.fromString(status)) {
+          ApplicationStatus.accepted => PillTone.live,
+          ApplicationStatus.rejected => PillTone.danger,
+          ApplicationStatus.pending || null => PillTone.neutral,
+        },
     };
     return PillBadge(label: status, tone: tone);
   }

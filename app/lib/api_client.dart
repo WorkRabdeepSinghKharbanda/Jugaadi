@@ -85,3 +85,7 @@ class ApiException implements Exception {
   @override
   String toString() => 'ApiException($statusCode): $body';
 }
+
+/// User-facing message for an error caught from an API call — never the raw exception
+/// toString() (e.g. `ApiException(500): {"error": "..."}`), which leaks backend internals.
+String apiErrorMessage(Object error) => error is ApiException ? error.message : 'Something went wrong';

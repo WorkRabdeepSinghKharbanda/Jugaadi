@@ -18,6 +18,12 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   bool _loading = false;
   String? _error;
 
+  @override
+  void dispose() {
+    _otpController.dispose();
+    super.dispose();
+  }
+
   Future<void> _verify() async {
     setState(() {
       _loading = true;

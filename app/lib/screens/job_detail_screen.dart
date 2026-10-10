@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api_client.dart';
 import '../config.dart';
+import '../core/job_status.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
 import 'plans_screen.dart';
@@ -59,9 +60,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/complete');
       if (!mounted) return;
       showAppToast(context, 'Job marked complete');
-      setState(() => job = {...job, 'status': 'done'});
+      setState(() => job = {...job, 'status': JobStatus.done.name});
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -90,10 +91,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       if (e.statusCode == 409) {
         if (mounted) setState(() => _reviewDone = true);
       } else if (mounted) {
-        showAppToast(context, '$e', tone: ToastTone.error);
+        showAppToast(context, e.message, tone: ToastTone.error);
       }
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _reviewSubmitting = false);
     }
@@ -105,19 +106,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/apply');
       if (!mounted) return;
       showAppToast(context, 'Applied successfully');
-      setState(() => job = {...job, 'my_application_status': 'pending'});
+      setState(() => job = {...job, 'my_application_status': ApplicationStatus.pending.name});
     } on ApiException catch (e) {
       if (!mounted) return;
       if (e.code == 'plan_limit') {
         showAppToast(context, e.message, tone: ToastTone.error);
         await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'worker')));
       } else if (e.code == 'already_applied') {
-        setState(() => job = {...job, 'my_application_status': 'pending'});
+        setState(() => job = {...job, 'my_application_status': ApplicationStatus.pending.name});
       } else {
         showAppToast(context, e.message, tone: ToastTone.error);
       }
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -227,7 +228,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
               ),
             ],
-            if (status == 'done' && (widget.isOwner ? hiredWorkers.isNotEmpty : isHiredAsWorker) && !_reviewDone) ...[
+            if (status == JobStatus.done.name && (widget.isOwner ? hiredWorkers.isNotEmpty : isHiredAsWorker) && !_reviewDone) ...[
               const SizedBox(height: AppSpacing.lg),
               SectionHeader(widget.isOwner ? 'Rate a worker' : 'Rate the owner'),
               NeuCard(
@@ -264,14 +265,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
               ),
             ],
-            if (status == 'done' && _reviewDone) ...[
+            if (status == JobStatus.done.name && _reviewDone) ...[
               const SizedBox(height: AppSpacing.lg),
               ErrorStrip('You\'ve already reviewed this job', warning: true),
             ],
             const SizedBox(height: AppSpacing.xl),
-            if (!widget.isOwner && status == 'open')
+            if (!widget.isOwner && status == JobStatus.open.name)
               NeuButton(
-                label: myApplicationStatus == 'rejected'
+                label: myApplicationStatus == ApplicationStatus.rejected.name
                     ? 'Not selected'
                     : myApplicationStatus != null
                         ? 'Applied'
@@ -280,7 +281,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 loading: _loading,
                 onPressed: myApplicationStatus != null ? null : _apply,
               ),
-            if (widget.isOwner && status == 'hired') NeuButton(label: 'Mark complete', icon: Icons.check_circle_outline_rounded, loading: _loading, onPressed: _complete),
+            if (widget.isOwner && status == JobStatus.hired.name) NeuButton(label: 'Mark complete', icon: Icons.check_circle_outline_rounded, loading: _loading, onPressed: _complete),
           ],
         ),
     );

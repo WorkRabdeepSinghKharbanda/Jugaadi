@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/job_status.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
@@ -71,7 +72,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
       if (mounted) showAppToast(context, 'Job removed');
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, '$e', tone: ToastTone.error);
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
     }
   }
 
@@ -153,7 +154,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),
                   child: NeuCard(
                     onTap: () async {
-                      if (job['status'] == 'open') {
+                      if (job['status'] == JobStatus.open.name) {
                         await Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => JobApplicantsScreen(job: job)),
                         );
@@ -185,7 +186,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                           ),
                         ),
                         PillBadge.status(job['status'] as String),
-                        if (job['status'] == 'open')
+                        if (job['status'] == JobStatus.open.name)
                           PopupMenuButton<String>(
                             icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
                             onSelected: (action) {
