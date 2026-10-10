@@ -8,9 +8,9 @@ function linksFor(type: "landing" | "feature" | "alternative" | "blog") {
 }
 
 export function GET() {
-  const body = `> Jugaadi connects shop owners and households with verified nearby workers for short, temporary gigs — from one day to one week.
+  const body = `> Jugaadi is a local services marketplace connecting shop owners and households with verified nearby workers for short, same-day tasks — from one day to one week.
 
-Jugaadi is a two-sided marketplace: owners post a job and hire from nearby verified workers; workers browse nearby jobs and apply. Currently piloting in a single city.
+Jugaadi is a two-sided marketplace: owners post a task and book from nearby verified workers; workers browse nearby tasks and respond. Currently piloting in a single city.
 
 ## Pages
 - [Home](${SITE_URL}/): what Jugaadi is, how it works, who it's for

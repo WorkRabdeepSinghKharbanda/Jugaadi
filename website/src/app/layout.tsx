@@ -11,11 +11,11 @@ const CLARITY_ID = "yv4vy55lfp";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Find temporary workers near you`,
+    default: `${SITE_NAME} — Same-day local help, verified nearby`,
     template: `%s — ${SITE_NAME}`,
   },
   description:
-    "Jugaadi connects shop owners and households with verified nearby workers for 1 day to 1 week gigs.",
+    "Jugaadi is a local services marketplace — shop owners and households book verified nearby help for short, same-day tasks, 1 day to 1 week.",
   verification: {
     google: "kCnHcd-bJBBVDMlmVNxSUX0BeGjeyEf17j31SsQBwP8",
   },

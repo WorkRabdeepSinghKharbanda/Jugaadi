@@ -13,7 +13,7 @@ export const HOME_COPY = {
     howOwnerH: "For shop & home owners",
     howOwnerSteps: ["Post what help you need and for how long", "See verified workers nearby", "Hire directly and pay them yourself"],
     howWorkerH: "For workers",
-    howWorkerSteps: ["Register and add your skills", "See nearby jobs matching what you do", "Accept work and get hired"],
+    howWorkerSteps: ["Register and add your skills", "See nearby tasks matching what you do", "Accept work and get booked"],
     findWorkersHeading: "Find workers near you",
     whoHeading: "Who it's for",
     whoItems: ["Kirana shop owners", "Small businesses", "Households needing maids, helpers, cleaners", "Part-time and daily wage workers looking for work"],
@@ -24,9 +24,9 @@ export const HOME_COPY = {
     seeHowText: "Read about direct hiring and worker verification.",
     browseFeatures: "Browse features",
     faqs: [
-      { q: "What does Jugaadi actually do?", a: "Connects shop owners and households who need short-term help with nearby workers who can do that specific job, for 1 day to 1 week." },
+      { q: "What does Jugaadi actually do?", a: "Connects shop owners and households who need short-term help with nearby workers who can do that specific task, for 1 day to 1 week." },
       { q: "Is Jugaadi live in my city?", a: "We're running a single-city pilot right now. Download the app below to try it." },
-      { q: "Do workers need to pay anything?", a: "No. Sign up, add your skills, and apply to nearby jobs — Jugaadi doesn't charge workers in this pilot." },
+      { q: "Do workers need to pay anything?", a: "No. Sign up, add your skills, and respond to nearby tasks — Jugaadi doesn't charge workers in this pilot." },
     ],
   },
   hi: {
@@ -67,7 +67,7 @@ export const HOME_COPY = {
     howOwnerH: "Shop aur home owners ke liye",
     howOwnerSteps: ["Batao aapko kaunsi help aur kitne din ke liye chahiye", "Paas ke verified workers dekho", "Directly hire karo aur khud payment karo"],
     howWorkerH: "Workers ke liye",
-    howWorkerSteps: ["Register karo aur apni skills add karo", "Apne kaam se match karte nearby jobs dekho", "Kaam accept karo aur hire ho jao"],
+    howWorkerSteps: ["Register karo aur apni skills add karo", "Apne kaam se match karte nearby tasks dekho", "Kaam accept karo aur book ho jao"],
     findWorkersHeading: "Apne paas worker dhoondo",
     whoHeading: "Yeh kiske liye hai",
     whoItems: ["Kirana shop owners", "Small businesses", "Ghar jinhe maid, helper, cleaner chahiye", "Part-time aur daily wage workers jo kaam dhoond rahe hain"],
@@ -80,7 +80,7 @@ export const HOME_COPY = {
     faqs: [
       { q: "Jugaadi actually karta kya hai?", a: "Shop owners aur gharon ko, jinhe short-term help chahiye, paas ke un workers se jodta hai jo woh specific kaam 1 din se 1 hafte tak kar sakein." },
       { q: "Kya Jugaadi meri city mein live hai?", a: "Abhi hum sirf ek city mein pilot chala rahe hain. Neeche se app download karke try karo." },
-      { q: "Kya workers ko kuch pay karna padta hai?", a: "Nahi. Sign up karo, apni skills add karo, aur nearby jobs ke liye apply karo — is pilot mein Jugaadi workers se koi charge nahi leta." },
+      { q: "Kya workers ko kuch pay karna padta hai?", a: "Nahi. Sign up karo, apni skills add karo, aur nearby tasks ke liye respond karo — is pilot mein Jugaadi workers se koi charge nahi leta." },
     ],
   },
 } satisfies Record<Locale, unknown>;
