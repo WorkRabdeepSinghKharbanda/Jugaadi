@@ -1,4 +1,6 @@
-## protected_branches: ["archive"]
+---
+protected_branches: ["archive"]
+---
 
 # Branching strategy
 
