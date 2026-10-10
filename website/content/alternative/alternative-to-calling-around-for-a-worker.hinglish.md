@@ -28,5 +28,5 @@ Jugaadi aapki samajh ki jagah nahi leta — aap phir bhi jo dekhte ho uske basis
 
 ## Next steps
 
-- Dekho [direct hiring](/hinglish/features/hire-instantly) post karne ke baad actually kaise kaam karti hai.
+- Dekho [direct hire](/hinglish/features/hire-instantly) post karne ke baad actually kaise kaam karta hai.
 - [Temporary worker near me](/hinglish/temporary-worker-near-me) ya [shop helper near me](/hinglish/shop-helper-near-me) se start karo.

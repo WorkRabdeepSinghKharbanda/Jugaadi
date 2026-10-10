@@ -6,7 +6,7 @@ faqs:
   - q: Worker ko verify kaise kiya jaata hai?
     a: Is single-city pilot mein, verification Jugaadi ke admin ka ek manual check hai — phone call ya in-person confirmation — koi automated background check ya ID system nahi.
   - q: Kya main hire karne se pehle badge dekh sakta hoon?
-    a: Haan — jab aap apni job ke applicants dekh rahe ho, tab worker ka verification status unke applicant card par dikhta hai.
+    a: Haan — jab aap apne task par respond karne waalon ko dekh rahe ho, tab worker ka verification status unke profile card par dikhta hai.
   - q: Kya verification baad mein zyada strict hoga?
     a: Pilot jaanbujhkar isse manual aur simple rakhta hai. Ek zyada automated KYC check future mein volume badhne par socha ja sakta hai, abhi ke MVP ka hissa nahi.
 ---
@@ -21,7 +21,7 @@ Pilot volume par, ek human check kisi untested third-party verification API ko w
 
 ## Yeh kahan dikhta hai
 
-Jab koi owner posted job ke applicants review karta hai, tab har worker ke naam ke paas verified badge dikhta hai — taaki hiring decision mein distance aur baaki jo bhi owner weigh karna chahe, uske saath verification bhi shaamil ho.
+Jab koi owner posted task par respond karne waalon ko review karta hai, tab har worker ke naam ke paas verified badge dikhta hai — taaki hiring decision mein distance aur baaki jo bhi owner weigh karna chahe, uske saath verification bhi shaamil ho.
 
 ## Next steps
 

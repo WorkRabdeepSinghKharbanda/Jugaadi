@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import type { Locale } from './locale';
+import { LOCALES, type Locale } from './locale';
+import { SITE_URL } from './site';
 
 export type ContentType = 'landing' | 'feature' | 'alternative' | 'blog';
 
@@ -82,6 +83,11 @@ function toMeta(type: ContentType, slug: string, locale: Locale, data: Record<st
     faqs: Array.isArray(data.faqs) ? (data.faqs as Faq[]) : [],
     competitor: data.competitor ? String(data.competitor) : undefined,
   };
+}
+
+/** Builds the `alternates.languages` object for a page's Metadata, pointing at its locale siblings. */
+export function hreflangFor(type: ContentType, slug: string): Record<string, string> {
+  return Object.fromEntries(LOCALES.map((locale) => [locale, `${SITE_URL}${pathFor({ type, slug, locale })}`]));
 }
 
 export function pathFor(meta: Pick<ContentMeta, 'type' | 'slug' | 'locale'>): string {

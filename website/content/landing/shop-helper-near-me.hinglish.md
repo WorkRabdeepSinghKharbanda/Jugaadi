@@ -8,7 +8,7 @@ faqs:
   - q: Kya mujhe ek din se zyada commit karna hoga?
     a: Nahi — agar sirf ek din chahiye toh ek din ke liye post karo, ya busy week ke liye ek hafte tak.
   - q: Hire karne ke baad kya hota hai?
-    a: Worker ka phone number share ho jaata hai taaki aap directly coordinate kar sako, aur kaam poora hone par aap job ko complete mark karte ho.
+    a: Worker ka phone number share ho jaata hai taaki aap directly coordinate kar sako, aur kaam poora hone par aap task ko complete mark karte ho.
 ---
 
 ## Bina backup staff ke shop chalana
@@ -17,7 +17,7 @@ Zyada tar small shops ek ya do logon par chalti hain. Ek sick din, achanak stock
 
 ## Post karo, paas waalon ko dekho, hire karo
 
-Aapko jo skill chahiye aur dates post karo. Paas ke workers jinhone woh skill list ki hai — loading/unloading, delivery, packing, ya general helper — apply kar sakte hain. Aap decide karte ho kise hire karna hai; hire karte hi unka contact share ho jaata hai, aur aap unhe directly pay karte ho.
+Aapko jo skill chahiye aur dates post karo. Paas ke workers jinhone woh skill list ki hai — loading/unloading, delivery, packing, ya general helper — respond kar sakte hain. Aap decide karte ho kise hire karna hai; hire karte hi unka contact share ho jaata hai, aur aap unhe directly pay karte ho.
 
 ## Next steps
 

@@ -9,7 +9,7 @@ Jugaadi ke landing page ko aisa dikhana easy hota jaise yeh har jagah available 
 
 ## Har jagah jaane ka lalach
 
-Ek marketplace zyada credible lagta hai jab woh bada dikhe — zyada cities, zyada workers, zyada posted jobs. Problem yeh hai ki ek two-sided marketplace sirf utna hi useful hota hai jitni ek jagah dono side ki density. Bees cities mein failey sau workers kisi ki madad nahi karte; ek mohalle mein pachaas workers kaafi hain taaki core loop — post, apply, hire — aaj kisi ke liye actually kaam kare.
+Ek marketplace zyada credible lagta hai jab woh bada dikhe — zyada cities, zyada workers, zyada posted tasks. Problem yeh hai ki ek two-sided marketplace sirf utna hi useful hota hai jitni ek jagah dono side ki density. Bees cities mein failey sau workers kisi ki madad nahi karte; ek mohalle mein pachaas workers kaafi hain taaki core loop — post, respond, hire — aaj kisi ke liye actually kaam kare.
 
 ## "Ek city" se kya milta hai
 

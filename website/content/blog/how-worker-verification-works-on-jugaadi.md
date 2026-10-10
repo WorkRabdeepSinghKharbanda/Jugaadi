@@ -9,7 +9,7 @@ A question we get early: "how do you verify workers?" The honest answer, right n
 
 ## What happens today
 
-A worker signs up, fills in their profile and skills, and their account sits unverified until Jugaadi's admin manually confirms their identity — a phone call or an in-person check, since this is a single-city pilot. Once confirmed, their profile gets a verified badge that owners see when reviewing applicants.
+A worker signs up, fills in their profile and skills, and their account sits unverified until Jugaadi's admin manually confirms their identity — a phone call or an in-person check, since this is a single-city pilot. Once confirmed, their profile gets a verified badge that owners see when reviewing who's responded.
 
 ## What this isn't
 

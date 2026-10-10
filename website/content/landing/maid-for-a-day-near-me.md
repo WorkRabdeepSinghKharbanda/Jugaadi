@@ -17,7 +17,7 @@ Most households rely on one person for cleaning, cooking, or general help. When 
 
 ## How it works for households
 
-Post what you need (cleaning, cooking, or general help) and the dates. Nearby pilot-verified workers who've listed that skill can apply; you pick who to hire and their phone number is shared once you do.
+Post what you need (cleaning, cooking, or general help) and the dates. Nearby pilot-verified workers who've listed that skill can respond; you pick who to hire and their phone number is shared once you do.
 
 ## A few things to check yourself
 

@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { PageList } from "@/components/PageList";
 import { FeatureCard } from "@/components/FeatureCard";
 
-const TITLES: Record<"feature" | "alternative" | "blog", Record<Locale, string>> = {
+export const TITLES: Record<"feature" | "alternative" | "blog", Record<Locale, string>> = {
   feature: { en: "Features", hi: "सुविधाएं", hinglish: "Features" },
   alternative: { en: "Alternatives", hi: "विकल्प", hinglish: "Alternatives" },
   blog: { en: "Blog", hi: "ब्लॉग", hinglish: "Blog" },

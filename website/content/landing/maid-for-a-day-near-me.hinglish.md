@@ -17,7 +17,7 @@ Zyada tar ghar cleaning, cooking, ya general help ke liye ek banda par depend ka
 
 ## Gharon ke liye yeh kaise kaam karta hai
 
-Batao aapko kya chahiye (cleaning, cooking, ya general help) aur dates. Paas ke pilot-verified workers jinhone woh skill list ki hai, apply kar sakte hain; aap decide karte ho kise hire karna hai, aur hire karte hi unka phone number share ho jaata hai.
+Batao aapko kya chahiye (cleaning, cooking, ya general help) aur dates. Paas ke pilot-verified workers jinhone woh skill list ki hai, respond kar sakte hain; aap decide karte ho kise hire karna hai, aur hire karte hi unka phone number share ho jaata hai.
 
 ## Khud check karne laayak kuch baatein
 

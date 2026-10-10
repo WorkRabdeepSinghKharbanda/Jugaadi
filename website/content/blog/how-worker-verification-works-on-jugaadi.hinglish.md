@@ -9,7 +9,7 @@ Ek sawaal jo humein shuruaat mein hi milta hai: "aap worker ko verify kaise kart
 
 ## Aaj kya hota hai
 
-Ek worker sign up karta hai, apni profile aur skills bharta hai, aur unka account unverified rehta hai jab tak Jugaadi ka admin manually unki identity confirm nahi karta — phone call ya in-person check, kyunki yeh ek single-city pilot hai. Confirm hone ke baad, unki profile par verified badge lag jaata hai jo owners applicants review karte waqt dekhte hain.
+Ek worker sign up karta hai, apni profile aur skills bharta hai, aur unka account unverified rehta hai jab tak Jugaadi ka admin manually unki identity confirm nahi karta — phone call ya in-person check, kyunki yeh ek single-city pilot hai. Confirm hone ke baad, unki profile par verified badge lag jaata hai jo owners kisne respond kiya review karte waqt dekhte hain.
 
 ## Yeh kya nahi hai
 

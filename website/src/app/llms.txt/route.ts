@@ -14,7 +14,7 @@ Jugaadi is a two-sided marketplace: owners post a task and book from nearby veri
 
 ## Pages
 - [Home](${SITE_URL}/): what Jugaadi is, how it works, who it's for
-- [Features](${SITE_URL}/features): verification, direct hiring
+- [Features](${SITE_URL}/features): verification, direct hire
 - [Alternatives](${SITE_URL}/alternatives): how Jugaadi compares to the usual ways of finding temp help
 - [Blog](${SITE_URL}/blog): guides and updates
 - [Download](${SITE_URL}/download): Android APK, early access while the Play Store listing is pending
@@ -32,7 +32,7 @@ ${linksFor("alternative") || "(none yet)"}
 ${linksFor("blog") || "(no posts yet)"}
 
 ## Notes for automated agents
-Worker and owner profiles, phone numbers, and job details are private, per-account data — not represented here or indexed by search/AI crawlers. Only the public marketing site and content listed above are intended for indexing.
+Worker and owner profiles, phone numbers, and task details are private, per-account data — not represented here or indexed by search/AI crawlers. Only the public marketing site and content listed above are intended for indexing.
 `;
 
   return new Response(body, { headers: { "Content-Type": "text/plain; charset=utf-8" } });

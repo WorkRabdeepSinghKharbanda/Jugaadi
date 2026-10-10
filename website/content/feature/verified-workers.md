@@ -6,7 +6,7 @@ faqs:
   - q: How is a worker verified?
     a: During this single-city pilot, verification is a manual check by Jugaadi's admin — a phone call or in-person confirmation — not an automated background check or ID system.
   - q: Can I see the badge before hiring?
-    a: Yes — a worker's verification status shows on their applicant card when you're reviewing who's applied to your job.
+    a: Yes — a worker's verification status shows on their profile card when you're reviewing who's responded to your task.
   - q: Will verification get more rigorous later?
     a: The pilot deliberately keeps this manual and simple. A more automated KYC check is a future consideration once volume justifies it, not part of the current MVP.
 ---
@@ -21,7 +21,7 @@ At pilot volume, a human check is faster to set up and more accurate than wiring
 
 ## Where you see it
 
-The verified badge shows up when an owner reviews applicants for a posted job, next to each worker's name — so the hiring decision factors in verification alongside distance and whatever else the owner wants to weigh.
+The verified badge shows up when an owner reviews who's responded to a posted task, next to each worker's name — so the hiring decision factors in verification alongside distance and whatever else the owner wants to weigh.
 
 ## Next steps
 

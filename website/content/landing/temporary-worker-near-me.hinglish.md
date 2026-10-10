@@ -6,7 +6,7 @@ faqs:
   - q: Jugaadi par temporary worker kitni jaldi mil sakta hai?
     a: Aap jo chahiye post karte ho aur usi waqt paas ke matching skill waale workers dikhte hain. Kitni jaldi koi accept karega yeh us waqt paas mein kaun available hai us par depend karta hai — Jugaadi hiring time guarantee nahi karta, bas search aasaan banata hai.
   - q: Kya mujhe agency ya middleman chahiye?
-    a: Nahi. Aap job post karte ho, applicants dekhte ho, aur directly hire karte ho. Payment aap khud worker ko karte ho — is pilot mein Jugaadi payment flow mein nahi aata.
+    a: Nahi. Aap task post karte ho, kisne respond kiya dekhte ho, aur directly hire karte ho. Payment aap khud worker ko karte ho — is pilot mein Jugaadi payment flow mein nahi aata.
   - q: Kya Jugaadi ke workers verified hote hain?
     a: Har worker profile par ek manual verification badge hota hai, jo is single-city pilot mein hire hone se pehle haath se check kiya jaata hai. Yeh ek basic trust signal hai, background check nahi.
   - q: Main kis tarah ka kaam post kar sakta hoon?
@@ -19,7 +19,7 @@ Ek ya do regular workers par chalne waali shop ke paas koi slack nahi hota. Jab 
 
 ## Jugaadi alag kya karta hai
 
-Batao aapko kya chahiye — skill, dates, roughly location — aur apne paas un workers ko dekho jinhone woh skill daali hai aur pilot-verified hain. Jise chaho hire karo; baaki sabki application automatically close ho jaati hai. Is pilot mein koi posting fee nahi, koi agency commission nahi.
+Batao aapko kya chahiye — skill, dates, roughly location — aur apne paas un workers ko dekho jinhone woh skill daali hai aur pilot-verified hain. Jise chaho hire karo; baaki jinhone respond kiya woh automatically clear ho jaate hain. Is pilot mein koi posting fee nahi, koi agency commission nahi.
 
 ## Yeh kiske liye hai
 

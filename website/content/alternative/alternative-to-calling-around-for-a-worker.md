@@ -28,5 +28,5 @@ Jugaadi doesn't replace judgement — you still decide who to hire based on what
 
 ## Next steps
 
-- See how [direct hiring](/features/hire-instantly) actually works once you've posted.
+- See how [direct hire](/features/hire-instantly) actually works once you've posted.
 - Start with [temporary worker near me](/temporary-worker-near-me) or [shop helper near me](/shop-helper-near-me).

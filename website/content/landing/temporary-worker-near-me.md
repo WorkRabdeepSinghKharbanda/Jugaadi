@@ -6,7 +6,7 @@ faqs:
   - q: How fast can I find a temporary worker on Jugaadi?
     a: You post what you need and see nearby workers matching that skill immediately. How quickly someone accepts depends on who's available nearby at that moment — Jugaadi doesn't guarantee a hire time, it shortens the search.
   - q: Do I need an agency or middleman?
-    a: No. You post the job, see applicants, and hire directly. You pay the worker yourself — Jugaadi doesn't sit in the payment flow in this pilot.
+    a: No. You post the task, see who responds, and hire directly. You pay the worker yourself — Jugaadi doesn't sit in the payment flow in this pilot.
   - q: Are workers on Jugaadi verified?
     a: Each worker profile carries a manual verification badge, checked by hand during this single-city pilot before they can be hired. It's a basic trust signal, not a background check.
   - q: What kind of work can I post?
@@ -19,7 +19,7 @@ A shop with one or two regular workers has no slack. When someone is sick, or a 
 
 ## What Jugaadi does differently
 
-Post what you need — the skill, the dates, roughly where — and see workers near you who've marked that skill and are pilot-verified. Hire the one you want; everyone else's application is automatically closed out. No posting fee, no agency commission in this pilot.
+Post what you need — the skill, the dates, roughly where — and see workers near you who've marked that skill and are pilot-verified. Hire the one you want; everyone else who responded is automatically cleared. No posting fee, no agency commission in this pilot.
 
 ## Who this is for
 
