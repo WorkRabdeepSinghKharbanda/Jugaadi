@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import * as jobRepo from '../repositories/job.repository.js';
 import * as planRepo from '../repositories/plan.repository.js';
-import '../types.js';
+import { JobStatus } from '../types.js';
 
 /// Returns an error message if the caller is over their plan's monthly limit, else null.
 /// Fails open (null = allowed) on a plan/usage lookup error — a billing-state hiccup shouldn't
@@ -39,6 +39,9 @@ export async function postJob(req: Request, res: Response) {
   res.status(201).json(data);
 }
 
+const DEFAULT_NEARBY_LIMIT = 50;
+const MAX_NEARBY_LIMIT = 100;
+
 export async function getNearbyJobs(req: Request, res: Response) {
   const lat = Number(req.query.lat);
   const lng = Number(req.query.lng);
@@ -47,7 +50,14 @@ export async function getNearbyJobs(req: Request, res: Response) {
     return res.status(400).json({ error: 'lat and lng query params are required' });
   }
 
-  const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius);
+  let limit = DEFAULT_NEARBY_LIMIT;
+  if (req.query.limit != null) {
+    limit = Number(req.query.limit);
+    if (!Number.isInteger(limit) || limit < 1) return res.status(400).json({ error: 'limit must be a positive integer' });
+    limit = Math.min(limit, MAX_NEARBY_LIMIT);
+  }
+
+  const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius, limit);
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 }
@@ -144,7 +154,7 @@ export async function hireApplicant(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(id);
   if (jobError) return res.status(500).json({ error: jobError.message });
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
-  if (job.status !== 'open') return res.status(409).json({ error: 'job is not open' });
+  if (job.status !== JobStatus.OPEN) return res.status(409).json({ error: 'job is not open' });
 
   const { error, conflict } = await jobRepo.hireWorker(id, workerId);
   if (conflict) return res.status(409).json({ error: error!.message });
@@ -156,7 +166,7 @@ export async function completeJob(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
   if (jobError) return res.status(500).json({ error: jobError.message });
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
-  if (job.status !== 'hired') return res.status(409).json({ error: 'job is not hired' });
+  if (job.status !== JobStatus.HIRED) return res.status(409).json({ error: 'job is not hired' });
 
   const { error } = await jobRepo.completeJob(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
@@ -171,7 +181,7 @@ export async function updateJob(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
   if (jobError) return res.status(500).json({ error: jobError.message });
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
-  if (job.status !== 'open') return res.status(409).json({ error: 'only open jobs can be edited' });
+  if (job.status !== JobStatus.OPEN) return res.status(409).json({ error: 'only open jobs can be edited' });
 
   const patch: Record<string, unknown> = {};
   for (const key of EDITABLE_FIELDS) {
@@ -189,7 +199,7 @@ export async function removeJob(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
   if (jobError) return res.status(500).json({ error: jobError.message });
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
-  if (job.status !== 'open') return res.status(409).json({ error: 'only open jobs can be removed' });
+  if (job.status !== JobStatus.OPEN) return res.status(409).json({ error: 'only open jobs can be removed' });
 
   const { data, error } = await jobRepo.removeOpenJob(req.params.id);
   if (error) return res.status(500).json({ error: error.message });

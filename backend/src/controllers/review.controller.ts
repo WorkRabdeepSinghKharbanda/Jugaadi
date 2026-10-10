@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import * as reviewRepo from '../repositories/review.repository.js';
 import * as jobRepo from '../repositories/job.repository.js';
+import { JobStatus } from '../types.js';
 
 export async function postReview(req: Request, res: Response) {
   const { rating, comment, worker_id } = req.body;
@@ -11,7 +12,7 @@ export async function postReview(req: Request, res: Response) {
   const { data: job, error: jobError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
   if (jobError) return res.status(500).json({ error: jobError.message });
   if (!job) return res.status(404).json({ error: 'not found' });
-  if (job.status !== 'done') return res.status(409).json({ error: 'job is not done yet' });
+  if (job.status !== JobStatus.DONE) return res.status(409).json({ error: 'job is not done yet' });
 
   const isOwner = job.owner_id === req.userId;
 

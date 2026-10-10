@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import * as profileRepo from '../repositories/profile.repository.js';
 import * as adminRepo from '../repositories/admin.repository.js';
+import { JobStatus } from '../types.js';
 
 export async function verifyWorker(req: Request, res: Response) {
   const { error } = await profileRepo.verifyProfile(req.params.userId);
@@ -32,12 +33,12 @@ export async function updateUser(req: Request, res: Response) {
 }
 
 export async function deleteUser(req: Request, res: Response) {
-  const { error } = await profileRepo.softDeleteProfile(req.params.id);
+  const { error } = await profileRepo.deactivateAccount(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 }
 
-const JOB_STATUSES = ['open', 'hired', 'done', 'removed'] as const;
+const JOB_STATUSES = Object.values(JobStatus);
 
 export async function listAllJobs(_req: Request, res: Response) {
   const { data, error } = await adminRepo.listAllJobs();
@@ -62,8 +63,11 @@ export async function forceUpdateJob(req: Request, res: Response) {
   res.json(data);
 }
 
-export async function hardDeleteJob(req: Request, res: Response) {
-  const { error } = await adminRepo.deleteJob(req.params.id);
+// Force-removes a job regardless of its current status (moderation override) — soft, like every
+// other status transition in this app. Reviews/job_applications reference job_id, so a hard
+// DELETE here would orphan them; see admin.repository.ts's removeJob.
+export async function removeJob(req: Request, res: Response) {
+  const { error } = await adminRepo.removeJob(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 }

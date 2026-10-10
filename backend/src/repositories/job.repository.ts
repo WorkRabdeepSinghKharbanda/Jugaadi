@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { supabase } from '../config/db.js';
+import { JobStatus, ApplicationStatus } from '../types.js';
 
 export interface JobInput {
   title: string;
@@ -18,8 +19,8 @@ export async function createJob(ownerId: string, job: JobInput) {
   return supabase.from('jobs').insert({ owner_id: ownerId, ...job }).select().single();
 }
 
-export async function nearbyJobs(lat: number, lng: number, radiusM: number) {
-  return supabase.rpc('nearby_jobs', { in_lat: lat, in_lng: lng, radius_m: radiusM });
+export async function nearbyJobs(lat: number, lng: number, radiusM: number, limit: number) {
+  return supabase.rpc('nearby_jobs', { in_lat: lat, in_lng: lng, radius_m: radiusM, in_limit: limit });
 }
 
 export async function jobsByOwner(ownerId: string) {
@@ -52,7 +53,7 @@ export async function acceptedWorkersForJob(jobId: string) {
       'worker_id, worker:profiles!job_applications_worker_id_fkey(phone, contact_phone, email, full_name, is_deleted, is_verified, bio, city, worker_skills(skill))'
     )
     .eq('job_id', jobId)
-    .eq('status', 'accepted');
+    .eq('status', ApplicationStatus.ACCEPTED);
 }
 
 export async function myApplicationStatus(jobId: string, workerId: string) {
@@ -75,7 +76,7 @@ export async function pendingApplicants(jobId: string) {
     .from('job_applications')
     .select('*, worker:profiles!job_applications_worker_id_fkey(full_name, phone, is_verified, bio, city, worker_skills(skill))')
     .eq('job_id', jobId)
-    .eq('status', 'pending');
+    .eq('status', ApplicationStatus.PENDING);
 }
 
 export async function hireWorker(jobId: string, workerId: string) {
@@ -91,18 +92,18 @@ export async function hireWorker(jobId: string, workerId: string) {
 }
 
 export async function completeJob(jobId: string) {
-  return supabase.from('jobs').update({ status: 'done' }).eq('id', jobId);
+  return supabase.from('jobs').update({ status: JobStatus.DONE }).eq('id', jobId);
 }
 
 export type JobUpdateInput = Partial<JobInput>;
 
 export async function updateOpenJob(jobId: string, patch: JobUpdateInput) {
   // Guard on status='open': editing a hired/done job's terms after the fact doesn't make sense.
-  return supabase.from('jobs').update(patch).eq('id', jobId).eq('status', 'open').select().maybeSingle();
+  return supabase.from('jobs').update(patch).eq('id', jobId).eq('status', JobStatus.OPEN).select().maybeSingle();
 }
 
 export async function removeOpenJob(jobId: string) {
-  return supabase.from('jobs').update({ status: 'removed' }).eq('id', jobId).eq('status', 'open').select().maybeSingle();
+  return supabase.from('jobs').update({ status: JobStatus.REMOVED }).eq('id', jobId).eq('status', JobStatus.OPEN).select().maybeSingle();
 }
 
 const PHOTOS_BUCKET = 'job-photos';
@@ -125,11 +126,9 @@ export async function photoCount(jobId: string) {
   return { data: (data?.photo_urls as string[] | undefined)?.length ?? 0, error: null };
 }
 
+// Atomic append via the add_job_photo() Postgres function (supabase/migrations/0012) — a
+// client-side read-then-push-then-write here could lose a photo under concurrent uploads.
 export async function addJobPhoto(jobId: string, photoUrl: string): Promise<{ data: unknown; error: { message: string } | null }> {
-  const { data: job, error: fetchError } = await supabase.from('jobs').select('photo_urls').eq('id', jobId).maybeSingle();
-  if (fetchError) return { data: null, error: fetchError };
-  if (!job) return { data: null, error: { message: 'not found' } };
-  const photo_urls = [...(job.photo_urls as string[]), photoUrl];
-  const { data, error } = await supabase.from('jobs').update({ photo_urls }).eq('id', jobId).select().maybeSingle();
+  const { data, error } = await supabase.rpc('add_job_photo', { p_job_id: jobId, p_url: photoUrl });
   return { data, error };
 }

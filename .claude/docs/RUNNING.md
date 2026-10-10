@@ -10,7 +10,7 @@
 
 ```
 cd backend
-cp .env.example .env   # fill in SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ADMIN_SECRET
+cp .env.example .env   # fill in SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 npm install
 npm run dev             # listens on PORT (default 3000)
 ```
@@ -19,12 +19,12 @@ npm run dev             # listens on PORT (default 3000)
 |---|---|---|
 | `SUPABASE_URL` | yes | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | yes | Server-only key; backend is the only thing holding it |
-| `ADMIN_SECRET` | yes | Shared secret for `PATCH /admin/verify/:userId` (MVP-only admin gate) |
 | `PORT` | no (default 3000) | HTTP port |
 
 **How to get each credential:**
 - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`: Supabase dashboard → Project Settings → API. Service-role key bypasses RLS — never ship it to the Flutter app, never commit it.
-- `ADMIN_SECRET`: any random string you generate yourself (e.g. `openssl rand -hex 32`); send it as the `x-admin-secret` header when calling the admin endpoint.
+
+All `/admin/*` routes (including `PATCH /admin/verify/:userId`) are gated by `requireAdminUser`: caller must send a valid Supabase session JWT (`Authorization: Bearer ...`) for a profile with `is_admin=true` (flipped manually via SQL for the pilot).
 
 ## app/
 

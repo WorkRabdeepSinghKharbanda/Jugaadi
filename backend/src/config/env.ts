@@ -5,7 +5,4 @@ export function validateEnv(): void {
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
-  if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_SECRET) {
-    console.warn('[env] ADMIN_SECRET is not set: PATCH /admin/verify/:userId will always refuse (403).');
-  }
 }

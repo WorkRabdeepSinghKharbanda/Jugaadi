@@ -101,7 +101,18 @@ export async function razorpayWebhook(req: Request, res: Response) {
     const profileId = payment?.notes?.profile_id;
     if (profileId) {
       const { error } = await planRepo.activateProPlan(profileId, payment.id);
-      if (error) console.warn('[billing] webhook activateProPlan failed:', error.message);
+      if (error) {
+        // Money path: a captured payment that never activates Pro is a real incident, not a
+        // warning. Logged at error level so it's visible in Render logs, and answered with a
+        // 5xx (instead of 200) so Razorpay's own webhook retry mechanism keeps calling us back
+        // until activateProPlan succeeds — a 200 here would tell Razorpay the job is done.
+        console.error('[billing] webhook activateProPlan failed', {
+          paymentId: payment.id,
+          profileId,
+          error: error.message,
+        });
+        return res.status(502).json({ error: 'failed to activate plan, please retry' });
+      }
     }
   }
 

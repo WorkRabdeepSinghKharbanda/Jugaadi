@@ -48,3 +48,17 @@ export async function softDeleteProfile(userId: string) {
     })
     .eq('id', userId);
 }
+
+// Shared by a user deleting their own account and an admin deleting someone else's — scrub PII
+// first, then ban the auth identity so they can't get a fresh session JWT and keep using the
+// API against the now-scrubbed profile. Auth ban is best-effort: if it fails the profile is
+// still fully scrubbed, so we don't fail the whole request over it.
+export async function deactivateAccount(userId: string): Promise<{ error: { message: string } | null }> {
+  const { error } = await softDeleteProfile(userId);
+  if (error) return { error };
+
+  const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+  if (authError) console.warn('[profile] auth.admin.deleteUser failed after soft delete:', authError.message);
+
+  return { error: null };
+}

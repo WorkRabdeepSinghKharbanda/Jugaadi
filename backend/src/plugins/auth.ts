@@ -15,16 +15,6 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   next();
 }
 
-// MVP-only admin gate: single shared secret header, no multi-admin auth yet. Kept for
-// scripts/curl (e.g. the one-off PATCH /admin/verify) alongside requireAdminUser below.
-export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret || req.headers['x-admin-secret'] !== secret) {
-    return res.status(403).json({ error: 'forbidden' });
-  }
-  next();
-}
-
 // Real admin gate for the in-app admin panel: the caller's own JWT-verified profile must
 // have is_admin=true (flipped manually via SQL for the pilot, same spirit as is_verified).
 // Must run after requireAuth (needs req.userId already set).
