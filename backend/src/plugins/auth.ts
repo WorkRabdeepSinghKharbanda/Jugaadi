@@ -13,7 +13,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
   // A banned auth user's already-issued access token stays valid until it expires, so also
   // reject soft-deleted accounts here. A missing profile row (new user mid-signup) is allowed.
-  const { data: profile } = await supabase.from('profiles').select('is_deleted').eq('id', data.user.id).maybeSingle();
+  const { data: profile, error: profileError } = await supabase.from('profiles').select('is_deleted').eq('id', data.user.id).maybeSingle();
+  if (profileError) console.warn('[auth] is_deleted lookup failed, allowing request:', profileError.message);
   if (profile?.is_deleted) return res.status(401).json({ error: 'account deleted' });
 
   req.userId = data.user.id;

@@ -19,7 +19,7 @@ export default function TermsPage() {
         <em>Last updated: 14 October 2026</em>
       </p>
       <p>
-        These terms apply when you use the Jugaadi Android app and website. By creating an account or using
+        These terms cover your use of the Jugaadi Android app and website. By creating an account or using
         Jugaadi you agree to them. If you do not agree, please do not use Jugaadi.
       </p>
 
@@ -70,8 +70,8 @@ export default function TermsPage() {
 
       <h2>Plans and payments</h2>
       <p>
-        Jugaadi has a free plan with monthly limits and an optional paid Pro plan, billed for a period of 30
-        days through Razorpay. Prices and limits are shown in the app before you pay. A Pro plan does not
+        Jugaadi has a free plan with monthly limits, a 7-day free trial of Pro for new accounts, and an optional
+        paid Pro plan billed for a period of 30 days through Razorpay. Prices and limits are shown in the app before you pay. A Pro plan does not
         renew automatically; you choose to buy it again. Payments are processed by Razorpay under its own
         terms.
       </p>
