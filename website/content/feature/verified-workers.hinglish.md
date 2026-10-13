@@ -1,5 +1,5 @@
 ---
-title: "Verified Workers"
+title: "Verified Workers Jo Paas Mein Book Ho Sakein"
 description: "Jugaadi par har worker profile ek manual verification badge rakhti hai, book hone se pehle pilot admin dwara check kiya jaata hai."
 keywords: [verified workers, worker verification]
 faqs:

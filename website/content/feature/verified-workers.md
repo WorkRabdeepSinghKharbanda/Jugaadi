@@ -1,5 +1,5 @@
 ---
-title: "Verified Workers"
+title: "Verified Workers You Can Book Nearby"
 description: "Every worker profile on Jugaadi carries a manual verification badge, checked by the pilot admin before they're trusted for tasks."
 keywords: [verified workers, worker verification, is_verified badge]
 faqs:

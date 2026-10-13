@@ -1,5 +1,5 @@
 ---
-title: "Jugaadi Par Worker Verification Abhi Kaise Kaam Karta Hai"
+title: "Jugaadi Par Worker Verification Kaise Kaam Karta Hai"
 description: "Jugaadi par verified badge actually kya check karta hai, aur pilot mein kya nahi karta, iski seedhi explanation."
 date: "2026-10-09"
 keywords: [jugaadi verification, worker verification process]

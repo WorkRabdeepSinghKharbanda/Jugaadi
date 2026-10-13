@@ -10,7 +10,7 @@ faqs:
   - q: Are workers on Jugaadi verified?
     a: Each worker profile carries a manual verification badge, checked by hand during this single-city pilot before they appear for tasks. It's a basic trust signal, not a background check.
   - q: What kind of work can I post?
-    a: Short gigs from one day to one week — loading/unloading, general helper work, cleaning, cooking, delivery, and packing, using a fixed skill list so both sides know what's being asked for.
+    a: Short tasks from one day to one week — loading/unloading, general helper work, cleaning, cooking, delivery, and packing, using a fixed skill list so both sides know what's being asked for.
 ---
 
 ## The problem with a sudden staffing gap

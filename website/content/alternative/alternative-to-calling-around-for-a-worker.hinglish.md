@@ -1,5 +1,5 @@
 ---
-title: "Replacement Worker Ke Liye Idhar-Udhar Call Karne Ka Alternative"
+title: "Replacement Worker Ke Liye Call Karne Ka Alternative"
 description: "Contacts ko ek-ek karke call karne ya labour chowk par khade hone ke bajaye, Jugaadi par ek baar post karo aur dekho actually paas mein kaun available hai."
 keywords: [worker ke liye idhar udhar call karne ka alternative, labour chowk alternative]
 competitor: "Local labour contractors"

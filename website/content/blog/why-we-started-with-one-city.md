@@ -1,5 +1,5 @@
 ---
-title: "Why Jugaadi Is Starting in One City, Not Launching Everywhere"
+title: "Why Jugaadi Is Starting in One City First"
 description: "The case for a deliberately small pilot instead of a nationwide launch, and what has to be true before Jugaadi expands."
 date: "2026-10-08"
 keywords: [jugaadi pilot city, single city launch strategy]

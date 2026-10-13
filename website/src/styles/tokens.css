@@ -1,8 +1,11 @@
+/* Mirrors app/lib/core/theme/tokens.dart (AppColors.dark, AppRadius, AppSpacing, AppShadows). Keep in sync.
+   Web-only additions (type scale, container, section rhythm, glass) are marked. Dark-first; no light theme. */
 :root {
   --bg: #0B0B0F;
-  --surface: #16161C;
-  --surface-high: #1E1E26;
-  --outline: #26262F;
+  --surface: #17171A;
+  --surface-high: #1E1E22;
+  --surface-low: #111114;
+  --outline: #2A2A30;
   --shadow-dark: #050507;
   --shadow-light: #2A2A36;
   --accent: #E8A33D;
@@ -10,30 +13,35 @@
   --on-accent: #0B0B0F;
   --text: #F5F5F7;
   --text-2: #A6A6B3;
-  --text-3: #6E6E7A;
+  --text-3: #8A8A97; /* AA on --bg for body text (web tweak of app's dimmer value) */
   --live: #3DDC97;
   --danger: #FF5A5F;
+  --warning: #FFB547;
 
   --r-sm: 12px; --r-md: 20px; --r-lg: 28px; --r-pill: 999px;
   --s-xs: 4px; --s-sm: 8px; --s-md: 16px; --s-lg: 24px; --s-xl: 32px; --s-xxl: 48px;
-  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --raised: 6px 6px 18px rgba(5,5,7,.9), -4px -4px 14px rgba(42,42,54,.55);
+  --font: var(--font-inter), system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Devanagari', sans-serif;
+  --raised: 6px 6px 18px rgba(5,5,7,.9), -4px -4px 14px rgba(42,42,54,.45);
   --floating: 0 10px 30px rgba(5,5,7,.7);
   --glow: 0 8px 24px rgba(232,163,61,.3);
   --dur: 220ms; --ease: cubic-bezier(.33,1,.68,1);
 
+  /* web-only */
   --grad: linear-gradient(135deg, var(--accent), var(--accent-deep));
   --grad-soft: linear-gradient(135deg, rgba(232,163,61,.18), rgba(193,123,29,.04));
-  --glass: rgba(22,22,28,.62);
+  --glass: rgba(11,11,15,.72);
   --glass-border: rgba(255,255,255,.08);
   --container: 1200px;
+  --gutter: 20px;
   --measure: 68ch;
+  --tap: 44px;
+  --header-h: 64px;
   --section: clamp(56px, 8vw, 112px);
-  --fs-display: clamp(34px, 7.5vw, 64px);
-  --fs-h1: clamp(30px, 5vw, 44px);
-  --fs-h2: clamp(24px, 4vw, 34px);
+  --fs-display: clamp(36px, 8vw, 72px);
+  --fs-h1: clamp(32px, 5vw, 48px);
+  --fs-h2: clamp(26px, 4vw, 40px);
+  --fs-h3: 19px;
   --fs-lede: clamp(17px, 1.6vw, 20px);
   --fs-eyebrow: 13px;
-  --card-icon-size: 40px;
 }
 @media (prefers-reduced-motion: reduce) { :root { --dur: 0ms; } }

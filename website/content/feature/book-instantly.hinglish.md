@@ -1,6 +1,6 @@
 ---
 title: "Worker Turant Book Karo — No Agency, No Waiting"
-description: "Jugaadi par task post karo, paas ke respond karne waale workers review karo, aur directly book karo — baaki sab automatically clear ho jaate hain aur worker ka contact turant share hota hai."
+description: "Jugaadi par task post karo, paas ke respond karne waale workers review karo, aur directly book karo — baaki sab clear ho jaate hain."
 keywords: [worker turant book karo, direct booking]
 faqs:
   - q: Kisi ko book karne ke baad baaki respond karne waalon ka kya hota hai?

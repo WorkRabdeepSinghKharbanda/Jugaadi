@@ -1,11 +1,12 @@
 "use client";
 
 import { APK_DOWNLOAD_URL } from "@/lib/site";
+import { buttonClass } from "@/components/ui/button-class";
 
-export function ApkDownloadLink({ children }: { children: React.ReactNode }) {
+export function ApkDownloadLink({ children, size = "lg" }: { children: React.ReactNode; size?: "sm" | "md" | "lg" }) {
   return (
     <a
-      className="btn"
+      className={buttonClass("primary", size)}
       data-cta="download-apk"
       href={APK_DOWNLOAD_URL}
       rel="noopener noreferrer"

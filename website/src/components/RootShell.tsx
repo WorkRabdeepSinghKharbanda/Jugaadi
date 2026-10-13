@@ -1,7 +1,10 @@
+import { Inter } from "next/font/google";
 import Script from "next/script";
 import "@/app/globals.css";
 import { JsonLd } from "@/components/JsonLd";
 import { website } from "@/lib/jsonld";
+
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 
 const GA_ID = "G-BZFQG9797Y";
 const CLARITY_ID = "yv4vy55lfp";
@@ -9,7 +12,7 @@ const CLARITY_ID = "yv4vy55lfp";
 /** Shared <html>/<body> for the per-locale root layouts, so `<html lang>` is correct without headers()/dynamic rendering. */
 export function RootShell({ lang, children }: { lang: string; children: React.ReactNode }) {
   return (
-    <html lang={lang}>
+    <html lang={lang} className={inter.variable}>
       <body>
         <Script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
         <Script id="ga4-init">

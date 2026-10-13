@@ -1,12 +1,16 @@
+import Link from "next/link";
 import type { Locale } from "@/lib/locale";
 import { APK_DRIVE_VIEW_URL } from "@/lib/site";
-import { breadcrumbList, faqPage, softwareApplication } from "@/lib/jsonld";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { Faqs } from "@/components/Faqs";
+import { softwareApplication } from "@/lib/jsonld";
+import { ui } from "@/lib/i18n";
+import { localePrefix } from "@/lib/locale";
 import { JsonLd } from "@/components/JsonLd";
 import { ApkDownloadLink } from "@/components/ApkDownloadLink";
+import { PageShell } from "@/components/ui/PageShell";
+import { PageHero } from "@/components/ui/doc";
+import { Card, Section } from "@/components/ui/primitives";
+import { Faq, Steps } from "@/components/ui/blocks";
+import { Icon } from "@/components/ui/Icon";
 
 const COPY: Record<Locale, {
   home: string;
@@ -121,57 +125,51 @@ const COPY: Record<Locale, {
 
 export function DownloadView({ locale }: { locale: Locale }) {
   const t = COPY[locale];
-  const prefix = locale === "en" ? "" : `/${locale}`;
+  const u = ui(locale);
+  const prefix = localePrefix(locale);
   const path = `${prefix}/download`;
-  const crumbs = [{ name: t.home, path: locale === "en" ? "/" : `/${locale}` }, { name: t.title, path }];
-  const jsonld = [breadcrumbList(crumbs), faqPage(t.faqs), softwareApplication(path)].filter((n): n is NonNullable<typeof n> => n !== null);
+  const crumbs = [{ name: t.home, path: prefix || "/" }, { name: t.title, path }];
 
   return (
-    <>
-      <Header locale={locale} path="/download" />
-      <main>
-        <article>
-          <JsonLd data={jsonld} />
-          <Breadcrumbs items={crumbs} />
-          <h1>{t.title}</h1>
-          <p>{t.intro}</p>
-          <p>
-            <ApkDownloadLink>{t.downloadBtn}</ApkDownloadLink>
-          </p>
-          <p>
+    <PageShell locale={locale} path="/download">
+      <JsonLd data={[softwareApplication(path)]} />
+      <PageHero crumbs={crumbs} title={t.title} lede={t.intro}>
+        <div className="u-dl">
+          <div className="u-cta-row"><ApkDownloadLink>{t.downloadBtn}</ApkDownloadLink></div>
+          <p className="u-hero-note">
             {t.fallback}{" "}
-            <a data-cta="download-apk-drive" href={APK_DRIVE_VIEW_URL} target="_blank" rel="noopener noreferrer">
-              {t.openDrive}
-            </a>
-            .
+            <a className="u-textlink" data-cta="download-apk-drive" href={APK_DRIVE_VIEW_URL} target="_blank" rel="noopener noreferrer">{t.openDrive}</a>.
           </p>
-          <ul>
-            {t.details.map((d) => (
-              <li key={d}>{d}</li>
-            ))}
-          </ul>
+        </div>
+      </PageHero>
 
-          <h2>{t.whatsNewHeading}</h2>
-          <ul>
-            {t.whatsNew.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+      <Section first title={t.whatsNewHeading} id="whats-new">
+        <div className="u-two">
+          <Card icon="check">
+            <ul className="u-checklist">
+              {t.whatsNew.map((item) => <li key={item}><Icon name="check" size={18} />{item}</li>)}
+            </ul>
+          </Card>
+          <Card icon="phone">
+            <ul className="u-checklist">
+              {t.details.map((d) => <li key={d}><Icon name="check" size={18} />{d}</li>)}
+            </ul>
+          </Card>
+        </div>
+      </Section>
 
-          <h2>{t.stepsHeading}</h2>
-          <ol>
-            {t.steps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
+      <Section tight title={t.stepsHeading} id="install">
+        <Steps steps={t.steps.map((text) => ({ text }))} cols={2} />
+      </Section>
 
-          <h2>{t.dataHeading}</h2>
+      <Section tight title={t.dataHeading} id="data">
+        <Card icon="lock">
           <p>{t.dataText}</p>
+          <Link className="u-textlink" href="/privacy">{u.privacy}</Link>
+        </Card>
+      </Section>
 
-          <Faqs faqs={t.faqs} locale={locale} />
-        </article>
-      </main>
-      <Footer locale={locale} />
-    </>
+      <Section tight title={u.faqHeading} id="faq"><Faq faqs={t.faqs} /></Section>
+    </PageShell>
   );
 }

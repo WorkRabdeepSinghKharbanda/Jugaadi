@@ -1,5 +1,5 @@
 ---
-title: "Jugaadi Ek City Se Kyun Shuru Kar Raha Hai, Har Jagah Launch Nahi"
+title: "Jugaadi Ek City Se Kyun Shuru Kar Raha Hai"
 description: "Pure desh mein launch ki bajaye jaanbujhkar ek chhote pilot ka case, aur expand karne se pehle kya sach hona chahiye."
 date: "2026-10-08"
 keywords: [jugaadi pilot city, single city launch strategy]

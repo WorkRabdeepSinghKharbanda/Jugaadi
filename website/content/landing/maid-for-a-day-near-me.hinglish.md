@@ -4,7 +4,7 @@ description: "Apna regular household staff available na ho toh ek din ya ek haft
 keywords: [maid for a day near me, household helper near me, ek din ka cook, kam notice par cleaner]
 faqs:
   - q: Kya main sirf ek din ke liye book kar sakta hoon?
-    a: Haan — Jugaadi ke gigs ek din se ek hafte tak chalte hain, bilkul "mera regular helper aaj nahi aaya" waali situation ke liye.
+    a: Haan — Jugaadi ke tasks ek din se ek hafte tak chalte hain, bilkul "mera regular helper aaj nahi aaya" waali situation ke liye.
   - q: Kya mere ghar aane waala banda verified hai?
     a: Workers ke paas pilot ke admin check ka ek manual verification badge hota hai. Hamesha khud milo aur kisi ko ghar mein aane dene se pehle apni samajh ka istemaal karo, jaise kisi bhi household helper ke liye karte ho.
   - q: Main payment kaise karoon?

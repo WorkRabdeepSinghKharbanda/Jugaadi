@@ -4,7 +4,7 @@ description: "Need a cleaner, cook, or helper for a day or a week while your reg
 keywords: [maid for a day near me, household helper near me, cook for a day, cleaner near me short notice]
 faqs:
   - q: Can I book for just one day?
-    a: Yes — Jugaadi's gigs run from a single day up to a week, matching exactly the "my regular help is out today" situation.
+    a: Yes — Jugaadi tasks run from a single day up to a week, matching exactly the "my regular help is out today" situation.
   - q: Is the person coming to my home verified?
     a: Workers carry a manual verification badge from the pilot's admin check. Always meet and use your own judgement before letting anyone into your home, same as with any household helper.
   - q: How do I pay?

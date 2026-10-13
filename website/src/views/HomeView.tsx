@@ -1,104 +1,78 @@
-import Link from "next/link";
 import { getAllContent, pathFor } from "@/lib/content";
 import { homeCopy } from "@/lib/home-copy";
-import type { Locale } from "@/lib/locale";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { FeatureCard } from "@/components/FeatureCard";
-import { HowItWorksTabs } from "@/components/HowItWorksTabs";
-import { Faqs } from "@/components/Faqs";
-import { CtaBand } from "@/components/CtaBand";
-import { JsonLd } from "@/components/JsonLd";
+import { ui } from "@/lib/i18n";
+import { localePrefix, type Locale } from "@/lib/locale";
 import { softwareApplication } from "@/lib/jsonld";
+import { JsonLd } from "@/components/JsonLd";
+import { PageShell } from "@/components/ui/PageShell";
+import { Hero, PhoneMock } from "@/components/ui/Hero";
+import { Section, LinkButton, Container } from "@/components/ui/primitives";
+import { CtaBand, Faq, FeatureGrid, PricingCards, StatRow, Steps, StepsGroup, UseCaseGrid } from "@/components/ui/blocks";
+import type { IconName } from "@/components/ui/Icon";
 
-const LANDING_ICONS: Record<string, string> = {
-  "temporary-worker-near-me": "🧑‍🔧",
-  "maid-for-a-day-near-me": "🏠",
-  "shop-helper-near-me": "🏪",
+const LANDING_ICONS: Record<string, IconName> = {
+  "temporary-worker-near-me": "users",
+  "maid-for-a-day-near-me": "home",
+  "shop-helper-near-me": "store",
 };
-const WHO_ICONS = ["🏪", "🏢", "🏠", "💼"];
 
 export function HomeView({ locale }: { locale: Locale }) {
   const c = homeCopy(locale);
-  const prefix = locale === "en" ? "" : `/${locale}`;
+  const t = ui(locale);
+  const prefix = localePrefix(locale);
   const landing = getAllContent("landing", locale).map((m) => ({
-    title: m.title,
-    description: m.description,
-    path: pathFor(m),
-    icon: LANDING_ICONS[m.slug] ?? "🔧",
+    title: m.title, description: m.description, href: pathFor(m), icon: LANDING_ICONS[m.slug] ?? ("tag" as IconName),
+  }));
+  const features = c.features.map((f) => ({
+    title: f.title, text: f.text, icon: f.icon as IconName, href: f.slug ? `${prefix}/features/${f.slug}` : undefined,
   }));
 
   return (
-    <>
-      <Header locale={locale} path="/" />
-      <main>
-        <JsonLd data={[softwareApplication(`${prefix}/download`)]} />
-        <section className="hero">
-          <p className="eyebrow">{c.eyebrow}</p>
-          <h1>{c.heroH1}</h1>
-          <p className="lede">{c.heroLede}</p>
-          <p className="cta-row">
-            <Link href={`${prefix}/download`} className="btn">
-              {c.ctaOwner}
-            </Link>
-            <Link href={`${prefix}/download`} className="btn ghost">
-              {c.ctaWorker}
-            </Link>
-          </p>
-          <div className="stat-strip">
-            {c.statStrip.map((s) => (
-              <span key={s}>
-                <strong>{s}</strong>
-              </span>
-            ))}
-          </div>
-        </section>
+    <PageShell locale={locale} path="/">
+      <JsonLd data={[softwareApplication(`${prefix}/download`)]} />
+      <Hero
+        eyebrow={c.eyebrow}
+        title={<>{c.heroH1[0]} <em>{c.heroH1[1]}</em></>}
+        lede={c.heroLede}
+        actions={<><LinkButton href={`${prefix}/download`} size="lg">{c.ctaOwner}</LinkButton><LinkButton href={`${prefix}/download`} variant="ghost" size="lg">{c.ctaWorker}</LinkButton></>}
+        note={c.heroNote}
+        visual={<PhoneMock copy={c.mock} />}
+      />
+      <section className="u-section tight" aria-label={c.trust[0]}>
+        <Container><StatRow items={c.trust} label={c.trust[0]} /></Container>
+      </section>
 
-        <HowItWorksTabs
-          heading={c.howHeading}
-          ownerLabel={c.howOwnerH}
-          workerLabel={c.howWorkerH}
-          ownerSteps={c.howOwnerSteps}
-          workerSteps={c.howWorkerSteps}
+      <Section id="how" eyebrow={c.howEyebrow} title={c.howHeading} lede={c.howLede}>
+        <StepsGroup>
+          <Steps title={c.howOwnerH} steps={c.howOwnerSteps} />
+          <Steps title={c.howWorkerH} steps={c.howWorkerSteps} />
+        </StepsGroup>
+      </Section>
+
+      <Section id="use" eyebrow={c.useEyebrow} title={c.useHeading} lede={c.useLede}>
+        <UseCaseGrid items={landing} moreLabel={t.learnMore} />
+      </Section>
+
+      <Section id="features" eyebrow={c.featEyebrow} title={c.featHeading} lede={c.featLede}>
+        <FeatureGrid items={features} moreLabel={t.learnMore} />
+      </Section>
+
+      <Section id="pricing" eyebrow={c.priceEyebrow} title={c.priceHeading} lede={c.priceLede}>
+        <PricingCards plans={c.plans} fine={c.priceFine} />
+      </Section>
+
+      <Section id="faq" eyebrow={c.faqEyebrow} title={t.faqHeading}>
+        <Faq faqs={c.faqs} />
+      </Section>
+
+      <Section>
+        <CtaBand
+          title={c.pilotHeading}
+          text={c.pilotText}
+          primary={{ href: `${prefix}/download`, label: c.downloadBtn }}
+          secondary={{ href: `${prefix}/features`, label: c.browseFeatures }}
         />
-
-        <section>
-          <div className="section-head">
-            <h2>{c.findWorkersHeading}</h2>
-          </div>
-          <div className="cards">
-            {landing.map((p) => (
-              <FeatureCard key={p.path} icon={p.icon} title={p.title} description={p.description} path={p.path} />
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <div className="section-head">
-            <h2>{c.whoHeading}</h2>
-          </div>
-          <div className="cards">
-            {c.whoItems.map((s, i) => (
-              <FeatureCard key={s} icon={WHO_ICONS[i] ?? "👤"} title={s} description="" />
-            ))}
-          </div>
-        </section>
-
-        <Faqs faqs={c.faqs} locale={locale} />
-
-        <section>
-          <div className="cta-band">
-            <h2>{c.pilotHeading}</h2>
-            <p>{c.pilotText}</p>
-            <Link href={`${prefix}/download`} className="btn">
-              {c.downloadBtn}
-            </Link>
-          </div>
-        </section>
-
-        <CtaBand title={c.seeHowHeading} text={c.seeHowText} primary={{ href: `${prefix}/features`, label: c.browseFeatures }} />
-      </main>
-      <Footer locale={locale} />
-    </>
+      </Section>
+    </PageShell>
   );
 }

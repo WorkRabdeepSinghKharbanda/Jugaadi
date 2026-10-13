@@ -1,5 +1,5 @@
 ---
-title: "Temporary Worker Near Me — Ek Din Ya Ek Hafte Ke Liye Book Karo"
+title: "Temporary Worker Near Me — Ek Din Ke Liye Book Karo"
 description: "Jugaadi aapki shop ya ghar ke paas verified temporary workers dikhata hai, 1 din se 1 hafte tak available — taaki staff ki kami poora din kharab na kare."
 keywords: [temporary worker near me, daily wage worker near me, ek din ke liye worker book karo]
 faqs:
@@ -10,7 +10,7 @@ faqs:
   - q: Kya Jugaadi ke workers verified hote hain?
     a: Har worker profile par ek manual verification badge hota hai, jo is single-city pilot mein dikhne se pehle haath se check kiya jaata hai. Yeh ek basic trust signal hai, background check nahi.
   - q: Main kis tarah ka kaam post kar sakta hoon?
-    a: Ek din se ek hafte tak ke chhote gigs — loading/unloading, general helper work, cleaning, cooking, delivery, aur packing, ek fixed skill list ke zariye taaki dono sides ko pata ho kya maanga ja raha hai.
+    a: Ek din se ek hafte tak ke chhote tasks — loading/unloading, general helper work, cleaning, cooking, delivery, aur packing, ek fixed skill list ke zariye taaki dono sides ko pata ho kya maanga ja raha hai.
 ---
 
 ## Achanak staff ki kami ki problem
