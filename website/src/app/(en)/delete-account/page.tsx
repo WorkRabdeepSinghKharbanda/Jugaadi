@@ -31,8 +31,8 @@ const SECTIONS: LegalSectionItem[] = [
           <li>Tap Delete account and confirm.</li>
         </ol>
         <p>
-          Deletion happens straight away and cannot be undone. You will be signed out and cannot sign in
-          again with that mobile number.
+          Deletion cannot be undone. You will be signed out and your sign-in is permanently disabled, so
+          you cannot sign in again with that mobile number.
         </p>
       </>
     ),
@@ -56,7 +56,7 @@ const SECTIONS: LegalSectionItem[] = [
     body: (
       <>
         <ul>
-          <li>Your name (it becomes &quot;Deleted user&quot;) and your mobile number.</li>
+          <li>Your name (it becomes &quot;Deleted user&quot;) and your mobile number on your profile.</li>
           <li>Your separate contact number, email address, bio and profile photo link.</li>
           <li>Your city, saved location and skills.</li>
           <li>Any responses you made that were still waiting for an answer.</li>
@@ -72,9 +72,13 @@ const SECTIONS: LegalSectionItem[] = [
       <>
         <ul>
           <li>
-            Records that involve other people, such as completed bookings, the details and photos of tasks
-            you posted, and the text of reviews you wrote. They stay so the other person&apos;s history
-            stays intact, and they show you only as &quot;Deleted user&quot;.
+            Records that involve other people, such as responses and bookings, the details and photos of
+            tasks you posted, and the text of reviews you wrote. They stay so the other person&apos;s
+            history stays intact, and they show you only as &quot;Deleted user&quot;.
+          </li>
+          <li>
+            A disabled sign-in record that still holds your mobile number. It cannot be used to sign in and
+            exists so the number is not reused for your old account.
           </li>
           <li>Payment reference IDs, kept for accounting and legal reasons.</li>
         </ul>

@@ -136,10 +136,12 @@ const SECTIONS: LegalSectionItem[] = [
           anytime in Profile.
         </li>
         <li>
-          <strong>Delete your account:</strong> in the app go to Profile → Delete account. Your name, mobile
-          number, contact number, email, bio, profile photo link, city, saved location and skills are erased
-          (your name becomes &quot;Deleted user&quot;), tasks you posted that are still open are taken down,
-          and you can no longer sign in with that number. Text you wrote in a review and the details or
+          <strong>Delete your account:</strong> in the app go to Profile → Delete account. Your name, contact
+          number, email, bio, profile photo link, city, saved location and skills are erased (your name
+          becomes &quot;Deleted user&quot;), your mobile number is removed from your profile, tasks you
+          posted that are still open are taken down, and your sign-in is permanently disabled. A disabled
+          sign-in record that still holds the number stays in our authentication system so it cannot be
+          used to sign in again. Text you wrote in a review and the details or
           photos of tasks you posted stay as part of the other person&apos;s record; if you want those
           removed too, email us and we will review the request.
         </li>
