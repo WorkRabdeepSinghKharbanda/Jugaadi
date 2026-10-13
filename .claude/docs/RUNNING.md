@@ -54,7 +54,7 @@ flutter run --dart-define-from-file=.env.production
 
 ### Release signing and Play Store bundle
 
-Release builds sign with the upload key in `app/android/upload-keystore.jks`, configured by `app/android/key.properties` (both gitignored — back them up outside the repo; losing the upload key means asking Google Play to reset it). Without `key.properties` Gradle falls back to the debug key, which is fine for `flutter run --release` but not for distribution.
+Release builds sign with the upload key in `app/android/jugaadi-upload.jks`, configured by `app/android/key.properties` (both gitignored — back them up outside the repo; losing the upload key means asking Google Play to reset it). Without `key.properties` Gradle falls back to the debug key, which is fine for `flutter run --release` but not for distribution.
 
 ```
 cd app
