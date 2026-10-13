@@ -21,7 +21,7 @@ async function planLimitError(profileId: string, role: 'owner' | 'worker'): Prom
 }
 
 export async function postJob(req: Request, res: Response) {
-  const { title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage, workers_needed } = req.body;
+  const { title, description, skill_needed, lat, lng, address_text, address_line2, start_date, end_date, daily_wage, workers_needed } = req.body;
   if (!title || !skill_needed || lat == null || lng == null || !start_date || !end_date) {
     return res.status(400).json({ error: 'title, skill_needed, lat, lng, start_date, end_date are required' });
   }
@@ -33,7 +33,7 @@ export async function postJob(req: Request, res: Response) {
   if (limitError) return res.status(409).json({ error: limitError, code: 'plan_limit' });
 
   const { data, error } = await jobRepo.createJob(req.userId, {
-    title, description, skill_needed, lat, lng, address_text, start_date, end_date, daily_wage, workers_needed,
+    title, description, skill_needed, lat, lng, address_text, address_line2, start_date, end_date, daily_wage, workers_needed,
   });
   if (error) return res.status(500).json({ error: error.message });
   res.status(201).json(data);
@@ -59,7 +59,16 @@ export async function getNearbyJobs(req: Request, res: Response) {
 
   const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius, limit);
   if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+
+  // Carry the worker's own application status onto each card so "Apply" doesn't flash back
+  // after they've already applied (list is otherwise status-blind — open jobs stay listed).
+  const jobs = data ?? [];
+  if (jobs.length > 0) {
+    const { data: myApps } = await jobRepo.applicationStatusesForWorker(req.userId, jobs.map((j: { id: string }) => j.id));
+    const statusByJob = new Map((myApps ?? []).map((a) => [a.job_id, a.status]));
+    for (const job of jobs) job.my_application_status = statusByJob.get(job.id) ?? null;
+  }
+  res.json(jobs);
 }
 
 export async function getMyApplications(req: Request, res: Response) {
@@ -173,7 +182,7 @@ export async function completeJob(req: Request, res: Response) {
   res.json({ ok: true });
 }
 
-const EDITABLE_FIELDS = ['title', 'description', 'skill_needed', 'lat', 'lng', 'address_text', 'start_date', 'end_date', 'daily_wage'] as const;
+const EDITABLE_FIELDS = ['title', 'description', 'skill_needed', 'lat', 'lng', 'address_text', 'address_line2', 'start_date', 'end_date', 'daily_wage'] as const;
 // workers_needed is deliberately not editable once posted — it'd desync from hired_count,
 // which only ever increases via the atomic hire_worker RPC.
 

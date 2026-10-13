@@ -176,6 +176,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ],
                   const SizedBox(height: AppSpacing.md),
                   _DetailRow(icon: Icons.location_on_outlined, label: 'Address', value: job['address_text'] as String? ?? '-'),
+                  if ((job['address_line2'] as String?)?.isNotEmpty ?? false) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    _DetailRow(icon: Icons.storefront_outlined, label: 'Shop / landmark', value: job['address_line2'] as String),
+                  ],
                 ],
               ),
             ),

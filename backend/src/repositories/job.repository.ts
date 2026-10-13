@@ -9,6 +9,7 @@ export interface JobInput {
   lat: number;
   lng: number;
   address_text?: string;
+  address_line2?: string;
   start_date: string;
   end_date: string;
   daily_wage?: number;
@@ -21,6 +22,10 @@ export async function createJob(ownerId: string, job: JobInput) {
 
 export async function nearbyJobs(lat: number, lng: number, radiusM: number, limit: number) {
   return supabase.rpc('nearby_jobs', { in_lat: lat, in_lng: lng, radius_m: radiusM, in_limit: limit });
+}
+
+export async function applicationStatusesForWorker(workerId: string, jobIds: string[]) {
+  return supabase.from('job_applications').select('job_id, status').eq('worker_id', workerId).in('job_id', jobIds);
 }
 
 export async function jobsByOwner(ownerId: string) {

@@ -23,6 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _customSkillController = TextEditingController();
   final _selectedSkills = <String>{};
   bool _saving = false;
+  bool _useCustomNumber = false;
   String? _error;
   Map<String, dynamic>? _profile;
   List<dynamic> _reviews = [];
@@ -37,6 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final data = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
     _profile = data;
     _contactController.text = (data['contact_phone'] as String?) ?? '';
+    _useCustomNumber = _contactController.text.isNotEmpty;
     _emailController.text = (data['email'] as String?) ?? '';
     _bioController.text = (data['bio'] as String?) ?? '';
     _selectedSkills
@@ -117,6 +119,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _save() async {
+    if (_useCustomNumber && _contactController.text.trim().isEmpty) {
+      showAppToast(context, 'Enter the number to show, or turn the toggle off', tone: ToastTone.error);
+      return;
+    }
     final profile = _profile!;
     setState(() {
       _saving = true;
@@ -130,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'city': profile['city'],
         'lat': profile['lat'],
         'lng': profile['lng'],
-        'contact_phone': _contactController.text.trim().isEmpty ? null : _contactController.text.trim(),
+        'contact_phone': _useCustomNumber && _contactController.text.trim().isNotEmpty ? _contactController.text.trim() : null,
         'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
         'bio': _bioController.text.trim().isEmpty ? null : _bioController.text.trim(),
         'skills': _selectedSkills.toList(),
@@ -210,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: AppSpacing.md),
                       _Row(
                         icon: Icons.call_outlined,
-                        label: 'Contact number',
+                        label: 'Number shown to hires',
                         value: (profile['contact_phone'] as String?) ?? 'Same as login number',
                       ),
                       if ((profile['email'] as String?)?.isNotEmpty ?? false) ...[
@@ -291,13 +297,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              NeuTextField(
-                label: 'Contact number',
-                controller: _contactController,
-                hint: 'Leave empty to use your login number',
-                icon: Icons.call_outlined,
-                keyboardType: TextInputType.phone,
+              NeuCard(
+                child: Row(
+                  children: [
+                    Icon(Icons.call_outlined, size: 20, color: c.textSecondary),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Share a different number', style: AppText.body),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Shown to a worker only once you hire them — off uses your login number',
+                            style: AppText.bodySmall.copyWith(color: c.textTertiary),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: _useCustomNumber,
+                      activeThumbColor: c.accent,
+                      onChanged: (v) => setState(() => _useCustomNumber = v),
+                    ),
+                  ],
+                ),
               ),
+              if (_useCustomNumber) ...[
+                const SizedBox(height: AppSpacing.md),
+                NeuTextField(
+                  label: 'Number to show',
+                  controller: _contactController,
+                  icon: Icons.phone_forwarded_outlined,
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               NeuTextField(label: 'Email', controller: _emailController, icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
               const SizedBox(height: AppSpacing.md),

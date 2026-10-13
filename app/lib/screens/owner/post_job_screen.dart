@@ -24,6 +24,7 @@ const _kOtherSkill = 'Other';
 
 class _PostJobScreenState extends State<PostJobScreen> {
   late final _titleController = TextEditingController(text: widget.existingJob?['title'] as String?);
+  late final _addressLine2Controller = TextEditingController(text: widget.existingJob?['address_line2'] as String?);
   late final _wageController = TextEditingController(text: widget.existingJob?['daily_wage']?.toString());
   late final _workersNeededController = TextEditingController(text: '${widget.existingJob?['workers_needed'] ?? 1}');
   late final _customSkillController = TextEditingController(
@@ -50,9 +51,21 @@ class _PostJobScreenState extends State<PostJobScreen> {
     return existing != null && !kSkillOptions.contains(existing);
   }
 
+  /// First unmet requirement, or null once the form is postable — same checks as
+  /// [_buildBodyOrShowError], kept separate so the button/photos gate can run without
+  /// triggering the inline `_error` strip on every keystroke.
+  String? get _missingField {
+    if (_titleController.text.trim().isEmpty) return 'Title is required';
+    if (_skill == _kOtherSkill && _customSkillController.text.trim().isEmpty) return 'Specify the skill needed';
+    if (_place == null) return 'Set the job location';
+    if (_range == null) return 'Pick start and end dates';
+    return null;
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
+    _addressLine2Controller.dispose();
     _wageController.dispose();
     _workersNeededController.dispose();
     _customSkillController.dispose();
@@ -87,25 +100,19 @@ class _PostJobScreenState extends State<PostJobScreen> {
   /// Validates the form same as a real submit, and returns the field body — used both by the
   /// final submit and by the "silently create so photos have somewhere to attach" path.
   Map<String, dynamic>? _buildBodyOrShowError() {
-    if (_range == null) {
-      setState(() => _error = 'Pick start and end dates');
-      return null;
-    }
-    if (_place == null) {
-      setState(() => _error = 'Set the job location first');
+    final missing = _missingField;
+    if (missing != null) {
+      showAppToast(context, missing, tone: ToastTone.error);
       return null;
     }
     final skillNeeded = _skill == _kOtherSkill ? _customSkillController.text.trim() : _skill;
-    if (skillNeeded.isEmpty) {
-      setState(() => _error = 'Type the skill needed');
-      return null;
-    }
     return {
       'title': _titleController.text.trim(),
       'skill_needed': skillNeeded,
       'lat': _place!.latitude,
       'lng': _place!.longitude,
       'address_text': _place!.label,
+      'address_line2': _addressLine2Controller.text.trim().isEmpty ? null : _addressLine2Controller.text.trim(),
       'start_date': _range!.start.toIso8601String().split('T').first,
       'end_date': _range!.end.toIso8601String().split('T').first,
       if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
@@ -115,6 +122,11 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   Future<void> _addPhotos() async {
     if (!_hasJobId) {
+      final missing = _missingField;
+      if (missing != null) {
+        showAppToast(context, missing, tone: ToastTone.error);
+        return;
+      }
       final body = _buildBodyOrShowError();
       if (body == null) return;
       setState(() => _uploadingPhotos = true);
@@ -216,6 +228,13 @@ class _PostJobScreenState extends State<PostJobScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
+          NeuTextField(
+            label: 'Shop name / address details (optional)',
+            controller: _addressLine2Controller,
+            hint: 'e.g. Shop 4, Ganesh Market, 2nd floor',
+            icon: Icons.storefront_outlined,
+          ),
+          const SizedBox(height: AppSpacing.md),
           NeuTextField(label: 'Daily wage (optional)', controller: _wageController, icon: Icons.payments_outlined, keyboardType: TextInputType.number),
           if (!_isEdit) ...[
             const SizedBox(height: AppSpacing.md),
@@ -263,7 +282,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
             ErrorStrip(_error!),
             const SizedBox(height: AppSpacing.lg),
           ],
-          NeuButton(label: _hasJobId ? 'Save changes' : 'Post job', icon: Icons.check_rounded, loading: _loading, onPressed: _submit),
+          AnimatedBuilder(
+            animation: Listenable.merge([_titleController, _customSkillController]),
+            builder: (_, __) => NeuButton(
+              label: _hasJobId ? 'Save changes' : 'Post job',
+              icon: Icons.check_rounded,
+              loading: _loading,
+              onPressed: _missingField != null ? null : _submit,
+            ),
+          ),
         ],
       ),
     );

@@ -141,7 +141,12 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(job['title'] as String, style: AppText.title),
+                              Row(
+                                children: [
+                                  Expanded(child: Text(job['title'] as String, style: AppText.title)),
+                                  if (job['my_application_status'] != null) PillBadge.status(job['my_application_status'] as String),
+                                ],
+                              ),
                               const SizedBox(height: 4),
                               Text(job['skill_needed'] as String, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                               const SizedBox(height: 4),
