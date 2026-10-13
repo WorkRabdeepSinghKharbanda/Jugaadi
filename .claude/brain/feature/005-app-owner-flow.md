@@ -3,4 +3,4 @@ route: "OwnerHomeScreen → PostJobScreen / JobApplicantsScreen / JobDetailScree
 entry_point: "app/lib/screens/owner/"
 category: app
 ---
-Owner posts a job, views own jobs (tabs by status via list), views applicants and hires one, marks job complete. All backed by the `backend/` API, never direct Supabase calls.
+Owner posts/edits a job (live required-field validation gates the Post button and photo upload; optional shop/address line), views own jobs, views applicants and hires, marks complete, reviews the hired worker once (then edits that review). Share button on open jobs (see 011). All via the `backend/` API.

@@ -36,6 +36,8 @@ const COPY: Record<Locale, {
       "Post tasks (single or multiple workers needed) and manage who's responded",
       "Browse nearby tasks by skill and location, and respond",
       "In-app profile, reviews, and admin tools",
+      "New: use the app in English, Hindi, or Hinglish (set it in Profile)",
+      "New: share a task as an image or copy its details, add a shop name or landmark, edit your review, and filter your responses by date",
     ],
     stepsHeading: "Install steps",
     steps: [
@@ -65,6 +67,8 @@ const COPY: Record<Locale, {
       "टास्क पोस्ट करें (एक या कई वर्कर चाहिए) और रिस्पॉन्ड करने वालों को मैनेज करें",
       "स्किल और लोकेशन के हिसाब से पास के टास्क देखें और रिस्पॉन्ड करें",
       "इन-ऐप प्रोफ़ाइल, रिव्यू, और एडमिन टूल्स",
+      "नया: ऐप को अंग्रेज़ी, हिंदी या हिंग्लिश में इस्तेमाल करें (प्रोफ़ाइल में सेट करें)",
+      "नया: टास्क को इमेज के रूप में शेयर करें या डिटेल्स कॉपी करें, दुकान का नाम या लैंडमार्क जोड़ें, अपना रिव्यू एडिट करें, और रिस्पॉन्स को तारीख से फ़िल्टर करें",
     ],
     stepsHeading: "इंस्टॉल स्टेप्स",
     steps: [
@@ -94,6 +98,8 @@ const COPY: Record<Locale, {
       "Task post karo (ek ya multiple workers chahiye) aur jinhone respond kiya unhe manage karo",
       "Skill aur location ke hisaab se nearby tasks dekho aur respond karo",
       "In-app profile, reviews, aur admin tools",
+      "Naya: app ko English, Hindi ya Hinglish mein use karo (Profile mein set karo)",
+      "Naya: task ko image ke roop mein share karo ya details copy karo, shop ka naam ya landmark add karo, apna review edit karo, aur responses ko date se filter karo",
     ],
     stepsHeading: "Install steps",
     steps: [
