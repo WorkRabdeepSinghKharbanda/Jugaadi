@@ -37,7 +37,7 @@ export function Footer({ locale, path = "/", hideLocales }: { locale: Locale; pa
           <Col heading={t.footer.features} items={[{ title: t.allFeatures, path: `${p}/features` }, ...toItems("feature"), { title: t.downloadApp, path: `${p}/download` }]} />
           <Col heading={t.footer.compare} items={[{ title: t.allComparisons, path: `${p}/alternatives` }, ...toItems("alternative")]} />
           <Col heading={t.footer.company} items={[{ title: t.nav.blog, path: `${p}/blog` }]} />
-          <Col heading={t.legal} items={[{ title: t.privacy, path: "/privacy" }, { title: t.terms, path: "/terms" }]} />
+          <Col heading={t.legal} items={[{ title: t.privacy, path: "/privacy" }, { title: t.terms, path: "/terms" }, { title: t.deleteAccount, path: "/delete-account" }]} />
         </div>
         <div className="u-footer-bottom">
           <p>&copy; 2026 Jugaadi. {t.footerCopy}</p>

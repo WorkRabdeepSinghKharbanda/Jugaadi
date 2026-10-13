@@ -36,6 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const legal = [
     { url: `${SITE_URL}/privacy`, lastModified: new Date("2026-10-13") },
     { url: `${SITE_URL}/terms`, lastModified: new Date("2026-10-14") },
+    { url: `${SITE_URL}/delete-account`, lastModified: new Date("2026-10-14") },
   ];
 
   return [...staticPages, ...legal, ...content];
