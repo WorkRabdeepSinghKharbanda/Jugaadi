@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import '../api_client.dart';
 import '../config.dart';
 import '../core/i18n/lang.dart';
@@ -130,6 +131,33 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   bool _sharing = false;
 
   Future<void> _share() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: context.colors.surface,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.image_outlined, color: ctx.colors.accent),
+              title: Text(ctx.tr('share_image_option')),
+              onTap: () => Navigator.of(ctx).pop('share'),
+            ),
+            ListTile(
+              leading: Icon(Icons.copy_rounded, color: ctx.colors.accent),
+              title: Text(ctx.tr('copy_text_option')),
+              onTap: () => Navigator.of(ctx).pop('copy'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (choice == null || !mounted) return;
+    if (choice == 'copy') {
+      await Clipboard.setData(ClipboardData(text: jobShareText(job, context.lang)));
+      if (mounted) showAppToast(context, context.tr('copied_to_clipboard'));
+      return;
+    }
     setState(() => _sharing = true);
     try {
       await shareJob(job, context.lang);

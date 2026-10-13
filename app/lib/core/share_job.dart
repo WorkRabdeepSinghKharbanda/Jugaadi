@@ -85,7 +85,7 @@ Future<Uint8List> _renderJobCard(Map<String, dynamic> job, Lang lang) async {
   return bytes!.buffer.asUint8List();
 }
 
-String _shareText(Map<String, dynamic> job, Lang lang) {
+String jobShareText(Map<String, dynamic> job, Lang lang) {
   final wage = job['daily_wage'] != null ? ' · ₹${job['daily_wage']}/${tr(lang, 'share_per_day')}' : '';
   return '${tr(lang, 'share_open_position_badge')}: ${job['title']}\n'
       '${tr(lang, 'share_skill_label')}: ${job['skill_needed']}$wage\n\n'
@@ -99,6 +99,6 @@ Future<void> shareJob(Map<String, dynamic> job, Lang lang) async {
   final file = File('${dir.path}/jugaadi_job_${job['id']}.png');
   await file.writeAsBytes(bytes);
   await SharePlus.instance.share(
-    ShareParams(text: _shareText(job, lang), files: [XFile(file.path)]),
+    ShareParams(text: jobShareText(job, lang), files: [XFile(file.path)]),
   );
 }

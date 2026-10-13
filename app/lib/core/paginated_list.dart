@@ -30,6 +30,9 @@ class PaginatedList<T> {
       items.addAll(page);
       hasMore = page.length == pageSize;
       return true;
+    } catch (_) {
+      // Transient failure: keep what's loaded; the next scroll near the bottom retries.
+      return false;
     } finally {
       isLoadingMore = false;
     }

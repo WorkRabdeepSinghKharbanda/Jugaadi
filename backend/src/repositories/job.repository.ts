@@ -46,7 +46,7 @@ export async function applicationsByWorker(
     .eq('worker_id', workerId);
   if (dateFrom) query = query.gte('job.start_date', dateFrom);
   if (dateTo) query = query.lte('job.start_date', dateTo);
-  return query.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
+  return query.order('created_at', { ascending: false }).order('id', { ascending: false }).range(offset, offset + limit - 1);
 }
 
 export async function getJobWithOwner(jobId: string) {

@@ -272,6 +272,9 @@ const Map<String, Map<Lang, String>> _strings = {
 
   // Share job (image + text shared outside the app — kept short and marketing-forward)
   'share_job': {Lang.en: 'Share', Lang.hi: 'शेयर करें', Lang.hinglish: 'Share karo'},
+  'share_image_option': {Lang.en: 'Share as image', Lang.hi: 'इमेज के रूप में शेयर करें', Lang.hinglish: 'Image ke roop mein share karo'},
+  'copy_text_option': {Lang.en: 'Copy text', Lang.hi: 'टेक्स्ट कॉपी करें', Lang.hinglish: 'Text copy karo'},
+  'copied_to_clipboard': {Lang.en: 'Copied to clipboard', Lang.hi: 'क्लिपबोर्ड पर कॉपी हो गया', Lang.hinglish: 'Clipboard par copy ho gaya'},
   'share_open_position_badge': {Lang.en: 'Open position', Lang.hi: 'खुली पोज़िशन', Lang.hinglish: 'Open position'},
   'share_skill_label': {Lang.en: 'Skill', Lang.hi: 'स्किल', Lang.hinglish: 'Skill'},
   'share_location_label': {Lang.en: 'Location', Lang.hi: 'लोकेशन', Lang.hinglish: 'Location'},
