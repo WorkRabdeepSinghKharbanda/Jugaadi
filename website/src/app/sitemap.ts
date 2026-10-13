@@ -3,8 +3,8 @@ import { getAllContent, pathFor } from "@/lib/content";
 import { LOCALES, localizedPath } from "@/lib/locale";
 import { SITE_URL } from "@/lib/site";
 
-// Last real edit per page group (bump when that group's copy changes). Privacy/terms are placeholders
-// and noindex, so they are intentionally not listed until real policies exist.
+// Last real edit per page group (bump when that group's copy changes). Terms is still a placeholder
+// (noindex), so it is intentionally not listed.
 const LAST_MODIFIED = {
   "/": "2026-10-10",
   "/blog": "2026-10-10",
@@ -34,5 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ),
   );
 
-  return [...staticPages, ...content];
+  const privacy = { url: `${SITE_URL}/privacy`, lastModified: new Date("2026-10-13") };
+
+  return [...staticPages, privacy, ...content];
 }
