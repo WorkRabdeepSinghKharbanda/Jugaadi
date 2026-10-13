@@ -30,7 +30,7 @@ const COPY: Record<Locale, {
     downloadBtn: "Download for Android (APK)",
     fallback: "If the download doesn't start,",
     openDrive: "open the file on Google Drive",
-    details: ["Version: 1.0.0 (1)", "Platform: Android. iOS is not available yet.", "Hosted on Google Drive — the button downloads directly; the backup link opens the Drive page."],
+    details: ["Version: 1.0.0 (2)", "Platform: Android. iOS is not available yet.", "Hosted on Google Drive — the button downloads directly; the backup link opens the Drive page."],
     whatsNewHeading: "What's in this build",
     whatsNew: [
       "Post tasks (single or multiple workers needed) and manage who's responded",
@@ -59,7 +59,7 @@ const COPY: Record<Locale, {
     downloadBtn: "एंड्रॉइड के लिए डाउनलोड करें (APK)",
     fallback: "अगर डाउनलोड शुरू नहीं होता, तो",
     openDrive: "Google Drive पर फ़ाइल खोलें",
-    details: ["वर्शन: 1.0.0 (1)", "प्लेटफ़ॉर्म: एंड्रॉइड। iOS अभी उपलब्ध नहीं है।", "Google Drive पर होस्टेड — बटन सीधे डाउनलोड करता है; बैकअप लिंक Drive पेज खोलता है।"],
+    details: ["वर्शन: 1.0.0 (2)", "प्लेटफ़ॉर्म: एंड्रॉइड। iOS अभी उपलब्ध नहीं है।", "Google Drive पर होस्टेड — बटन सीधे डाउनलोड करता है; बैकअप लिंक Drive पेज खोलता है।"],
     whatsNewHeading: "इस बिल्ड में क्या है",
     whatsNew: [
       "टास्क पोस्ट करें (एक या कई वर्कर चाहिए) और रिस्पॉन्ड करने वालों को मैनेज करें",
@@ -88,7 +88,7 @@ const COPY: Record<Locale, {
     downloadBtn: "Android ke liye download karo (APK)",
     fallback: "Agar download start nahi hota, toh",
     openDrive: "Google Drive pe file kholo",
-    details: ["Version: 1.0.0 (1)", "Platform: Android. iOS abhi available nahi hai.", "Google Drive pe hosted — button seedha download karta hai; backup link Drive page kholta hai."],
+    details: ["Version: 1.0.0 (2)", "Platform: Android. iOS abhi available nahi hai.", "Google Drive pe hosted — button seedha download karta hai; backup link Drive page kholta hai."],
     whatsNewHeading: "Is build mein kya hai",
     whatsNew: [
       "Task post karo (ek ya multiple workers chahiye) aur jinhone respond kiya unhe manage karo",
