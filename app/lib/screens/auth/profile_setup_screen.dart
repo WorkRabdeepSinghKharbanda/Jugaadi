@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/services/place_gateway.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
@@ -71,7 +72,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   Future<void> _save() async {
     if (_place == null) {
-      setState(() => _error = 'Set your location first');
+      setState(() => _error = context.tr('set_location_first'));
       return;
     }
     setState(() {
@@ -92,7 +93,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       });
 
       if (!mounted) return;
-      showAppToast(context, 'Profile saved');
+      showAppToast(context, context.tr('profile_saved'));
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const RootRouter()),
         (route) => false,
@@ -109,24 +110,24 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: 'Set up your profile',
+      title: context.tr('set_up_profile_title'),
       scroll: true,
       resizeForKeyboard: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          NeuTextField(label: 'Full name', controller: _nameController, icon: Icons.person_outline_rounded),
+          NeuTextField(label: context.tr('full_name'), controller: _nameController, icon: Icons.person_outline_rounded),
           const SizedBox(height: AppSpacing.md),
-          NeuTextField(label: 'Phone', controller: _phoneController, icon: Icons.phone_rounded, keyboardType: TextInputType.phone),
+          NeuTextField(label: context.tr('phone'), controller: _phoneController, icon: Icons.phone_rounded, keyboardType: TextInputType.phone),
           const SizedBox(height: AppSpacing.md),
           NeuTextField(
-            label: 'Email (optional)',
+            label: context.tr('email_optional'),
             controller: _emailController,
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: AppSpacing.md),
-          Text('LOCATION', style: AppText.label.copyWith(color: c.textSecondary)),
+          Text(context.tr('location_label'), style: AppText.label.copyWith(color: c.textSecondary)),
           const SizedBox(height: AppSpacing.sm),
           NeuCard(
             onTap: _pickLocation,
@@ -136,7 +137,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
-                    _place?.label ?? 'Tap to set your location',
+                    _place?.label ?? context.tr('tap_to_set_location'),
                     style: AppText.body.copyWith(color: _place == null ? c.textTertiary : c.textPrimary),
                   ),
                 ),
@@ -146,7 +147,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           ),
           if (widget.role == 'worker') ...[
             const SizedBox(height: AppSpacing.lg),
-            SectionHeader('Your skills'),
+            SectionHeader(context.tr('your_skills')),
             Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
@@ -176,14 +177,14 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               children: [
                 Expanded(
                   child: NeuTextField(
-                    label: 'Other skill',
+                    label: context.tr('other_skill'),
                     controller: _customSkillController,
-                    hint: 'Type a skill not listed above',
+                    hint: context.tr('other_skill_hint'),
                     onSubmitted: (_) => _addCustomSkill(),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                NeuButton(label: 'Add', expand: false, height: 48, onPressed: _addCustomSkill),
+                NeuButton(label: context.tr('add'), expand: false, height: 48, onPressed: _addCustomSkill),
               ],
             ),
           ],
@@ -192,7 +193,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             ErrorStrip(_error!),
             const SizedBox(height: AppSpacing.lg),
           ],
-          NeuButton(label: 'Continue', icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _save),
+          NeuButton(label: context.tr('continue'), icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _save),
         ],
       ),
     );

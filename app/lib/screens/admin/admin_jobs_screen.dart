@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/job_status.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
@@ -31,7 +32,7 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
   Future<void> _forceStatus(Map<String, dynamic> job, String status) async {
     try {
       await ApiClient(Config.apiBaseUrl).patch('/admin/jobs/${job['id']}', {'status': status});
-      if (mounted) showAppToast(context, 'Status set to $status');
+      if (mounted) showAppToast(context, '${context.tr('status_set_to')} $status');
       _refresh();
     } catch (e) {
       if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
@@ -42,18 +43,18 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete this job permanently?'),
-        content: const Text('This removes the job and cannot be undone (unlike a normal "remove").'),
+        title: Text(ctx.tr('delete_job_permanently_title')),
+        content: Text(ctx.tr('delete_job_permanently_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Delete')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('delete'))),
         ],
       ),
     );
     if (confirmed != true) return;
     try {
       await ApiClient(Config.apiBaseUrl).delete('/admin/jobs/${job['id']}');
-      if (mounted) showAppToast(context, 'Job deleted');
+      if (mounted) showAppToast(context, context.tr('job_deleted'));
       _refresh();
     } catch (e) {
       if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
@@ -76,7 +77,7 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
             return Center(child: ErrorStrip('${snapshot.error}'));
           }
           final jobs = snapshot.data!;
-          if (jobs.isEmpty) return const EmptyState(icon: Icons.work_outline_rounded, text: 'No jobs');
+          if (jobs.isEmpty) return EmptyState(icon: Icons.work_outline_rounded, text: context.tr('no_jobs'));
           return ListView.builder(
             padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
             itemCount: jobs.length,

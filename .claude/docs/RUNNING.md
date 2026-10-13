@@ -41,6 +41,17 @@ Without these three `--dart-define` values the app shows a "not configured" scre
 
 - `SUPABASE_ANON_KEY`: Supabase dashboard → Project Settings → API (the public anon key, safe to ship in the app).
 
+### Run against production (simulator/emulator)
+
+To point a simulator/emulator build at the live Render backend + Supabase project instead of local, use `.env.production` (same file the release APK is built from):
+
+```
+cd app
+flutter run --dart-define-from-file=.env.production
+```
+
+`flutter devices` lists available simulators/emulators; add `-d <device-id>` to target one. Release build for distribution is the same flag with `flutter build apk --release` instead of `flutter run`.
+
 ## website/
 
 ```

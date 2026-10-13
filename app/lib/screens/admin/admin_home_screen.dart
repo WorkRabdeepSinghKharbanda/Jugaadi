@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/theme/tokens.dart';
 import '../../main.dart';
 import '../owner/owner_home_screen.dart';
@@ -37,18 +38,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Scaffold(
       backgroundColor: c.bg,
       appBar: AppBar(
-        title: Text(_index == 0 ? 'Admin · Users' : 'Admin · Jobs'),
+        title: Text(_index == 0 ? context.tr('admin_users_title') : context.tr('admin_jobs_title')),
         actions: [
-          IconButton(icon: const Icon(Icons.swap_horiz_rounded), tooltip: 'View as my role', onPressed: _viewAsOwnRole),
+          IconButton(icon: const Icon(Icons.swap_horiz_rounded), tooltip: context.tr('view_as_my_role'), onPressed: _viewAsOwnRole),
         ],
       ),
       body: pages[_index],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.people_outline_rounded), label: 'Users'),
-          NavigationDestination(icon: Icon(Icons.work_outline_rounded), label: 'Jobs'),
+        destinations: [
+          NavigationDestination(icon: const Icon(Icons.people_outline_rounded), label: context.tr('users')),
+          NavigationDestination(icon: const Icon(Icons.work_outline_rounded), label: context.tr('jobs')),
         ],
       ),
     );

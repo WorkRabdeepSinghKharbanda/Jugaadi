@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clarity_flutter/clarity_flutter.dart';
 import 'api_client.dart';
 import 'config.dart';
+import 'core/i18n/lang.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/tokens.dart';
 import 'core/widgets/widgets.dart';
@@ -17,12 +18,19 @@ final _clarityConfig = ClarityConfig(projectId: Config.clarityProjectId, logLeve
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final langController = await LangController.load();
   if (Config.supabaseUrl.isEmpty || Config.supabaseAnonKey.isEmpty) {
-    runApp(ClarityWidget(app: const _NotConfiguredApp(), clarityConfig: _clarityConfig));
+    runApp(ClarityWidget(
+      app: LangScope(controller: langController, child: const _NotConfiguredApp()),
+      clarityConfig: _clarityConfig,
+    ));
     return;
   }
   await Supabase.initialize(url: Config.supabaseUrl, anonKey: Config.supabaseAnonKey);
-  runApp(ClarityWidget(app: const JugaadiApp(), clarityConfig: _clarityConfig));
+  runApp(ClarityWidget(
+    app: LangScope(controller: langController, child: const JugaadiApp()),
+    clarityConfig: _clarityConfig,
+  ));
 }
 
 class _NotConfiguredApp extends StatelessWidget {
@@ -82,8 +90,9 @@ class _RootRouterState extends State<RootRouter> {
   Future<Map<String, dynamic>?> _loadProfile() async {
     if (Supabase.instance.client.auth.currentSession == null) return null;
     try {
-      final data = await ApiClient(Config.apiBaseUrl).get('/profile/me');
-      return data as Map<String, dynamic>;
+      final data = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
+      if (mounted) LangScope.controllerOf(context).syncFromProfile(data['lang'] as String?);
+      return data;
     } on ApiException catch (e) {
       if (e.statusCode == 404) return {};
       rethrow;

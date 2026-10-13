@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/location.dart';
+import '../../core/paginated_list.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
@@ -19,14 +21,24 @@ class WorkerHomeScreen extends StatefulWidget {
 }
 
 class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
-  late Future<List<dynamic>> _future;
+  late Future<void> _future;
+  late final _pager = PaginatedList<dynamic>(fetchPage: _fetchPage);
+  final _scrollController = ScrollController();
   bool _isAdmin = false;
+  double? _lat, _lng;
 
   @override
   void initState() {
     super.initState();
-    _future = _load();
+    _pager.attachScrollController(_scrollController, () => setState(() {}));
+    _future = _loadFirst();
     _checkAdmin();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _checkAdmin() async {
@@ -38,52 +50,55 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     }
   }
 
-  Future<List<dynamic>> _load() async {
-    final api = ApiClient(Config.apiBaseUrl);
-    double lat, lng;
-    try {
-      final profile = await api.get('/profile/me') as Map<String, dynamic>;
-      if (profile['lat'] == null || profile['lng'] == null) throw Exception('no saved location');
-      lat = (profile['lat'] as num).toDouble();
-      lng = (profile['lng'] as num).toDouble();
-    } catch (_) {
-      // No saved location yet (shouldn't normally happen post-setup) — fall back to a live GPS fix.
-      final position = await getCurrentPositionOrThrow();
-      lat = position.latitude;
-      lng = position.longitude;
-    }
-    final data = await api.get('/jobs/nearby', {'lat': lat, 'lng': lng});
+  Future<List<dynamic>> _fetchPage(int offset, int limit) async {
+    final data = await ApiClient(Config.apiBaseUrl).get('/jobs/nearby', {'lat': _lat, 'lng': _lng, 'limit': limit, 'offset': offset});
     return data as List<dynamic>;
   }
 
-  void _refresh() => setState(() { _future = _load(); });
+  Future<void> _loadFirst() async {
+    final api = ApiClient(Config.apiBaseUrl);
+    try {
+      final profile = await api.get('/profile/me') as Map<String, dynamic>;
+      if (profile['lat'] == null || profile['lng'] == null) throw Exception('no saved location');
+      _lat = (profile['lat'] as num).toDouble();
+      _lng = (profile['lng'] as num).toDouble();
+    } catch (_) {
+      // No saved location yet (shouldn't normally happen post-setup) — fall back to a live GPS fix.
+      final position = await getCurrentPositionOrThrow();
+      _lat = position.latitude;
+      _lng = position.longitude;
+    }
+    await _pager.loadFirstPage();
+  }
+
+  void _refresh() => setState(() { _future = _loadFirst(); });
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
     return AppScaffold(
-      title: 'Nearby jobs',
+      title: context.tr('nearby_jobs_title'),
       fullBleed: true,
       actions: [
         if (_isAdmin)
           NeuIconButton(
             icon: Icons.admin_panel_settings_outlined,
-            semanticLabel: 'Admin console',
+            semanticLabel: context.tr('admin_console'),
             onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
           ),
         NeuIconButton(
           icon: Icons.swap_horiz_rounded,
-          semanticLabel: 'Post a job instead',
+          semanticLabel: context.tr('post_job_instead'),
           onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
         ),
         NeuIconButton(
           icon: Icons.bolt_outlined,
-          semanticLabel: 'Plan',
+          semanticLabel: context.tr('plan'),
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'worker'))),
         ),
         NeuIconButton(
           icon: Icons.location_on_outlined,
-          semanticLabel: 'Update location',
+          semanticLabel: context.tr('update_location'),
           onPressed: () async {
             await editLocation(context);
             _refresh();
@@ -91,14 +106,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         ),
         NeuIconButton(
           icon: Icons.person_outline_rounded,
-          semanticLabel: 'Profile',
+          semanticLabel: context.tr('profile_title'),
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
         ),
       ],
       body: RefreshIndicator(
         color: c.accent,
         onRefresh: () async => _refresh(),
-        child: FutureBuilder<List<dynamic>>(
+        child: FutureBuilder<void>(
           future: _future,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
@@ -113,18 +128,25 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                     children: [
                       ErrorStrip('${snapshot.error}'),
                       const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: 'Retry', expand: false, onPressed: _refresh),
+                      NeuButton(label: context.tr('retry'), expand: false, onPressed: _refresh),
                     ],
                   ),
                 ),
               );
             }
-            final jobs = snapshot.data!;
-            if (jobs.isEmpty) return const EmptyState(icon: Icons.search_off_rounded, text: 'No open jobs nearby');
+            final jobs = _pager.items;
+            if (jobs.isEmpty) return EmptyState(icon: Icons.search_off_rounded, text: context.tr('no_open_jobs_nearby'));
             return ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
-              itemCount: jobs.length,
+              itemCount: jobs.length + (_pager.hasMore ? 1 : 0),
               itemBuilder: (context, i) {
+                if (i == jobs.length) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                    child: Center(child: CircularProgressIndicator(color: c.accent)),
+                  );
+                }
                 final job = jobs[i] as Map<String, dynamic>;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),

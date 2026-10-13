@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import '../api_client.dart';
 import '../config.dart';
+import '../core/i18n/lang.dart';
+import '../core/i18n/strings.dart';
 import '../core/job_status.dart';
+import '../core/share_job.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
 import 'plans_screen.dart';
@@ -59,7 +62,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/complete');
       if (!mounted) return;
-      showAppToast(context, 'Job marked complete');
+      showAppToast(context, context.tr('job_marked_complete'));
       setState(() => job = {...job, 'status': JobStatus.done.name});
     } catch (e) {
       if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
@@ -70,11 +73,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Future<void> _submitReview() async {
     if (_rating == 0) {
-      showAppToast(context, 'Pick a star rating first', tone: ToastTone.error);
+      showAppToast(context, context.tr('pick_star_rating'), tone: ToastTone.error);
       return;
     }
     if (widget.isOwner && _reviewTargetWorkerId == null) {
-      showAppToast(context, 'Pick which worker to rate', tone: ToastTone.error);
+      showAppToast(context, context.tr('pick_worker_to_rate'), tone: ToastTone.error);
       return;
     }
     setState(() => _reviewSubmitting = true);
@@ -85,7 +88,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         if (widget.isOwner) 'worker_id': _reviewTargetWorkerId,
       });
       if (!mounted) return;
-      showAppToast(context, 'Review submitted');
+      showAppToast(context, context.tr('review_submitted'));
       setState(() => _reviewDone = true);
     } on ApiException catch (e) {
       if (e.statusCode == 409) {
@@ -105,7 +108,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/apply');
       if (!mounted) return;
-      showAppToast(context, 'Applied successfully');
+      showAppToast(context, context.tr('applied_successfully'));
       setState(() => job = {...job, 'my_application_status': ApplicationStatus.pending.name});
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -124,6 +127,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     }
   }
 
+  bool _sharing = false;
+
+  Future<void> _share() async {
+    setState(() => _sharing = true);
+    try {
+      await shareJob(job, context.lang);
+    } catch (e) {
+      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -138,6 +154,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
       scroll: true,
+      actions: [
+        if (status == JobStatus.open.name)
+          _sharing
+              ? const Padding(padding: EdgeInsets.all(AppSpacing.sm), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+              : NeuIconButton(icon: Icons.share_rounded, semanticLabel: context.tr('share_job'), onPressed: _share),
+      ],
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -167,25 +189,25 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _DetailRow(icon: Icons.build_outlined, label: 'Skill', value: job['skill_needed'] as String? ?? '-'),
+                  _DetailRow(icon: Icons.build_outlined, label: context.tr('skill'), value: job['skill_needed'] as String? ?? '-'),
                   const SizedBox(height: AppSpacing.md),
-                  _DetailRow(icon: Icons.date_range_rounded, label: 'Dates', value: '${job['start_date']} → ${job['end_date']}'),
+                  _DetailRow(icon: Icons.date_range_rounded, label: context.tr('dates'), value: '${job['start_date']} → ${job['end_date']}'),
                   if (job['daily_wage'] != null) ...[
                     const SizedBox(height: AppSpacing.md),
-                    _DetailRow(icon: Icons.payments_outlined, label: 'Wage', value: '${job['daily_wage']}/day'),
+                    _DetailRow(icon: Icons.payments_outlined, label: context.tr('wage'), value: '${job['daily_wage']}/${context.tr('share_per_day')}'),
                   ],
                   const SizedBox(height: AppSpacing.md),
-                  _DetailRow(icon: Icons.location_on_outlined, label: 'Address', value: job['address_text'] as String? ?? '-'),
+                  _DetailRow(icon: Icons.location_on_outlined, label: context.tr('address'), value: job['address_text'] as String? ?? '-'),
                   if ((job['address_line2'] as String?)?.isNotEmpty ?? false) ...[
                     const SizedBox(height: AppSpacing.md),
-                    _DetailRow(icon: Icons.storefront_outlined, label: 'Shop / landmark', value: job['address_line2'] as String),
+                    _DetailRow(icon: Icons.storefront_outlined, label: context.tr('shop_landmark'), value: job['address_line2'] as String),
                   ],
                 ],
               ),
             ),
             if (widget.isOwner && hiredWorkers.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.lg),
-              SectionHeader(hiredWorkers.length > 1 ? 'Hired workers' : 'Hired worker'),
+              SectionHeader(hiredWorkers.length > 1 ? context.tr('hired_workers') : context.tr('hired_worker')),
               for (final w in hiredWorkers) ...[
                 NeuCard(
                   gradientBorder: true,
@@ -211,7 +233,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ],
             if (isHiredAsWorker) ...[
               const SizedBox(height: AppSpacing.lg),
-              SectionHeader('Owner contact'),
+              SectionHeader(context.tr('owner_contact')),
               NeuCard(
                 gradientBorder: true,
                 child: Row(
@@ -234,7 +256,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ],
             if (status == JobStatus.done.name && (widget.isOwner ? hiredWorkers.isNotEmpty : isHiredAsWorker) && !_reviewDone) ...[
               const SizedBox(height: AppSpacing.lg),
-              SectionHeader(widget.isOwner ? 'Rate a worker' : 'Rate the owner'),
+              SectionHeader(widget.isOwner ? context.tr('rate_a_worker') : context.tr('rate_the_owner')),
               NeuCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,30 +284,30 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
-                    NeuTextField(label: 'Comment (optional)', controller: _commentController, icon: Icons.chat_bubble_outline_rounded),
+                    NeuTextField(label: context.tr('comment_optional'), controller: _commentController, icon: Icons.chat_bubble_outline_rounded),
                     const SizedBox(height: AppSpacing.md),
-                    NeuButton(label: 'Submit review', loading: _reviewSubmitting, onPressed: _submitReview),
+                    NeuButton(label: context.tr('submit_review'), loading: _reviewSubmitting, onPressed: _submitReview),
                   ],
                 ),
               ),
             ],
             if (status == JobStatus.done.name && _reviewDone) ...[
               const SizedBox(height: AppSpacing.lg),
-              ErrorStrip('You\'ve already reviewed this job', warning: true),
+              ErrorStrip(context.tr('already_reviewed'), warning: true),
             ],
             const SizedBox(height: AppSpacing.xl),
             if (!widget.isOwner && status == JobStatus.open.name)
               NeuButton(
                 label: myApplicationStatus == ApplicationStatus.rejected.name
-                    ? 'Not selected'
+                    ? context.tr('not_selected')
                     : myApplicationStatus != null
-                        ? 'Applied'
-                        : 'Apply',
+                        ? context.tr('applied')
+                        : context.tr('apply'),
                 icon: myApplicationStatus != null ? Icons.check_rounded : Icons.send_rounded,
                 loading: _loading,
                 onPressed: myApplicationStatus != null ? null : _apply,
               ),
-            if (widget.isOwner && status == JobStatus.hired.name) NeuButton(label: 'Mark complete', icon: Icons.check_circle_outline_rounded, loading: _loading, onPressed: _complete),
+            if (widget.isOwner && status == JobStatus.hired.name) NeuButton(label: context.tr('mark_complete'), icon: Icons.check_circle_outline_rounded, loading: _loading, onPressed: _complete),
           ],
         ),
     );

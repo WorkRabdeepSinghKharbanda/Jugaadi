@@ -1,0 +1,297 @@
+import 'package:flutter/widgets.dart';
+import 'lang.dart';
+
+/// Translation dictionary. One entry per user-facing string, keyed by a short snake_case name —
+/// not by the English text, so renaming the English copy doesn't touch the key. Keep keys sorted
+/// roughly by the screen they belong to (see comments) so two people/PRs touching different
+/// screens don't collide on the same region of the map.
+const Map<String, Map<Lang, String>> _strings = {
+  // Shared
+  'retry': {Lang.en: 'Retry', Lang.hi: 'फिर कोशिश करें', Lang.hinglish: 'Phir try karo'},
+  'cancel': {Lang.en: 'Cancel', Lang.hi: 'रद्द करें', Lang.hinglish: 'Cancel karo'},
+  'save': {Lang.en: 'Save', Lang.hi: 'सेव करें', Lang.hinglish: 'Save karo'},
+  'delete': {Lang.en: 'Delete', Lang.hi: 'डिलीट करें', Lang.hinglish: 'Delete karo'},
+
+  // Profile screen
+  'profile_title': {Lang.en: 'Profile', Lang.hi: 'प्रोफ़ाइल', Lang.hinglish: 'Profile'},
+  'login_number': {Lang.en: 'Login number', Lang.hi: 'लॉगिन नंबर', Lang.hinglish: 'Login number'},
+  'number_shown_to_hires': {
+    Lang.en: 'Number shown to hires',
+    Lang.hi: 'हायर करने वालों को दिखने वाला नंबर',
+    Lang.hinglish: 'Hire karne walon ko dikhne wala number',
+  },
+  'same_as_login_number': {
+    Lang.en: 'Same as login number',
+    Lang.hi: 'लॉगिन नंबर जैसा ही',
+    Lang.hinglish: 'Login number jaisa hi',
+  },
+  'email': {Lang.en: 'Email', Lang.hi: 'ईमेल', Lang.hinglish: 'Email'},
+  'city': {Lang.en: 'City', Lang.hi: 'शहर', Lang.hinglish: 'City'},
+  'about': {Lang.en: 'About', Lang.hi: 'परिचय', Lang.hinglish: 'About'},
+  'skills': {Lang.en: 'Skills', Lang.hi: 'स्किल्स', Lang.hinglish: 'Skills'},
+  'no_skills_yet': {Lang.en: 'No skills added yet', Lang.hi: 'अभी कोई स्किल नहीं जोड़ी', Lang.hinglish: 'Abhi tak koi skill add nahi ki'},
+  'reviews': {Lang.en: 'Reviews', Lang.hi: 'रिव्यू', Lang.hinglish: 'Reviews'},
+  'no_reviews_yet': {Lang.en: 'No reviews yet', Lang.hi: 'अभी कोई रिव्यू नहीं', Lang.hinglish: 'Abhi tak koi review nahi'},
+  'edit_profile': {Lang.en: 'Edit profile', Lang.hi: 'प्रोफ़ाइल एडिट करें', Lang.hinglish: 'Profile edit karo'},
+  'log_out': {Lang.en: 'Log out', Lang.hi: 'लॉग आउट', Lang.hinglish: 'Log out karo'},
+  'delete_account': {Lang.en: 'Delete account', Lang.hi: 'अकाउंट डिलीट करें', Lang.hinglish: 'Account delete karo'},
+  'logout_dialog_title': {Lang.en: 'Log out?', Lang.hi: 'लॉग आउट करें?', Lang.hinglish: 'Log out karna hai?'},
+  'logout_dialog_body': {
+    Lang.en: "You'll need to verify your phone number again to sign back in.",
+    Lang.hi: 'दोबारा लॉगिन करने के लिए आपको फिर से फ़ोन नंबर वेरिफ़ाई करना होगा।',
+    Lang.hinglish: 'Wapas login karne ke liye phone number phir se verify karna hoga.',
+  },
+  'delete_dialog_title': {Lang.en: 'Delete account?', Lang.hi: 'अकाउंट डिलीट करें?', Lang.hinglish: 'Account delete karna hai?'},
+  'delete_dialog_body': {
+    Lang.en: "This can't be undone. Your profile will be deactivated and you won't be able to log in again with this number.",
+    Lang.hi: 'यह वापस नहीं हो सकता। आपकी प्रोफ़ाइल डीएक्टिवेट हो जाएगी और आप इस नंबर से दोबारा लॉगिन नहीं कर पाएंगे।',
+    Lang.hinglish: 'Yeh wapas nahi ho sakta. Aapki profile deactivate ho jayegi aur is number se dobara login nahi kar paoge.',
+  },
+  'share_different_number': {Lang.en: 'Share a different number', Lang.hi: 'अलग नंबर शेयर करें', Lang.hinglish: 'Alag number share karo'},
+  'share_different_number_desc': {
+    Lang.en: 'Shown to a worker only once you hire them — off uses your login number',
+    Lang.hi: 'सिर्फ़ हायर करने के बाद वर्कर को दिखेगा — बंद होने पर लॉगिन नंबर इस्तेमाल होगा',
+    Lang.hinglish: 'Sirf hire karne ke baad worker ko dikhega — off hone par login number use hoga',
+  },
+  'number_to_show': {Lang.en: 'Number to show', Lang.hi: 'दिखाने वाला नंबर', Lang.hinglish: 'Dikhane wala number'},
+  'other_skill': {Lang.en: 'Other skill', Lang.hi: 'अन्य स्किल', Lang.hinglish: 'Dusri skill'},
+  'other_skill_hint': {
+    Lang.en: 'Type a skill not listed above',
+    Lang.hi: 'ऊपर न दिखी स्किल टाइप करें',
+    Lang.hinglish: 'Upar na dikhi skill type karo',
+  },
+  'add': {Lang.en: 'Add', Lang.hi: 'जोड़ें', Lang.hinglish: 'Add karo'},
+  'profile_updated': {Lang.en: 'Profile updated', Lang.hi: 'प्रोफ़ाइल अपडेट हुई', Lang.hinglish: 'Profile update ho gayi'},
+  'enter_number_or_toggle_off': {
+    Lang.en: 'Enter the number to show, or turn the toggle off',
+    Lang.hi: 'दिखाने वाला नंबर डालें, या टॉगल बंद करें',
+    Lang.hinglish: 'Dikhane wala number daalo, ya toggle off karo',
+  },
+  'app_language': {Lang.en: 'App language', Lang.hi: 'ऐप की भाषा', Lang.hinglish: 'App ki language'},
+  'language_en': {Lang.en: 'English', Lang.hi: 'अंग्रेज़ी', Lang.hinglish: 'English'},
+  'language_hi': {Lang.en: 'Hindi', Lang.hi: 'हिंदी', Lang.hinglish: 'Hindi'},
+  'language_hinglish': {Lang.en: 'Hinglish', Lang.hi: 'हिंग्लिश', Lang.hinglish: 'Hinglish'},
+
+  // Admin screens
+  'admin_users_title': {Lang.en: 'Admin · Users', Lang.hi: 'एडमिन · यूज़र्स', Lang.hinglish: 'Admin · Users'},
+  'admin_jobs_title': {Lang.en: 'Admin · Jobs', Lang.hi: 'एडमिन · जॉब्स', Lang.hinglish: 'Admin · Jobs'},
+  'view_as_my_role': {Lang.en: 'View as my role', Lang.hi: 'मेरी भूमिका में देखें', Lang.hinglish: 'Apni role mein dekho'},
+  'users': {Lang.en: 'Users', Lang.hi: 'यूज़र्स', Lang.hinglish: 'Users'},
+  'jobs': {Lang.en: 'Jobs', Lang.hi: 'जॉब्स', Lang.hinglish: 'Jobs'},
+  'status_set_to': {Lang.en: 'Status set to', Lang.hi: 'स्टेटस सेट किया गया', Lang.hinglish: 'Status set ho gaya'},
+  'delete_job_permanently_title': {
+    Lang.en: 'Delete this job permanently?',
+    Lang.hi: 'इस जॉब को स्थायी रूप से डिलीट करें?',
+    Lang.hinglish: 'Is job ko permanently delete karna hai?',
+  },
+  'delete_job_permanently_body': {
+    Lang.en: 'This removes the job and cannot be undone (unlike a normal "remove").',
+    Lang.hi: 'यह जॉब को हटा देगा और यह वापस नहीं हो सकता (सामान्य "remove" से अलग)।',
+    Lang.hinglish: 'Yeh job ko hata dega aur wapas nahi ho sakta (normal "remove" se alag).',
+  },
+  'job_deleted': {Lang.en: 'Job deleted', Lang.hi: 'जॉब डिलीट हो गई', Lang.hinglish: 'Job delete ho gayi'},
+  'no_jobs': {Lang.en: 'No jobs', Lang.hi: 'कोई जॉब नहीं', Lang.hinglish: 'Koi job nahi'},
+  'deactivate_user_title': {Lang.en: 'Deactivate this user?', Lang.hi: 'इस यूज़र को डीएक्टिवेट करें?', Lang.hinglish: 'Is user ko deactivate karna hai?'},
+  'deactivate_user_body': {
+    Lang.en: 'will be soft-deleted and signed out of their account.',
+    Lang.hi: 'को सॉफ्ट-डिलीट कर दिया जाएगा और अकाउंट से साइन आउट कर दिया जाएगा।',
+    Lang.hinglish: 'ko soft-delete kar diya jayega aur account se sign out kar diya jayega.',
+  },
+  'user_deactivated': {Lang.en: 'User deactivated', Lang.hi: 'यूज़र डीएक्टिवेट हो गया', Lang.hinglish: 'User deactivate ho gaya'},
+  'no_users': {Lang.en: 'No users', Lang.hi: 'कोई यूज़र नहीं', Lang.hinglish: 'Koi user nahi'},
+  'admin_label': {Lang.en: 'Admin', Lang.hi: 'एडमिन', Lang.hinglish: 'Admin'},
+  'deleted_label': {Lang.en: 'Deleted', Lang.hi: 'डिलीट किया गया', Lang.hinglish: 'Delete ho gaya'},
+  'unverify': {Lang.en: 'Unverify', Lang.hi: 'अनवेरिफ़ाई करें', Lang.hinglish: 'Unverify karo'},
+  'verify': {Lang.en: 'Verify', Lang.hi: 'वेरिफ़ाई करें', Lang.hinglish: 'Verify karo'},
+  'deactivate': {Lang.en: 'Deactivate', Lang.hi: 'डीएक्टिवेट करें', Lang.hinglish: 'Deactivate karo'},
+
+  // Auth screens
+  'enter_otp_title': {Lang.en: 'Enter OTP', Lang.hi: 'OTP डालें', Lang.hinglish: 'OTP daalo'},
+  'otp_sent_to': {Lang.en: 'Sent to', Lang.hi: 'भेजा गया', Lang.hinglish: 'Bheja gaya'},
+  'otp_code': {Lang.en: 'OTP code', Lang.hi: 'OTP कोड', Lang.hinglish: 'OTP code'},
+  'tagline': {
+    Lang.en: 'Find help, or find work — same day.',
+    Lang.hi: 'मदद ढूंढें, या काम ढूंढें — उसी दिन।',
+    Lang.hinglish: 'Madad dhoondo, ya kaam dhoondo — usi din.',
+  },
+  'phone_number': {Lang.en: 'Phone number', Lang.hi: 'फ़ोन नंबर', Lang.hinglish: 'Phone number'},
+  'send_otp': {Lang.en: 'Send OTP', Lang.hi: 'OTP भेजें', Lang.hinglish: 'OTP bhejo'},
+  'set_location_first': {Lang.en: 'Set your location first', Lang.hi: 'पहले अपनी लोकेशन सेट करें', Lang.hinglish: 'Pehle apni location set karo'},
+  'profile_saved': {Lang.en: 'Profile saved', Lang.hi: 'प्रोफ़ाइल सेव हो गई', Lang.hinglish: 'Profile save ho gayi'},
+  'set_up_profile_title': {Lang.en: 'Set up your profile', Lang.hi: 'अपनी प्रोफ़ाइल सेट करें', Lang.hinglish: 'Apni profile set karo'},
+  'full_name': {Lang.en: 'Full name', Lang.hi: 'पूरा नाम', Lang.hinglish: 'Pura naam'},
+  'phone': {Lang.en: 'Phone', Lang.hi: 'फ़ोन', Lang.hinglish: 'Phone'},
+  'email_optional': {Lang.en: 'Email (optional)', Lang.hi: 'ईमेल (वैकल्पिक)', Lang.hinglish: 'Email (optional)'},
+  'location_label': {Lang.en: 'LOCATION', Lang.hi: 'लोकेशन', Lang.hinglish: 'LOCATION'},
+  'tap_to_set_location': {Lang.en: 'Tap to set your location', Lang.hi: 'अपनी लोकेशन सेट करने के लिए टैप करें', Lang.hinglish: 'Apni location set karne ke liye tap karo'},
+  'your_skills': {Lang.en: 'Your skills', Lang.hi: 'आपकी स्किल्स', Lang.hinglish: 'Aapki skills'},
+  'continue': {Lang.en: 'Continue', Lang.hi: 'जारी रखें', Lang.hinglish: 'Continue karo'},
+  'role_select_title': {Lang.en: 'What brings you here?', Lang.hi: 'आप यहाँ क्यों आए हैं?', Lang.hinglish: 'Aap yahan kyun aaye ho?'},
+  'role_select_subtitle': {
+    Lang.en: "Pick the side you're on — you can't switch later.",
+    Lang.hi: 'अपना पक्ष चुनें — बाद में बदल नहीं सकते।',
+    Lang.hinglish: 'Apna side chuno — baad mein switch nahi kar paoge.',
+  },
+  'i_need_workers': {Lang.en: 'I need workers', Lang.hi: 'मुझे वर्कर चाहिए', Lang.hinglish: 'Mujhe worker chahiye'},
+  'post_job_hire_nearby': {Lang.en: 'Post a job, hire nearby', Lang.hi: 'जॉब पोस्ट करें, नज़दीक से हायर करें', Lang.hinglish: 'Job post karo, nearby se hire karo'},
+  'i_want_work': {Lang.en: 'I want work', Lang.hi: 'मुझे काम चाहिए', Lang.hinglish: 'Mujhe kaam chahiye'},
+  'find_jobs_apply_fast': {
+    Lang.en: 'Find jobs nearby, apply fast',
+    Lang.hi: 'नज़दीकी जॉब्स ढूंढें, जल्दी अप्लाई करें',
+    Lang.hinglish: 'Nearby jobs dhoondo, jaldi apply karo',
+  },
+
+  // Owner screens
+  'worker_hired': {Lang.en: 'Worker hired', Lang.hi: 'वर्कर हायर हो गया', Lang.hinglish: 'Worker hire ho gaya'},
+  'applicants_title': {Lang.en: 'Applicants', Lang.hi: 'आवेदक', Lang.hinglish: 'Applicants'},
+  'hired_suffix': {Lang.en: 'hired', Lang.hi: 'हायर किए गए', Lang.hinglish: 'hire ho gaye'},
+  'all_slots_filled': {
+    Lang.en: 'All slots filled — this job no longer appears in Nearby.',
+    Lang.hi: 'सभी स्लॉट भर गए — यह जॉब अब नज़दीक में नहीं दिखेगी।',
+    Lang.hinglish: 'Sabhi slots bhar gaye — yeh job ab Nearby mein nahi dikhegi.',
+  },
+  'no_applicants_yet': {Lang.en: 'No applicants yet', Lang.hi: 'अभी तक कोई आवेदक नहीं', Lang.hinglish: 'Abhi tak koi applicant nahi'},
+  'hired_section': {Lang.en: 'Hired', Lang.hi: 'हायर किए गए', Lang.hinglish: 'Hire ho gaye'},
+  'pending_section': {Lang.en: 'Pending', Lang.hi: 'लंबित', Lang.hinglish: 'Pending'},
+  'unknown': {Lang.en: 'Unknown', Lang.hi: 'अज्ञात', Lang.hinglish: 'Unknown'},
+  'pending_verification': {Lang.en: 'Pending verification', Lang.hi: 'वेरिफिकेशन लंबित', Lang.hinglish: 'Verification pending'},
+  'hire': {Lang.en: 'Hire', Lang.hi: 'हायर करें', Lang.hinglish: 'Hire karo'},
+  'remove_job_title': {Lang.en: 'Remove this job?', Lang.hi: 'इस जॉब को हटाएं?', Lang.hinglish: 'Is job ko remove karna hai?'},
+  'remove_job_body': {
+    Lang.en: "This can't be undone. Workers will no longer be able to see or apply to it.",
+    Lang.hi: 'यह वापस नहीं हो सकता। वर्कर अब इसे देख या अप्लाई नहीं कर पाएंगे।',
+    Lang.hinglish: 'Yeh wapas nahi ho sakta. Workers ab ise dekh ya apply nahi kar paoge.',
+  },
+  'remove': {Lang.en: 'Remove', Lang.hi: 'हटाएं', Lang.hinglish: 'Remove karo'},
+  'job_removed': {Lang.en: 'Job removed', Lang.hi: 'जॉब हटा दी गई', Lang.hinglish: 'Job remove ho gayi'},
+  'my_jobs_title': {Lang.en: 'My jobs', Lang.hi: 'मेरी जॉब्स', Lang.hinglish: 'Meri jobs'},
+  'admin_console': {Lang.en: 'Admin console', Lang.hi: 'एडमिन कंसोल', Lang.hinglish: 'Admin console'},
+  'find_work_instead': {Lang.en: 'Find work instead', Lang.hi: 'इसके बजाय काम ढूंढें', Lang.hinglish: 'Iske bajay kaam dhoondo'},
+  'plan': {Lang.en: 'Plan', Lang.hi: 'प्लान', Lang.hinglish: 'Plan'},
+  'update_location': {Lang.en: 'Update location', Lang.hi: 'लोकेशन अपडेट करें', Lang.hinglish: 'Location update karo'},
+  'no_jobs_posted_yet': {Lang.en: 'No jobs posted yet', Lang.hi: 'अभी तक कोई जॉब पोस्ट नहीं की', Lang.hinglish: 'Abhi tak koi job post nahi ki'},
+  'edit': {Lang.en: 'Edit', Lang.hi: 'एडिट करें', Lang.hinglish: 'Edit karo'},
+  'title_required': {Lang.en: 'Title is required', Lang.hi: 'शीर्षक ज़रूरी है', Lang.hinglish: 'Title zaroori hai'},
+  'specify_skill_needed': {Lang.en: 'Specify the skill needed', Lang.hi: 'ज़रूरी स्किल बताएं', Lang.hinglish: 'Zaroori skill batao'},
+  'set_job_location': {Lang.en: 'Set the job location', Lang.hi: 'जॉब की लोकेशन सेट करें', Lang.hinglish: 'Job ki location set karo'},
+  'pick_start_end_dates': {Lang.en: 'Pick start and end dates', Lang.hi: 'शुरू और खत्म होने की तारीख चुनें', Lang.hinglish: 'Start aur end date chuno'},
+  'job_updated': {Lang.en: 'Job updated', Lang.hi: 'जॉब अपडेट हो गई', Lang.hinglish: 'Job update ho gayi'},
+  'job_posted_successfully': {Lang.en: 'Job posted successfully', Lang.hi: 'जॉब सफलतापूर्वक पोस्ट हुई', Lang.hinglish: 'Job successfully post ho gayi'},
+  'edit_job_title': {Lang.en: 'Edit job', Lang.hi: 'जॉब एडिट करें', Lang.hinglish: 'Job edit karo'},
+  'post_a_job_title': {Lang.en: 'Post a job', Lang.hi: 'जॉब पोस्ट करें', Lang.hinglish: 'Job post karo'},
+  'title_label': {Lang.en: 'Title', Lang.hi: 'शीर्षक', Lang.hinglish: 'Title'},
+  'skill_needed_label': {Lang.en: 'SKILL NEEDED', Lang.hi: 'ज़रूरी स्किल', Lang.hinglish: 'SKILL NEEDED'},
+  'specify_skill': {Lang.en: 'Specify skill', Lang.hi: 'स्किल बताएं', Lang.hinglish: 'Skill batao'},
+  'type_skill_needed': {Lang.en: 'Type the skill needed', Lang.hi: 'ज़रूरी स्किल टाइप करें', Lang.hinglish: 'Zaroori skill type karo'},
+  'tap_to_set_job_location': {Lang.en: 'Tap to set job location', Lang.hi: 'जॉब की लोकेशन सेट करने के लिए टैप करें', Lang.hinglish: 'Job ki location set karne ke liye tap karo'},
+  'shop_name_address_optional': {
+    Lang.en: 'Shop name / address details (optional)',
+    Lang.hi: 'दुकान का नाम / पता विवरण (वैकल्पिक)',
+    Lang.hinglish: 'Shop ka naam / address details (optional)',
+  },
+  'shop_address_hint': {
+    Lang.en: 'e.g. Shop 4, Ganesh Market, 2nd floor',
+    Lang.hi: 'जैसे शॉप 4, गणेश मार्केट, दूसरी मंज़िल',
+    Lang.hinglish: 'jaise Shop 4, Ganesh Market, 2nd floor',
+  },
+  'daily_wage_optional': {Lang.en: 'Daily wage (optional)', Lang.hi: 'दैनिक मज़दूरी (वैकल्पिक)', Lang.hinglish: 'Daily wage (optional)'},
+  'workers_needed_label': {Lang.en: 'Workers needed', Lang.hi: 'ज़रूरी वर्कर', Lang.hinglish: 'Workers needed'},
+  'photos_label': {Lang.en: 'Photos', Lang.hi: 'फ़ोटो', Lang.hinglish: 'Photos'},
+  'pick_dates': {Lang.en: 'Pick dates', Lang.hi: 'तारीखें चुनें', Lang.hinglish: 'Dates chuno'},
+  'save_changes': {Lang.en: 'Save changes', Lang.hi: 'बदलाव सेव करें', Lang.hinglish: 'Changes save karo'},
+  'post_job': {Lang.en: 'Post job', Lang.hi: 'जॉब पोस्ट करें', Lang.hinglish: 'Job post karo'},
+
+  // Plans screen
+  'billing_not_available': {
+    Lang.en: 'Billing not available yet — ask the admin',
+    Lang.hi: 'बिलिंग अभी उपलब्ध नहीं है — एडमिन से पूछें',
+    Lang.hinglish: 'Billing abhi available nahi hai — admin se pucho',
+  },
+  'upgraded_to_pro': {Lang.en: 'Upgraded to Pro!', Lang.hi: 'प्रो में अपग्रेड हो गया!', Lang.hinglish: 'Pro mein upgrade ho gaya!'},
+  'payment_failed': {Lang.en: 'Payment failed', Lang.hi: 'भुगतान विफल हुआ', Lang.hinglish: 'Payment fail ho gaya'},
+  'plan_posting_jobs': {Lang.en: 'Plan — Posting jobs', Lang.hi: 'प्लान — जॉब पोस्ट करना', Lang.hinglish: 'Plan — Jobs post karna'},
+  'plan_finding_work': {Lang.en: 'Plan — Finding work', Lang.hi: 'प्लान — काम ढूंढना', Lang.hinglish: 'Plan — Kaam dhoondna'},
+  'per_month_suffix': {Lang.en: '/month', Lang.hi: '/माह', Lang.hinglish: '/month'},
+  'unlimited_job_posts': {Lang.en: 'Unlimited job posts', Lang.hi: 'असीमित जॉब पोस्ट', Lang.hinglish: 'Unlimited job posts'},
+  'unlimited_applications': {Lang.en: 'Unlimited applications', Lang.hi: 'असीमित आवेदन', Lang.hinglish: 'Unlimited applications'},
+  'job_posts_this_month': {Lang.en: 'job posts this month', Lang.hi: 'इस महीने जॉब पोस्ट', Lang.hinglish: 'is mahine job posts'},
+  'applications_this_month': {Lang.en: 'applications this month', Lang.hi: 'इस महीने आवेदन', Lang.hinglish: 'is mahine applications'},
+  'pro_label': {Lang.en: 'Pro', Lang.hi: 'प्रो', Lang.hinglish: 'Pro'},
+  'free_label': {Lang.en: 'Free', Lang.hi: 'फ्री', Lang.hinglish: 'Free'},
+  'trial_then_price': {Lang.en: '7-day free trial, then', Lang.hi: '7-दिन का फ्री ट्रायल, फिर', Lang.hinglish: '7-din ka free trial, phir'},
+  'upgrade_to_pro': {Lang.en: 'Upgrade to Pro', Lang.hi: 'प्रो में अपग्रेड करें', Lang.hinglish: 'Pro mein upgrade karo'},
+  'your_status': {Lang.en: 'Your status', Lang.hi: 'आपका स्टेटस', Lang.hinglish: 'Aapka status'},
+  'trial_prefix': {Lang.en: 'Trial:', Lang.hi: 'ट्रायल:', Lang.hinglish: 'Trial:'},
+  'day_left': {Lang.en: 'day left', Lang.hi: 'दिन बचा', Lang.hinglish: 'din bacha'},
+  'days_left': {Lang.en: 'days left', Lang.hi: 'दिन बचे', Lang.hinglish: 'din bache'},
+  'trial_ended': {Lang.en: 'Trial ended', Lang.hi: 'ट्रायल खत्म हुआ', Lang.hinglish: 'Trial khatam ho gaya'},
+
+  // Worker screens
+  'my_applications_title': {Lang.en: 'My applications', Lang.hi: 'मेरे आवेदन', Lang.hinglish: 'Mere applications'},
+  'no_applications_yet': {Lang.en: 'No applications yet', Lang.hi: 'अभी तक कोई आवेदन नहीं', Lang.hinglish: 'Abhi tak koi application nahi'},
+  'no_applications_in_range': {
+    Lang.en: 'No applications in this date range',
+    Lang.hi: 'इस तारीख सीमा में कोई आवेदन नहीं',
+    Lang.hinglish: 'Is date range mein koi application nahi',
+  },
+  'lifetime_applications': {Lang.en: 'Lifetime applications', Lang.hi: 'सभी समय के आवेदन', Lang.hinglish: 'Lifetime applications'},
+  'filter_by_date': {Lang.en: 'Filter by date', Lang.hi: 'तारीख से फ़िल्टर करें', Lang.hinglish: 'Date se filter karo'},
+  'clear_filter': {Lang.en: 'Clear filter', Lang.hi: 'फ़िल्टर हटाएं', Lang.hinglish: 'Filter clear karo'},
+  'job_status_prefix': {Lang.en: 'Job:', Lang.hi: 'जॉब:', Lang.hinglish: 'Job:'},
+  'nearby_jobs_title': {Lang.en: 'Nearby jobs', Lang.hi: 'नज़दीकी जॉब्स', Lang.hinglish: 'Nearby jobs'},
+  'post_job_instead': {Lang.en: 'Post a job instead', Lang.hi: 'इसके बजाय जॉब पोस्ट करें', Lang.hinglish: 'Iske bajay job post karo'},
+  'no_open_jobs_nearby': {Lang.en: 'No open jobs nearby', Lang.hi: 'आस-पास कोई खुली जॉब नहीं', Lang.hinglish: 'Aas-paas koi open job nahi'},
+
+  // Job detail screen
+  'skill': {Lang.en: 'Skill', Lang.hi: 'स्किल', Lang.hinglish: 'Skill'},
+  'dates': {Lang.en: 'Dates', Lang.hi: 'तारीखें', Lang.hinglish: 'Dates'},
+  'wage': {Lang.en: 'Wage', Lang.hi: 'मज़दूरी', Lang.hinglish: 'Wage'},
+  'address': {Lang.en: 'Address', Lang.hi: 'पता', Lang.hinglish: 'Address'},
+  'shop_landmark': {Lang.en: 'Shop / landmark', Lang.hi: 'दुकान / लैंडमार्क', Lang.hinglish: 'Shop / landmark'},
+  'hired_workers': {Lang.en: 'Hired workers', Lang.hi: 'हायर किए गए वर्कर', Lang.hinglish: 'Hire kiye gaye workers'},
+  'hired_worker': {Lang.en: 'Hired worker', Lang.hi: 'हायर किया गया वर्कर', Lang.hinglish: 'Hire kiya gaya worker'},
+  'owner_contact': {Lang.en: 'Owner contact', Lang.hi: 'मालिक का संपर्क', Lang.hinglish: 'Owner ka contact'},
+  'rate_a_worker': {Lang.en: 'Rate a worker', Lang.hi: 'वर्कर को रेट करें', Lang.hinglish: 'Worker ko rate karo'},
+  'rate_the_owner': {Lang.en: 'Rate the owner', Lang.hi: 'मालिक को रेट करें', Lang.hinglish: 'Owner ko rate karo'},
+  'comment_optional': {Lang.en: 'Comment (optional)', Lang.hi: 'टिप्पणी (वैकल्पिक)', Lang.hinglish: 'Comment (optional)'},
+  'submit_review': {Lang.en: 'Submit review', Lang.hi: 'रिव्यू सबमिट करें', Lang.hinglish: 'Review submit karo'},
+  'already_reviewed': {
+    Lang.en: "You've already reviewed this job",
+    Lang.hi: 'आपने इस जॉब को पहले ही रिव्यू कर दिया है',
+    Lang.hinglish: 'Aap is job ko pehle hi review kar chuke ho',
+  },
+  'not_selected': {Lang.en: 'Not selected', Lang.hi: 'चयनित नहीं', Lang.hinglish: 'Select nahi hue'},
+  'applied': {Lang.en: 'Applied', Lang.hi: 'आवेदन किया', Lang.hinglish: 'Apply ho gaya'},
+  'apply': {Lang.en: 'Apply', Lang.hi: 'आवेदन करें', Lang.hinglish: 'Apply karo'},
+  'mark_complete': {Lang.en: 'Mark complete', Lang.hi: 'पूर्ण के रूप में चिह्नित करें', Lang.hinglish: 'Complete mark karo'},
+  'applied_successfully': {Lang.en: 'Applied successfully', Lang.hi: 'सफलतापूर्वक आवेदन हो गया', Lang.hinglish: 'Successfully apply ho gaya'},
+  'job_marked_complete': {Lang.en: 'Job marked complete', Lang.hi: 'जॉब पूर्ण के रूप में चिह्नित हुई', Lang.hinglish: 'Job complete mark ho gayi'},
+  'pick_star_rating': {Lang.en: 'Pick a star rating first', Lang.hi: 'पहले स्टार रेटिंग चुनें', Lang.hinglish: 'Pehle star rating chuno'},
+  'pick_worker_to_rate': {Lang.en: 'Pick which worker to rate', Lang.hi: 'किस वर्कर को रेट करना है चुनें', Lang.hinglish: 'Kis worker ko rate karna hai chuno'},
+  'review_submitted': {Lang.en: 'Review submitted', Lang.hi: 'रिव्यू सबमिट हो गया', Lang.hinglish: 'Review submit ho gaya'},
+
+  // Share job (image + text shared outside the app — kept short and marketing-forward)
+  'share_job': {Lang.en: 'Share', Lang.hi: 'शेयर करें', Lang.hinglish: 'Share karo'},
+  'share_open_position_badge': {Lang.en: 'Open position', Lang.hi: 'खुली पोज़िशन', Lang.hinglish: 'Open position'},
+  'share_skill_label': {Lang.en: 'Skill', Lang.hi: 'स्किल', Lang.hinglish: 'Skill'},
+  'share_location_label': {Lang.en: 'Location', Lang.hi: 'लोकेशन', Lang.hinglish: 'Location'},
+  'share_wage_label': {Lang.en: 'Pay', Lang.hi: 'मज़दूरी', Lang.hinglish: 'Pay'},
+  'share_per_day': {Lang.en: 'day', Lang.hi: 'दिन', Lang.hinglish: 'din'},
+  'share_cta_line': {
+    Lang.en: 'Find daily-wage work near you on Jugaadi. Install the app:',
+    Lang.hi: 'Jugaadi पर अपने पास दिहाड़ी काम ढूंढें। ऐप इंस्टॉल करें:',
+    Lang.hinglish: 'Jugaadi pe apne paas daily-wage kaam dhoondo. App install karo:',
+  },
+};
+
+String tr(Lang lang, String key) {
+  final entry = _strings[key];
+  assert(entry != null, 'Missing translation key: $key');
+  return entry?[lang] ?? entry?[Lang.en] ?? key;
+}
+
+extension TrX on BuildContext {
+  String tr(String key) => jugaadiTr(this, key);
+}
+
+String jugaadiTr(BuildContext context, String key) => tr(LangScope.of(context), key);

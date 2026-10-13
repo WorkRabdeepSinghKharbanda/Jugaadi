@@ -4,13 +4,16 @@ import * as planRepo from '../repositories/plan.repository.js';
 import '../types.js';
 
 export async function createOrUpdateProfile(req: Request, res: Response) {
-  const { role, full_name, phone, photo_url, city, lat, lng, skills, contact_phone, bio, email } = req.body;
+  const { role, full_name, phone, photo_url, city, lat, lng, skills, contact_phone, bio, email, lang } = req.body;
   if (!role || !full_name || !phone) {
     return res.status(400).json({ error: 'role, full_name, phone are required' });
   }
+  if (lang != null && !['en', 'hi', 'hinglish'].includes(lang)) {
+    return res.status(400).json({ error: "lang must be 'en', 'hi', or 'hinglish'" });
+  }
 
   const { error: profileError } = await profileRepo.upsertProfile(req.userId, {
-    role, full_name, phone, photo_url, city, lat, lng, contact_phone, bio, email,
+    role, full_name, phone, photo_url, city, lat, lng, contact_phone, bio, email, lang,
   });
   if (profileError) return res.status(500).json({ error: profileError.message });
 

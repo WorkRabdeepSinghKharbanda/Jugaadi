@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import 'profile_setup_screen.dart';
@@ -9,8 +10,8 @@ class RoleSelectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: 'What brings you here?',
-      subtitle: 'Pick the side you\'re on — you can\'t switch later.',
+      title: context.tr('role_select_title'),
+      subtitle: context.tr('role_select_subtitle'),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -27,9 +28,9 @@ class RoleSelectScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('I need workers', style: AppText.title),
+                      Text(context.tr('i_need_workers'), style: AppText.title),
                       const SizedBox(height: 4),
-                      Text('Post a job, hire nearby', style: AppText.bodySmall.copyWith(color: context.colors.textSecondary)),
+                      Text(context.tr('post_job_hire_nearby'), style: AppText.bodySmall.copyWith(color: context.colors.textSecondary)),
                     ],
                   ),
                 ),
@@ -50,9 +51,9 @@ class RoleSelectScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('I want work', style: AppText.title),
+                      Text(context.tr('i_want_work'), style: AppText.title),
                       const SizedBox(height: 4),
-                      Text('Find jobs nearby, apply fast', style: AppText.bodySmall.copyWith(color: context.colors.textSecondary)),
+                      Text(context.tr('find_jobs_apply_fast'), style: AppText.bodySmall.copyWith(color: context.colors.textSecondary)),
                     ],
                   ),
                 ),

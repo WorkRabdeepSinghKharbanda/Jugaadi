@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 
@@ -39,7 +40,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/${widget.job['id']}/hire/$workerId');
       if (!mounted) return;
-      showAppToast(context, 'Worker hired');
+      showAppToast(context, context.tr('worker_hired'));
       setState(() {
         _hiredCount++;
         _future = _load();
@@ -55,14 +56,14 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     final full = _hiredCount >= _workersNeeded;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: _workersNeeded > 1 ? 'Applicants ($_hiredCount/$_workersNeeded hired)' : 'Applicants',
+      title: _workersNeeded > 1 ? '${context.tr('applicants_title')} ($_hiredCount/$_workersNeeded ${context.tr('hired_suffix')})' : context.tr('applicants_title'),
       fullBleed: true,
       body: Column(
         children: [
           if (full)
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, 0),
-              child: ErrorStrip('All slots filled — this job no longer appears in Nearby.', warning: true),
+              child: ErrorStrip(context.tr('all_slots_filled'), warning: true),
             ),
           Expanded(
             child: RefreshIndicator(
@@ -86,7 +87,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             ErrorStrip('${snapshot.error}'),
                             const SizedBox(height: AppSpacing.md),
                             NeuButton(
-                              label: 'Retry',
+                              label: context.tr('retry'),
                               expand: false,
                               onPressed: () => setState(() {
                                 _future = _load();
@@ -99,7 +100,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   }
                   final (applicants, hiredWorkers) = snapshot.data!;
                   if (applicants.isEmpty && hiredWorkers.isEmpty) {
-                    return const EmptyState(icon: Icons.people_outline_rounded, text: 'No applicants yet');
+                    return EmptyState(icon: Icons.people_outline_rounded, text: context.tr('no_applicants_yet'));
                   }
                   final hiredSection = hiredWorkers.isNotEmpty ? hiredWorkers.length + 1 : 0;
                   final pendingSection = applicants.isNotEmpty ? 1 : 0;
@@ -108,7 +109,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     itemCount: hiredSection + pendingSection + applicants.length,
                     itemBuilder: (context, i) {
                       if (i < hiredSection) {
-                        if (i == 0) return SectionHeader('Hired (${hiredWorkers.length})');
+                        if (i == 0) return SectionHeader('${context.tr('hired_section')} (${hiredWorkers.length})');
                         final w = hiredWorkers[i - 1] as Map<String, dynamic>;
                         final wVerified = w['is_verified'] == true;
                         final wSkills = (w['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String).toList() ?? const [];
@@ -173,7 +174,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       }
                       var i2 = i - hiredSection;
                       if (pendingSection == 1) {
-                        if (i2 == 0) return SectionHeader('Pending (${applicants.length})');
+                        if (i2 == 0) return SectionHeader('${context.tr('pending_section')} (${applicants.length})');
                         i2 -= 1;
                       }
                       final a = applicants[i2] as Map<String, dynamic>;
@@ -201,9 +202,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(worker?['full_name'] as String? ?? 'Unknown', style: AppText.title),
+                                        Text(worker?['full_name'] as String? ?? context.tr('unknown'), style: AppText.title),
                                         const SizedBox(height: 4),
-                                        verified ? const PillBadge.verified() : PillBadge(label: 'Pending verification'),
+                                        verified ? const PillBadge.verified() : PillBadge(label: context.tr('pending_verification')),
                                       ],
                                     ),
                                   ),
@@ -243,7 +244,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               ],
                               const SizedBox(height: AppSpacing.md),
                               NeuButton(
-                                label: 'Hire',
+                                label: context.tr('hire'),
                                 height: 44,
                                 onPressed: full ? null : () => _hire(a['worker_id'] as String),
                               ),

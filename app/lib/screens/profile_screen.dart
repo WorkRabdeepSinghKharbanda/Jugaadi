@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../api_client.dart';
 import '../config.dart';
+import '../core/i18n/lang.dart';
+import '../core/i18n/strings.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
 import 'auth/phone_auth_screen.dart';
@@ -75,11 +77,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text('You\'ll need to verify your phone number again to sign back in.'),
+        title: Text(ctx.tr('logout_dialog_title')),
+        content: Text(ctx.tr('logout_dialog_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Log out')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('log_out'))),
         ],
       ),
     );
@@ -96,11 +98,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete account?'),
-        content: const Text('This can\'t be undone. Your profile will be deactivated and you won\'t be able to log in again with this number.'),
+        title: Text(ctx.tr('delete_dialog_title')),
+        content: Text(ctx.tr('delete_dialog_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Delete')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('delete'))),
         ],
       ),
     );
@@ -120,10 +122,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _save() async {
     if (_useCustomNumber && _contactController.text.trim().isEmpty) {
-      showAppToast(context, 'Enter the number to show, or turn the toggle off', tone: ToastTone.error);
+      showAppToast(context, context.tr('enter_number_or_toggle_off'), tone: ToastTone.error);
       return;
     }
     final profile = _profile!;
+    final lang = context.lang;
     setState(() {
       _saving = true;
       _error = null;
@@ -140,9 +143,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
         'bio': _bioController.text.trim().isEmpty ? null : _bioController.text.trim(),
         'skills': _selectedSkills.toList(),
+        'lang': lang.name,
       });
       if (!mounted) return;
-      showAppToast(context, 'Profile updated');
+      showAppToast(context, context.tr('profile_updated'));
       setState(() {
         _editing = false;
         _future = _load();
@@ -159,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: 'Profile',
+      title: context.tr('profile_title'),
       scroll: true,
       resizeForKeyboard: true,
       body: FutureBuilder<Map<String, dynamic>>(
@@ -174,7 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 ErrorStrip('${snapshot.error}'),
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: 'Retry', expand: false, onPressed: () => setState(() { _future = _load(); })),
+                NeuButton(label: context.tr('retry'), expand: false, onPressed: () => setState(() { _future = _load(); })),
               ],
             );
           }
@@ -212,39 +216,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _Row(icon: Icons.phone_rounded, label: 'Login number', value: profile['phone'] as String? ?? '-'),
+                      _Row(icon: Icons.phone_rounded, label: context.tr('login_number'), value: profile['phone'] as String? ?? '-'),
                       const SizedBox(height: AppSpacing.md),
                       _Row(
                         icon: Icons.call_outlined,
-                        label: 'Number shown to hires',
-                        value: (profile['contact_phone'] as String?) ?? 'Same as login number',
+                        label: context.tr('number_shown_to_hires'),
+                        value: (profile['contact_phone'] as String?) ?? context.tr('same_as_login_number'),
                       ),
                       if ((profile['email'] as String?)?.isNotEmpty ?? false) ...[
                         const SizedBox(height: AppSpacing.md),
-                        _Row(icon: Icons.email_outlined, label: 'Email', value: profile['email'] as String),
+                        _Row(icon: Icons.email_outlined, label: context.tr('email'), value: profile['email'] as String),
                       ],
                       const SizedBox(height: AppSpacing.md),
-                      _Row(icon: Icons.location_city_rounded, label: 'City', value: profile['city'] as String? ?? '-'),
+                      _Row(icon: Icons.location_city_rounded, label: context.tr('city'), value: profile['city'] as String? ?? '-'),
                       if ((profile['bio'] as String?)?.isNotEmpty ?? false) ...[
                         const SizedBox(height: AppSpacing.md),
-                        _Row(icon: Icons.info_outline_rounded, label: 'About', value: profile['bio'] as String),
+                        _Row(icon: Icons.info_outline_rounded, label: context.tr('about'), value: profile['bio'] as String),
                       ],
                     ],
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                SectionHeader('Skills'),
+                SectionHeader(context.tr('skills')),
                 Wrap(
                   spacing: AppSpacing.sm,
                   runSpacing: AppSpacing.sm,
                   children: _selectedSkills.isEmpty
-                      ? [Text('No skills added yet', style: AppText.bodySmall.copyWith(color: c.textTertiary))]
+                      ? [Text(context.tr('no_skills_yet'), style: AppText.bodySmall.copyWith(color: c.textTertiary))]
                       : _selectedSkills.map((s) => Chip(label: Text(s))).toList(),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                SectionHeader('Reviews'),
+                SectionHeader(context.tr('reviews')),
                 if (_reviews.isEmpty)
-                  Text('No reviews yet', style: AppText.bodySmall.copyWith(color: c.textTertiary))
+                  Text(context.tr('no_reviews_yet'), style: AppText.bodySmall.copyWith(color: c.textTertiary))
                 else
                   for (final r in _reviews.cast<Map<String, dynamic>>()) ...[
                     NeuCard(
@@ -280,12 +284,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: AppSpacing.sm),
                   ],
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: 'Edit profile', icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
+                NeuButton(label: context.tr('edit_profile'), icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: 'Log out', icon: Icons.logout_rounded, variant: NeuButtonVariant.ghost, onPressed: _logout),
+                NeuButton(label: context.tr('log_out'), icon: Icons.logout_rounded, variant: NeuButtonVariant.ghost, onPressed: _logout),
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(
-                  label: 'Delete account',
+                  label: context.tr('delete_account'),
                   icon: Icons.delete_outline_rounded,
                   variant: NeuButtonVariant.danger,
                   onPressed: _deleteAccount,
@@ -300,16 +304,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
               NeuCard(
                 child: Row(
                   children: [
+                    Icon(Icons.translate_rounded, size: 20, color: c.textSecondary),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(child: Text(context.tr('app_language'), style: AppText.body)),
+                    DropdownButton<Lang>(
+                      value: context.lang,
+                      dropdownColor: c.surfaceHigh,
+                      underline: const SizedBox.shrink(),
+                      items: Lang.values
+                          .map((l) => DropdownMenuItem(value: l, child: Text(context.tr('language_${l.name}'))))
+                          .toList(),
+                      onChanged: (l) {
+                        if (l != null) LangScope.controllerOf(context).setLang(l);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              NeuCard(
+                child: Row(
+                  children: [
                     Icon(Icons.call_outlined, size: 20, color: c.textSecondary),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Share a different number', style: AppText.body),
+                          Text(context.tr('share_different_number'), style: AppText.body),
                           const SizedBox(height: 2),
                           Text(
-                            'Shown to a worker only once you hire them — off uses your login number',
+                            context.tr('share_different_number_desc'),
                             style: AppText.bodySmall.copyWith(color: c.textTertiary),
                           ),
                         ],
@@ -326,18 +351,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (_useCustomNumber) ...[
                 const SizedBox(height: AppSpacing.md),
                 NeuTextField(
-                  label: 'Number to show',
+                  label: context.tr('number_to_show'),
                   controller: _contactController,
                   icon: Icons.phone_forwarded_outlined,
                   keyboardType: TextInputType.phone,
                 ),
               ],
               const SizedBox(height: AppSpacing.md),
-              NeuTextField(label: 'Email', controller: _emailController, icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+              NeuTextField(label: context.tr('email'), controller: _emailController, icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
               const SizedBox(height: AppSpacing.md),
-              NeuTextField(label: 'About', controller: _bioController, icon: Icons.info_outline_rounded, maxLines: 3),
+              NeuTextField(label: context.tr('about'), controller: _bioController, icon: Icons.info_outline_rounded, maxLines: 3),
               const SizedBox(height: AppSpacing.lg),
-              SectionHeader('Skills'),
+              SectionHeader(context.tr('skills')),
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
@@ -364,17 +389,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
               const SizedBox(height: AppSpacing.sm),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: NeuTextField(
-                      label: 'Other skill',
+                      label: context.tr('other_skill'),
                       controller: _customSkillController,
-                      hint: 'Type a skill not listed above',
+                      hint: context.tr('other_skill_hint'),
                       onSubmitted: (_) => _addCustomSkill(),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  NeuButton(label: 'Add', expand: false, height: 48, onPressed: _addCustomSkill),
+                  NeuButton(label: context.tr('add'), expand: false, height: 48, radius: AppRadius.sm, onPressed: _addCustomSkill),
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -386,13 +412,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Expanded(
                     child: NeuButton(
-                      label: 'Cancel',
+                      label: context.tr('cancel'),
                       variant: NeuButtonVariant.ghost,
                       onPressed: () => setState(() => _editing = false),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: NeuButton(label: 'Save', loading: _saving, onPressed: _save)),
+                  Expanded(child: NeuButton(label: context.tr('save'), loading: _saving, onPressed: _save)),
                 ],
               ),
             ],

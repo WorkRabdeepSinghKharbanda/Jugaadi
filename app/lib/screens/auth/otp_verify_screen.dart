@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../../main.dart';
@@ -51,15 +52,15 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   Widget build(BuildContext context) {
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: 'Enter OTP',
-      subtitle: 'Sent to ${widget.phone}',
+      title: context.tr('enter_otp_title'),
+      subtitle: '${context.tr('otp_sent_to')} ${widget.phone}',
       scroll: true,
       resizeForKeyboard: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           NeuTextField(
-            label: 'OTP code',
+            label: context.tr('otp_code'),
             controller: _otpController,
             hint: '······',
             icon: Icons.password_rounded,
@@ -71,7 +72,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
             ErrorStrip(_error!),
             const SizedBox(height: AppSpacing.lg),
           ],
-          NeuButton(label: 'Verify', icon: Icons.check_rounded, loading: _loading, onPressed: _verify),
+          NeuButton(label: context.tr('verify'), icon: Icons.check_rounded, loading: _loading, onPressed: _verify),
         ],
       ),
     );

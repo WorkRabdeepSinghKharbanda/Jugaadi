@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/job_photos.dart';
 import '../../core/services/place_gateway.dart';
 import '../../core/theme/tokens.dart';
@@ -55,10 +56,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
   /// [_buildBodyOrShowError], kept separate so the button/photos gate can run without
   /// triggering the inline `_error` strip on every keystroke.
   String? get _missingField {
-    if (_titleController.text.trim().isEmpty) return 'Title is required';
-    if (_skill == _kOtherSkill && _customSkillController.text.trim().isEmpty) return 'Specify the skill needed';
-    if (_place == null) return 'Set the job location';
-    if (_range == null) return 'Pick start and end dates';
+    if (_titleController.text.trim().isEmpty) return context.tr('title_required');
+    if (_skill == _kOtherSkill && _customSkillController.text.trim().isEmpty) return context.tr('specify_skill_needed');
+    if (_place == null) return context.tr('set_job_location');
+    if (_range == null) return context.tr('pick_start_end_dates');
     return null;
   }
 
@@ -166,7 +167,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         await api.post('/jobs', body);
       }
       if (!mounted) return;
-      showAppToast(context, _hasJobId ? 'Job updated' : 'Job posted successfully');
+      showAppToast(context, _hasJobId ? context.tr('job_updated') : context.tr('job_posted_successfully'));
       Navigator.of(context).pop(true);
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -188,15 +189,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: _isEdit ? 'Edit job' : 'Post a job',
+      title: _isEdit ? context.tr('edit_job_title') : context.tr('post_a_job_title'),
       scroll: true,
       resizeForKeyboard: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          NeuTextField(label: 'Title', controller: _titleController, icon: Icons.title_rounded),
+          NeuTextField(label: context.tr('title_label'), controller: _titleController, icon: Icons.title_rounded),
           const SizedBox(height: AppSpacing.md),
-          Text('SKILL NEEDED', style: AppText.label.copyWith(color: c.textSecondary)),
+          Text(context.tr('skill_needed_label'), style: AppText.label.copyWith(color: c.textSecondary)),
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
             initialValue: _skill,
@@ -206,10 +207,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
           ),
           if (_skill == _kOtherSkill) ...[
             const SizedBox(height: AppSpacing.md),
-            NeuTextField(label: 'Specify skill', controller: _customSkillController, hint: 'Type the skill needed'),
+            NeuTextField(label: context.tr('specify_skill'), controller: _customSkillController, hint: context.tr('type_skill_needed')),
           ],
           const SizedBox(height: AppSpacing.md),
-          Text('LOCATION', style: AppText.label.copyWith(color: c.textSecondary)),
+          Text(context.tr('location_label'), style: AppText.label.copyWith(color: c.textSecondary)),
           const SizedBox(height: AppSpacing.sm),
           NeuCard(
             onTap: _pickLocation,
@@ -219,7 +220,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
-                    _place?.label ?? 'Tap to set job location',
+                    _place?.label ?? context.tr('tap_to_set_job_location'),
                     style: AppText.body.copyWith(color: _place == null ? c.textTertiary : c.textPrimary),
                   ),
                 ),
@@ -229,24 +230,24 @@ class _PostJobScreenState extends State<PostJobScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           NeuTextField(
-            label: 'Shop name / address details (optional)',
+            label: context.tr('shop_name_address_optional'),
             controller: _addressLine2Controller,
-            hint: 'e.g. Shop 4, Ganesh Market, 2nd floor',
+            hint: context.tr('shop_address_hint'),
             icon: Icons.storefront_outlined,
           ),
           const SizedBox(height: AppSpacing.md),
-          NeuTextField(label: 'Daily wage (optional)', controller: _wageController, icon: Icons.payments_outlined, keyboardType: TextInputType.number),
+          NeuTextField(label: context.tr('daily_wage_optional'), controller: _wageController, icon: Icons.payments_outlined, keyboardType: TextInputType.number),
           if (!_isEdit) ...[
             const SizedBox(height: AppSpacing.md),
             NeuTextField(
-              label: 'Workers needed',
+              label: context.tr('workers_needed_label'),
               controller: _workersNeededController,
               icon: Icons.groups_outlined,
               keyboardType: TextInputType.number,
             ),
           ],
           const SizedBox(height: AppSpacing.lg),
-          SectionHeader('Photos (${_photoUrls.length}/$_kMaxJobPhotos)'),
+          SectionHeader('${context.tr('photos_label')} (${_photoUrls.length}/$_kMaxJobPhotos)'),
           Wrap(
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
@@ -258,7 +259,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 ),
               if (_photoUrls.length < _kMaxJobPhotos)
                 NeuButton(
-                  label: 'Add',
+                  label: context.tr('add'),
                   icon: Icons.add_a_photo_outlined,
                   variant: NeuButtonVariant.ghost,
                   expand: false,
@@ -271,7 +272,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
           const SizedBox(height: AppSpacing.lg),
           NeuButton(
             label: _range == null
-                ? 'Pick dates'
+                ? context.tr('pick_dates')
                 : '${_range!.start.toIso8601String().split('T').first} → ${_range!.end.toIso8601String().split('T').first}',
             icon: Icons.date_range_rounded,
             variant: NeuButtonVariant.ghost,
@@ -285,7 +286,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
           AnimatedBuilder(
             animation: Listenable.merge([_titleController, _customSkillController]),
             builder: (_, __) => NeuButton(
-              label: _hasJobId ? 'Save changes' : 'Post job',
+              label: _hasJobId ? context.tr('save_changes') : context.tr('post_job'),
               icon: Icons.check_rounded,
               loading: _loading,
               onPressed: _missingField != null ? null : _submit,

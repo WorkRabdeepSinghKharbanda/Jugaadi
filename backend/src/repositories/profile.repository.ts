@@ -11,6 +11,7 @@ export interface ProfileInput {
   contact_phone?: string | null;
   bio?: string | null;
   email?: string | null;
+  lang?: 'en' | 'hi' | 'hinglish';
 }
 
 export async function upsertProfile(userId: string, profile: ProfileInput) {

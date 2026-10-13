@@ -16,6 +16,7 @@ class NeuButton extends StatelessWidget {
     this.loading = false,
     this.height = 56,
     this.expand = true,
+    this.radius = AppRadius.md,
   });
 
   final String label;
@@ -25,6 +26,7 @@ class NeuButton extends StatelessWidget {
   final bool loading;
   final double height;
   final bool expand;
+  final double radius;
 
   bool get _enabled => onPressed != null && !loading;
 
@@ -40,7 +42,7 @@ class NeuButton extends StatelessWidget {
     final decoration = BoxDecoration(
       gradient: isPrimary ? c.accentGradient : null,
       color: isPrimary ? null : (variant == NeuButtonVariant.danger ? c.dangerSoft : c.surface),
-      borderRadius: AppRadius.mdAll,
+      borderRadius: BorderRadius.circular(radius),
       border: isPrimary ? null : Border.all(color: variant == NeuButtonVariant.danger ? c.danger.withValues(alpha: 0.4) : c.outline),
       boxShadow: !_enabled ? AppShadows.none : (isPrimary ? AppShadows.accentGlow(c) : AppShadows.raised(c)),
     );

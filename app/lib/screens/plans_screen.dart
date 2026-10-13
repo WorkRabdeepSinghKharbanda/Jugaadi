@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../api_client.dart';
 import '../config.dart';
+import '../core/i18n/strings.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
 
@@ -64,7 +65,7 @@ class _PlansScreenState extends State<PlansScreen> {
       });
     } on ApiException catch (e) {
       if (e.statusCode == 501 && mounted) {
-        showAppToast(context, 'Billing not available yet — ask the admin', tone: ToastTone.info);
+        showAppToast(context, context.tr('billing_not_available'), tone: ToastTone.info);
       } else if (mounted) {
         showAppToast(context, e.message, tone: ToastTone.error);
       }
@@ -83,7 +84,7 @@ class _PlansScreenState extends State<PlansScreen> {
         'razorpay_signature': response.signature,
       });
       if (!mounted) return;
-      showAppToast(context, 'Upgraded to Pro!');
+      showAppToast(context, context.tr('upgraded_to_pro'));
       // Whoever opened this screen (home, or a plan-limit redirect from apply/post) is right
       // below on the stack — pop back to them instead of leaving the user stranded here.
       Navigator.of(context).pop();
@@ -95,7 +96,7 @@ class _PlansScreenState extends State<PlansScreen> {
   }
 
   void _onPaymentError(PaymentFailureResponse response) {
-    if (mounted) showAppToast(context, response.message ?? 'Payment failed', tone: ToastTone.error);
+    if (mounted) showAppToast(context, response.message ?? context.tr('payment_failed'), tone: ToastTone.error);
     if (mounted) setState(() => _checkingOut = false);
   }
 
@@ -108,7 +109,7 @@ class _PlansScreenState extends State<PlansScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: _role == 'owner' ? 'Plan — Posting jobs' : _role == 'worker' ? 'Plan — Finding work' : 'Plan',
+      title: _role == 'owner' ? context.tr('plan_posting_jobs') : _role == 'worker' ? context.tr('plan_finding_work') : context.tr('plan'),
       scroll: true,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _future,
@@ -122,7 +123,7 @@ class _PlansScreenState extends State<PlansScreen> {
               children: [
                 ErrorStrip('${snapshot.error}'),
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: 'Retry', expand: false, onPressed: () => setState(() { _future = _load(); })),
+                NeuButton(label: context.tr('retry'), expand: false, onPressed: () => setState(() { _future = _load(); })),
               ],
             );
           }
@@ -133,11 +134,11 @@ class _PlansScreenState extends State<PlansScreen> {
           final daysLeft = trialEndsAt != null ? DateTime.parse(trialEndsAt).difference(DateTime.now()).inDays : null;
           final isOwner = _role == 'owner';
           final price = (billing['priceByRole'] as Map<String, dynamic>?)?[_role ?? 'worker'];
-          final priceLabel = price == null ? '' : '₹$price/month';
-          final benefit = isOwner ? 'Unlimited job posts' : 'Unlimited applications';
+          final priceLabel = price == null ? '' : '₹$price${context.tr('per_month_suffix')}';
+          final benefit = isOwner ? context.tr('unlimited_job_posts') : context.tr('unlimited_applications');
           final freeLimitLine = isOwner
-              ? '${billing['usageThisMonth']['owner']}/3 job posts this month'
-              : '${billing['usageThisMonth']['worker']}/3 applications this month';
+              ? '${billing['usageThisMonth']['owner']}/3 ${context.tr('job_posts_this_month')}'
+              : '${billing['usageThisMonth']['worker']}/3 ${context.tr('applications_this_month')}';
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,20 +148,20 @@ class _PlansScreenState extends State<PlansScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(isPro ? 'Pro — $priceLabel' : priceLabel, style: AppText.headline),
+                    Text(isPro ? '${context.tr('pro_label')} — $priceLabel' : priceLabel, style: AppText.headline),
                     const SizedBox(height: AppSpacing.xs),
-                    if (!isPro) Text('7-day free trial, then $priceLabel', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                    if (!isPro) Text('${context.tr('trial_then_price')} $priceLabel', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                     const SizedBox(height: AppSpacing.lg),
                     _Benefit(isOwner ? Icons.post_add_rounded : Icons.send_rounded, benefit),
                     if (!isPro) ...[
                       const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: 'Upgrade to Pro', icon: Icons.bolt_rounded, loading: _checkingOut, onPressed: _upgrade),
+                      NeuButton(label: context.tr('upgrade_to_pro'), icon: Icons.bolt_rounded, loading: _checkingOut, onPressed: _upgrade),
                     ],
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              SectionHeader('Your status'),
+              SectionHeader(context.tr('your_status')),
               NeuCard(
                 variant: NeuVariant.pressed,
                 child: Row(
@@ -169,17 +170,17 @@ class _PlansScreenState extends State<PlansScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(isPro ? 'Pro' : 'Free', style: AppText.body.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700)),
+                          Text(isPro ? context.tr('pro_label') : context.tr('free_label'), style: AppText.body.copyWith(color: c.textPrimary, fontWeight: FontWeight.w700)),
                           const SizedBox(height: 2),
                           if (status == 'trialing' && daysLeft != null)
                             Text(
-                              daysLeft > 0 ? 'Trial: $daysLeft day${daysLeft == 1 ? '' : 's'} left' : 'Trial ended',
+                              daysLeft > 0 ? '${context.tr('trial_prefix')} $daysLeft ${daysLeft == 1 ? context.tr('day_left') : context.tr('days_left')}' : context.tr('trial_ended'),
                               style: AppText.bodySmall.copyWith(color: c.textSecondary),
                             )
                           else if (!isPro)
                             Text(freeLimitLine, style: AppText.bodySmall.copyWith(color: c.textSecondary))
                           else
-                            Text(isOwner ? 'Unlimited job posts' : 'Unlimited applications', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                            Text(isOwner ? context.tr('unlimited_job_posts') : context.tr('unlimited_applications'), style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                         ],
                       ),
                     ),

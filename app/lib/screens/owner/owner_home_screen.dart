@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/job_status.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
@@ -58,18 +59,18 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Remove this job?'),
-        content: const Text('This can\'t be undone. Workers will no longer be able to see or apply to it.'),
+        title: Text(ctx.tr('remove_job_title')),
+        content: Text(ctx.tr('remove_job_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Remove')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('remove'))),
         ],
       ),
     );
     if (confirmed != true) return;
     try {
       await ApiClient(Config.apiBaseUrl).post('/jobs/$jobId/remove');
-      if (mounted) showAppToast(context, 'Job removed');
+      if (mounted) showAppToast(context, context.tr('job_removed'));
       _refresh();
     } catch (e) {
       if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
@@ -80,29 +81,29 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
   Widget build(BuildContext context) {
     final c = context.colors;
     return AppScaffold(
-      title: 'My jobs',
+      title: context.tr('my_jobs_title'),
       fullBleed: true,
       actions: [
         if (_isAdmin)
           NeuIconButton(
             icon: Icons.admin_panel_settings_outlined,
-            semanticLabel: 'Admin console',
+            semanticLabel: context.tr('admin_console'),
             onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
           ),
         NeuIconButton(
           icon: Icons.swap_horiz_rounded,
-          semanticLabel: 'Find work instead',
+          semanticLabel: context.tr('find_work_instead'),
           onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const WorkerTabs())),
         ),
         NeuIconButton(
           icon: Icons.bolt_outlined,
-          semanticLabel: 'Plan',
+          semanticLabel: context.tr('plan'),
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'owner'))),
         ),
-        NeuIconButton(icon: Icons.location_on_outlined, semanticLabel: 'Update location', onPressed: () => editLocation(context)),
+        NeuIconButton(icon: Icons.location_on_outlined, semanticLabel: context.tr('update_location'), onPressed: () => editLocation(context)),
         NeuIconButton(
           icon: Icons.person_outline_rounded,
-          semanticLabel: 'Profile',
+          semanticLabel: context.tr('profile_title'),
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
         ),
       ],
@@ -135,7 +136,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     children: [
                       ErrorStrip('${snapshot.error}'),
                       const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: 'Retry', expand: false, onPressed: _refresh),
+                      NeuButton(label: context.tr('retry'), expand: false, onPressed: _refresh),
                     ],
                   ),
                 ),
@@ -143,7 +144,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
             }
             final jobs = snapshot.data!;
             if (jobs.isEmpty) {
-              return const EmptyState(icon: Icons.work_outline_rounded, text: 'No jobs posted yet');
+              return EmptyState(icon: Icons.work_outline_rounded, text: context.tr('no_jobs_posted_yet'));
             }
             return ListView.builder(
               padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
@@ -178,7 +179,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                               if ((job['workers_needed'] as int? ?? 1) > 1) ...[
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${job['hired_count'] ?? 0}/${job['workers_needed']} hired',
+                                  '${job['hired_count'] ?? 0}/${job['workers_needed']} ${context.tr('hired_suffix')}',
                                   style: AppText.bodySmall.copyWith(color: c.textTertiary),
                                 ),
                               ],
@@ -193,9 +194,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                               if (action == 'edit') _edit(job);
                               if (action == 'remove') _remove(job['id']);
                             },
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(value: 'edit', child: Text('Edit')),
-                              PopupMenuItem(value: 'remove', child: Text('Remove')),
+                            itemBuilder: (_) => [
+                              PopupMenuItem(value: 'edit', child: Text(context.tr('edit'))),
+                              PopupMenuItem(value: 'remove', child: Text(context.tr('remove'))),
                             ],
                           ),
                       ],

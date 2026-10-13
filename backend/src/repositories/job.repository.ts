@@ -20,8 +20,8 @@ export async function createJob(ownerId: string, job: JobInput) {
   return supabase.from('jobs').insert({ owner_id: ownerId, ...job }).select().single();
 }
 
-export async function nearbyJobs(lat: number, lng: number, radiusM: number, limit: number) {
-  return supabase.rpc('nearby_jobs', { in_lat: lat, in_lng: lng, radius_m: radiusM, in_limit: limit });
+export async function nearbyJobs(lat: number, lng: number, radiusM: number, limit: number, offset: number) {
+  return supabase.rpc('nearby_jobs', { in_lat: lat, in_lng: lng, radius_m: radiusM, in_limit: limit, in_offset: offset });
 }
 
 export async function applicationStatusesForWorker(workerId: string, jobIds: string[]) {
@@ -32,12 +32,21 @@ export async function jobsByOwner(ownerId: string) {
   return supabase.from('jobs').select('*').eq('owner_id', ownerId).order('created_at', { ascending: false });
 }
 
-export async function applicationsByWorker(workerId: string) {
-  return supabase
+export async function applicationsByWorker(
+  workerId: string,
+  limit: number,
+  offset: number,
+  dateFrom?: string,
+  dateTo?: string,
+) {
+  // !inner so .gte/.lte below can filter on the embedded job's columns, not just job_applications'.
+  let query = supabase
     .from('job_applications')
-    .select('status, job:jobs(*)')
-    .eq('worker_id', workerId)
-    .order('created_at', { ascending: false });
+    .select('status, job:jobs!inner(*)')
+    .eq('worker_id', workerId);
+  if (dateFrom) query = query.gte('job.start_date', dateFrom);
+  if (dateTo) query = query.lte('job.start_date', dateTo);
+  return query.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
 }
 
 export async function getJobWithOwner(jobId: string) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import 'otp_verify_screen.dart';
@@ -57,10 +58,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           children: [
             Text('Jugaadi', style: AppText.display.copyWith(color: context.colors.accent)),
             const SizedBox(height: AppSpacing.sm),
-            Text('Find help, or find work — same day.', style: AppText.body.copyWith(color: context.colors.textSecondary)),
+            Text(context.tr('tagline'), style: AppText.body.copyWith(color: context.colors.textSecondary)),
             const SizedBox(height: AppSpacing.xxl),
             NeuTextField(
-              label: 'Phone number',
+              label: context.tr('phone_number'),
               controller: _phoneController,
               hint: '98765 43210',
               icon: Icons.phone_rounded,
@@ -71,7 +72,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ErrorStrip(_error!),
               const SizedBox(height: AppSpacing.lg),
             ],
-            NeuButton(label: 'Send OTP', icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _sendOtp),
+            NeuButton(label: context.tr('send_otp'), icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _sendOtp),
           ],
         ),
       ),

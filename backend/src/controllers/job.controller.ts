@@ -39,8 +39,25 @@ export async function postJob(req: Request, res: Response) {
   res.status(201).json(data);
 }
 
-const DEFAULT_NEARBY_LIMIT = 50;
-const MAX_NEARBY_LIMIT = 100;
+const DEFAULT_PAGE_LIMIT = 50;
+const MAX_PAGE_LIMIT = 100;
+
+/// Shared `?limit=&offset=` parsing for the paginated list endpoints — returns an error message
+/// to send back as a 400, or the parsed { limit, offset } to use.
+function parsePageParams(query: Request['query']): { error: string } | { limit: number; offset: number } {
+  let limit = DEFAULT_PAGE_LIMIT;
+  if (query.limit != null) {
+    limit = Number(query.limit);
+    if (!Number.isInteger(limit) || limit < 1) return { error: 'limit must be a positive integer' };
+    limit = Math.min(limit, MAX_PAGE_LIMIT);
+  }
+  let offset = 0;
+  if (query.offset != null) {
+    offset = Number(query.offset);
+    if (!Number.isInteger(offset) || offset < 0) return { error: 'offset must be a non-negative integer' };
+  }
+  return { limit, offset };
+}
 
 export async function getNearbyJobs(req: Request, res: Response) {
   const lat = Number(req.query.lat);
@@ -50,14 +67,10 @@ export async function getNearbyJobs(req: Request, res: Response) {
     return res.status(400).json({ error: 'lat and lng query params are required' });
   }
 
-  let limit = DEFAULT_NEARBY_LIMIT;
-  if (req.query.limit != null) {
-    limit = Number(req.query.limit);
-    if (!Number.isInteger(limit) || limit < 1) return res.status(400).json({ error: 'limit must be a positive integer' });
-    limit = Math.min(limit, MAX_NEARBY_LIMIT);
-  }
+  const page = parsePageParams(req.query);
+  if ('error' in page) return res.status(400).json({ error: page.error });
 
-  const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius, limit);
+  const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius, page.limit, page.offset);
   if (error) return res.status(500).json({ error: error.message });
 
   // Carry the worker's own application status onto each card so "Apply" doesn't flash back
@@ -71,8 +84,18 @@ export async function getNearbyJobs(req: Request, res: Response) {
   res.json(jobs);
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 export async function getMyApplications(req: Request, res: Response) {
-  const { data, error } = await jobRepo.applicationsByWorker(req.userId);
+  const page = parsePageParams(req.query);
+  if ('error' in page) return res.status(400).json({ error: page.error });
+
+  const dateFrom = req.query.from as string | undefined;
+  const dateTo = req.query.to as string | undefined;
+  if (dateFrom != null && !DATE_RE.test(dateFrom)) return res.status(400).json({ error: 'from must be YYYY-MM-DD' });
+  if (dateTo != null && !DATE_RE.test(dateTo)) return res.status(400).json({ error: 'to must be YYYY-MM-DD' });
+
+  const { data, error } = await jobRepo.applicationsByWorker(req.userId, page.limit, page.offset, dateFrom, dateTo);
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 }

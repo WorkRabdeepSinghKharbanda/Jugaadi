@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/i18n/strings.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 
@@ -40,18 +41,18 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Deactivate this user?'),
-        content: Text('${user['full_name']} will be soft-deleted and signed out of their account.'),
+        title: Text(ctx.tr('deactivate_user_title')),
+        content: Text('${user['full_name']} ${ctx.tr('deactivate_user_body')}'),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Deactivate')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('deactivate'))),
         ],
       ),
     );
     if (confirmed != true) return;
     try {
       await ApiClient(Config.apiBaseUrl).post('/admin/users/${user['id']}/delete');
-      if (mounted) showAppToast(context, 'User deactivated');
+      if (mounted) showAppToast(context, context.tr('user_deactivated'));
       _refresh();
     } catch (e) {
       if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
@@ -74,7 +75,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             return Center(child: ErrorStrip('${snapshot.error}'));
           }
           final users = snapshot.data!;
-          if (users.isEmpty) return const EmptyState(icon: Icons.people_outline_rounded, text: 'No users');
+          if (users.isEmpty) return EmptyState(icon: Icons.people_outline_rounded, text: context.tr('no_users'));
           return ListView.builder(
             padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
             itemCount: users.length,
@@ -99,8 +100,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                               ],
                             ),
                           ),
-                          if (user['is_admin'] == true) const PillBadge(label: 'Admin', tone: PillTone.accent),
-                          if (deleted) const PillBadge(label: 'Deleted', tone: PillTone.danger),
+                          if (user['is_admin'] == true) PillBadge(label: context.tr('admin_label'), tone: PillTone.accent),
+                          if (deleted) PillBadge(label: context.tr('deleted_label'), tone: PillTone.danger),
                           if (user['is_verified'] == true && !deleted) const PillBadge.verified(),
                         ],
                       ),
@@ -110,7 +111,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                           children: [
                             Expanded(
                               child: NeuButton(
-                                label: user['is_verified'] == true ? 'Unverify' : 'Verify',
+                                label: user['is_verified'] == true ? context.tr('unverify') : context.tr('verify'),
                                 variant: NeuButtonVariant.ghost,
                                 height: 40,
                                 onPressed: () => _toggleVerified(user),
@@ -118,7 +119,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
-                              child: NeuButton(label: 'Deactivate', variant: NeuButtonVariant.danger, height: 40, onPressed: () => _delete(user)),
+                              child: NeuButton(label: context.tr('deactivate'), variant: NeuButtonVariant.danger, height: 40, onPressed: () => _delete(user)),
                             ),
                           ],
                         ),
