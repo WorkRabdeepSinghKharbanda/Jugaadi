@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import * as jobRepo from '../repositories/job.repository.js';
 import * as planRepo from '../repositories/plan.repository.js';
+import * as reviewRepo from '../repositories/review.repository.js';
 import { JobStatus } from '../types.js';
 
 /// Returns an error message if the caller is over their plan's monthly limit, else null.
@@ -142,8 +143,11 @@ export async function getJobDetail(req: Request, res: Response) {
     myApplicationStatus = myApp?.status ?? null;
   }
 
+  const { data: myReview } = await reviewRepo.getMyReview(req.params.id, req.userId);
+
   res.json({
     ...job,
+    my_review: myReview ?? null,
     // Owner sees every hired worker's contact as soon as each is individually accepted —
     // independent of whether the job still has open slots (workers_needed > 1).
     hired_workers: isOwner ? accepted?.map((a) => ({ worker_id: a.worker_id, ...revealContact(a.worker) })) ?? [] : undefined,

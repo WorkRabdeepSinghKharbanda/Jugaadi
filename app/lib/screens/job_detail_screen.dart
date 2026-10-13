@@ -29,7 +29,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   int _rating = 0;
   final _commentController = TextEditingController();
   bool _reviewSubmitting = false;
-  bool _reviewDone = false;
+  bool _editingReview = false;
   String? _reviewTargetWorkerId;
 
   @override
@@ -72,28 +72,50 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     }
   }
 
+  Map<String, dynamic>? get _myReview => job['my_review'] as Map<String, dynamic>?;
+
+  void _startEditReview() {
+    final r = _myReview!;
+    setState(() {
+      _rating = r['rating'] as int;
+      _commentController.text = (r['comment'] as String?) ?? '';
+      _editingReview = true;
+    });
+  }
+
   Future<void> _submitReview() async {
+    final isEdit = _myReview != null;
     if (_rating == 0) {
       showAppToast(context, context.tr('pick_star_rating'), tone: ToastTone.error);
       return;
     }
-    if (widget.isOwner && _reviewTargetWorkerId == null) {
+    if (!isEdit && widget.isOwner && _reviewTargetWorkerId == null) {
       showAppToast(context, context.tr('pick_worker_to_rate'), tone: ToastTone.error);
       return;
     }
+    final comment = _commentController.text.trim();
     setState(() => _reviewSubmitting = true);
     try {
-      await ApiClient(Config.apiBaseUrl).post('/jobs/${job['id']}/review', {
-        'rating': _rating,
-        if (_commentController.text.trim().isNotEmpty) 'comment': _commentController.text.trim(),
-        if (widget.isOwner) 'worker_id': _reviewTargetWorkerId,
-      });
+      final api = ApiClient(Config.apiBaseUrl);
+      final path = '/jobs/${job['id']}/review';
+      if (isEdit) {
+        await api.patch(path, {'rating': _rating, 'comment': comment.isEmpty ? null : comment});
+      } else {
+        await api.post(path, {
+          'rating': _rating,
+          if (comment.isNotEmpty) 'comment': comment,
+          if (widget.isOwner) 'worker_id': _reviewTargetWorkerId,
+        });
+      }
       if (!mounted) return;
-      showAppToast(context, context.tr('review_submitted'));
-      setState(() => _reviewDone = true);
+      showAppToast(context, context.tr(isEdit ? 'review_updated' : 'review_submitted'));
+      setState(() {
+        job = {...job, 'my_review': {..._myReview ?? {}, 'rating': _rating, 'comment': comment.isEmpty ? null : comment}};
+        _editingReview = false;
+      });
     } on ApiException catch (e) {
       if (e.statusCode == 409) {
-        if (mounted) setState(() => _reviewDone = true);
+        await _refreshDetail();
       } else if (mounted) {
         showAppToast(context, e.message, tone: ToastTone.error);
       }
@@ -282,14 +304,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
               ),
             ],
-            if (status == JobStatus.done.name && (widget.isOwner ? hiredWorkers.isNotEmpty : isHiredAsWorker) && !_reviewDone) ...[
+            if (status == JobStatus.done.name && (widget.isOwner ? hiredWorkers.isNotEmpty : isHiredAsWorker) && (_myReview == null || _editingReview)) ...[
               const SizedBox(height: AppSpacing.lg),
               SectionHeader(widget.isOwner ? context.tr('rate_a_worker') : context.tr('rate_the_owner')),
               NeuCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (widget.isOwner && hiredWorkers.length > 1) ...[
+                    if (widget.isOwner && hiredWorkers.length > 1 && _myReview == null) ...[
                       DropdownButton<String>(
                         isExpanded: true,
                         value: _reviewTargetWorkerId,
@@ -314,14 +336,37 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     const SizedBox(height: AppSpacing.sm),
                     NeuTextField(label: context.tr('comment_optional'), controller: _commentController, icon: Icons.chat_bubble_outline_rounded),
                     const SizedBox(height: AppSpacing.md),
-                    NeuButton(label: context.tr('submit_review'), loading: _reviewSubmitting, onPressed: _submitReview),
+                    NeuButton(label: context.tr(_myReview == null ? 'submit_review' : 'update_review'), loading: _reviewSubmitting, onPressed: _submitReview),
+                    if (_editingReview) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      NeuButton(label: context.tr('cancel'), variant: NeuButtonVariant.ghost, onPressed: () => setState(() => _editingReview = false)),
+                    ],
                   ],
                 ),
               ),
             ],
-            if (status == JobStatus.done.name && _reviewDone) ...[
+            if (status == JobStatus.done.name && _myReview != null && !_editingReview) ...[
               const SizedBox(height: AppSpacing.lg),
-              ErrorStrip(context.tr('already_reviewed'), warning: true),
+              SectionHeader(context.tr('your_review')),
+              NeuCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: List.generate(
+                        5,
+                        (i) => Icon(i < (_myReview!['rating'] as int) ? Icons.star_rounded : Icons.star_outline_rounded, color: c.accent, size: 24),
+                      ),
+                    ),
+                    if ((_myReview!['comment'] as String?)?.isNotEmpty ?? false) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(_myReview!['comment'] as String, style: AppText.body),
+                    ],
+                    const SizedBox(height: AppSpacing.md),
+                    NeuButton(label: context.tr('edit_review'), icon: Icons.edit_outlined, variant: NeuButtonVariant.ghost, onPressed: _startEditReview),
+                  ],
+                ),
+              ),
             ],
             const SizedBox(height: AppSpacing.xl),
             if (!widget.isOwner && status == JobStatus.open.name)

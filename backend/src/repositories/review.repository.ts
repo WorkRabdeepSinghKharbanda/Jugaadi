@@ -19,3 +19,17 @@ export async function reviewsForProfile(profileId: string) {
 export async function hasReviewed(jobId: string, reviewerId: string) {
   return supabase.from('reviews').select('id').eq('job_id', jobId).eq('reviewer_id', reviewerId).maybeSingle();
 }
+
+export async function getMyReview(jobId: string, reviewerId: string) {
+  return supabase.from('reviews').select('id, rating, comment, reviewee_id').eq('job_id', jobId).eq('reviewer_id', reviewerId).maybeSingle();
+}
+
+export async function updateMyReview(jobId: string, reviewerId: string, rating: number, comment?: string | null) {
+  return supabase
+    .from('reviews')
+    .update({ rating, comment: comment ?? null })
+    .eq('job_id', jobId)
+    .eq('reviewer_id', reviewerId)
+    .select('id, rating, comment, reviewee_id')
+    .maybeSingle();
+}

@@ -43,6 +43,18 @@ export async function postReview(req: Request, res: Response) {
   res.status(201).json(data);
 }
 
+// Only the reviewer can edit, and only their own review for this job — no new one gets created.
+export async function patchReview(req: Request, res: Response) {
+  const { rating, comment } = req.body;
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: 'rating must be an integer 1-5' });
+  }
+  const { data, error } = await reviewRepo.updateMyReview(req.params.id, req.userId, rating, comment);
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: 'you have not reviewed this job yet' });
+  res.json(data);
+}
+
 export async function getProfileReviews(req: Request, res: Response) {
   const { data, error } = await reviewRepo.reviewsForProfile(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
