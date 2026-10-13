@@ -7,7 +7,7 @@ export function website(): Node {
   return {
     '@context': 'https://schema.org',
     '@graph': [
-      { '@type': 'Organization', '@id': `${SITE_URL}/#org`, name: SITE_NAME, url: SITE_URL },
+      { '@type': 'Organization', '@id': `${SITE_URL}/#org`, name: SITE_NAME, url: SITE_URL, logo: `${SITE_URL}/opengraph-image` },
       { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: SITE_NAME, url: SITE_URL },
     ],
   };
@@ -38,6 +38,18 @@ export function blogPosting(meta: ContentMeta, path: string): Node {
     keywords: meta.keywords.length ? meta.keywords.join(', ') : undefined,
     author: { '@type': 'Organization', name: SITE_NAME },
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+  };
+}
+
+export function softwareApplication(downloadPath: string): Node {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: SITE_NAME,
+    operatingSystem: 'Android',
+    applicationCategory: 'BusinessApplication',
+    downloadUrl: `${SITE_URL}${downloadPath}`,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
   };
 }
 

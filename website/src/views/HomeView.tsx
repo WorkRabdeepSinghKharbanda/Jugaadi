@@ -8,6 +8,8 @@ import { FeatureCard } from "@/components/FeatureCard";
 import { HowItWorksTabs } from "@/components/HowItWorksTabs";
 import { Faqs } from "@/components/Faqs";
 import { CtaBand } from "@/components/CtaBand";
+import { JsonLd } from "@/components/JsonLd";
+import { softwareApplication } from "@/lib/jsonld";
 
 const LANDING_ICONS: Record<string, string> = {
   "temporary-worker-near-me": "🧑‍🔧",
@@ -30,6 +32,7 @@ export function HomeView({ locale }: { locale: Locale }) {
     <>
       <Header locale={locale} path="/" />
       <main>
+        <JsonLd data={[softwareApplication(`${prefix}/download`)]} />
         <section className="hero">
           <p className="eyebrow">{c.eyebrow}</p>
           <h1>{c.heroH1}</h1>

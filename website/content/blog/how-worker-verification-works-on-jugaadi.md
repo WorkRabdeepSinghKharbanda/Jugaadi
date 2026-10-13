@@ -17,8 +17,8 @@ It's not a police verification, not a credit check, not an automated KYC pipelin
 
 ## Why we didn't build something heavier for launch
 
-A more automated verification system is real infrastructure — a vendor integration, a review queue, a cost per check. Building that before we know whether the core hiring loop even works for people would be solving a problem we don't have yet. The manual check is enough to get started, and we'll revisit it if and when the volume of worker signups makes a human bottleneck instead of a feature.
+A more automated verification system is real infrastructure — a vendor integration, a review queue, a cost per check. Building that before we know whether the core booking loop even works for people would be solving a problem we don't have yet. The manual check is enough to get started, and we'll revisit it if and when the volume of worker signups makes a human bottleneck instead of a feature.
 
 ## What you should still do
 
-Treat the badge as one input, not a guarantee. Meet the person, use your judgement, same as any other hire — Jugaadi shortens your search, it doesn't replace the parts of hiring that are genuinely your call to make.
+Treat the badge as one input, not a guarantee. Meet the person, use your judgement, same as with any other helper — Jugaadi shortens your search, it doesn't replace the parts of choosing that are genuinely your call to make.

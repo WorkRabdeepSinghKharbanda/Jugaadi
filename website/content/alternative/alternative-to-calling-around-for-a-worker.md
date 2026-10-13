@@ -24,9 +24,9 @@ Post once, with the skill and dates you need. See nearby workers who've listed t
 
 ## What doesn't change
 
-Jugaadi doesn't replace judgement — you still decide who to hire based on what you see, same as asking around. It also doesn't guarantee coverage; a single-city pilot means some areas have more workers signed up than others.
+Jugaadi doesn't replace judgement — you still decide who to book based on what you see, same as asking around. It also doesn't guarantee coverage; a single-city pilot means some areas have more workers signed up than others.
 
 ## Next steps
 
-- See how [direct hire](/features/hire-instantly) actually works once you've posted.
+- See how [instant booking](/features/book-instantly) actually works once you've posted.
 - Start with [temporary worker near me](/temporary-worker-near-me) or [shop helper near me](/shop-helper-near-me).

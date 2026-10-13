@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import { LOCALES, type Locale } from './locale';
+import { LOCALES, localizedPath, type Locale } from './locale';
 import { SITE_URL } from './site';
 
 export type ContentType = 'landing' | 'feature' | 'alternative' | 'blog';
@@ -85,9 +85,21 @@ function toMeta(type: ContentType, slug: string, locale: Locale, data: Record<st
   };
 }
 
-/** Builds the `alternates.languages` object for a page's Metadata, pointing at its locale siblings. */
+const HREFLANG: Record<Locale, string> = { en: 'en', hi: 'hi', hinglish: 'hi-Latn' };
+
+/** `alternates.languages` for a page, given its English path (e.g. "/features" or "/"). Adds x-default -> English. */
+export function hreflangForPath(enPath: string): Record<string, string> {
+  const languages = Object.fromEntries(LOCALES.map((l) => [HREFLANG[l], `${SITE_URL}${localizedPath(l, enPath)}`]));
+  return { ...languages, 'x-default': languages.en };
+}
+
 export function hreflangFor(type: ContentType, slug: string): Record<string, string> {
-  return Object.fromEntries(LOCALES.map((locale) => [locale, `${SITE_URL}${pathFor({ type, slug, locale })}`]));
+  return hreflangForPath(pathFor({ type, slug, locale: 'en' }));
+}
+
+/** Self-referencing canonical + hreflang. Page-level `alternates` replaces the layout's, so every page must set both. */
+export function alternatesFor(locale: Locale, enPath: string) {
+  return { canonical: `${SITE_URL}${localizedPath(locale, enPath)}`, languages: hreflangForPath(enPath) };
 }
 
 export function pathFor(meta: Pick<ContentMeta, 'type' | 'slug' | 'locale'>): string {

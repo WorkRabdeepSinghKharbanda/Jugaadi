@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { HubView, TITLES } from "@/views/HubView";
+import { pageMetadata } from "@/lib/seo";
+import { HubView } from "@/views/HubView";
 
-export const metadata: Metadata = {
-  title: TITLES.feature.hinglish,
-  description: "Shop owners, households, aur workers ke liye Jugaadi kya karta hai.",
-};
+export const metadata: Metadata = pageMetadata({
+  locale: "hinglish",
+  enPath: "/features",
+  title: "Features: Verified Workers Aur Instant Booking",
+  description: "Jugaadi ke features dekho: paas ke manually verified workers, instant booking, aur shop owners, gharon aur workers ke liye usi din ke aasaan tasks.",
+});
 
 export default function FeaturesHubPageHinglish() {
   return <HubView type="feature" locale="hinglish" />;

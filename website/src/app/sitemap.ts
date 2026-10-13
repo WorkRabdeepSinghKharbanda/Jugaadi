@@ -1,27 +1,38 @@
 import type { MetadataRoute } from "next";
 import { getAllContent, pathFor } from "@/lib/content";
-import { LOCALES } from "@/lib/locale";
+import { LOCALES, localizedPath } from "@/lib/locale";
 import { SITE_URL } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = LOCALES.flatMap((locale) => {
-    const prefix = locale === "en" ? "" : `/${locale}`;
-    return ["", "/blog", "/features", "/alternatives", "/download"].map((path) => ({
-      url: path === "" ? `${SITE_URL}${prefix || "/"}` : `${SITE_URL}${prefix}${path}`,
-      lastModified: new Date(),
-    }));
-  });
+// Last real edit per page group (bump when that group's copy changes). Privacy/terms are placeholders
+// and noindex, so they are intentionally not listed until real policies exist.
+const LAST_MODIFIED = {
+  "/": "2026-10-10",
+  "/blog": "2026-10-10",
+  "/features": "2026-10-10",
+  "/alternatives": "2026-10-10",
+  "/download": "2026-10-13",
+  landing: "2026-10-10",
+  feature: "2026-10-10",
+  alternative: "2026-10-10",
+  blog: "2026-10-10",
+} as const;
 
-  const legalPages = ["/privacy", "/terms"].map((path) => ({ url: `${SITE_URL}${path}`, lastModified: new Date() }));
+export default function sitemap(): MetadataRoute.Sitemap {
+  const staticPages = LOCALES.flatMap((locale) =>
+    (["/", "/blog", "/features", "/alternatives", "/download"] as const).map((path) => ({
+      url: `${SITE_URL}${localizedPath(locale, path)}`,
+      lastModified: new Date(LAST_MODIFIED[path]),
+    })),
+  );
 
   const content = LOCALES.flatMap((locale) =>
     (["landing", "feature", "alternative", "blog"] as const).flatMap((type) =>
       getAllContent(type, locale).map((m) => ({
         url: `${SITE_URL}${pathFor(m)}`,
-        lastModified: m.date ? new Date(m.date) : new Date(),
+        lastModified: new Date(m.date ?? LAST_MODIFIED[type]),
       })),
     ),
   );
 
-  return [...staticPages, ...legalPages, ...content];
+  return [...staticPages, ...content];
 }

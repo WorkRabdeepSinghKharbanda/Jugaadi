@@ -9,6 +9,7 @@ import { Faqs } from "@/components/Faqs";
 import { CtaBand } from "@/components/CtaBand";
 import { JsonLd } from "@/components/JsonLd";
 import { TrustBadge } from "@/components/TrustBadge";
+import { RelatedLinks } from "@/components/RelatedLinks";
 import { breadcrumbList, faqPage, blogPosting } from "@/lib/jsonld";
 
 const HUB: Record<Exclude<ContentType, "landing">, string> = {
@@ -63,6 +64,7 @@ export async function ContentPageView({ type, slug, locale }: { type: ContentTyp
               endorsed by, or sponsored by {page.competitor}.
             </p>
           )}
+          {type === "blog" && <RelatedLinks locale={locale} />}
           {type === "landing" && (
             <CtaBand
               title={locale === "en" ? "Need a worker, or looking for work?" : t.downloadApp}

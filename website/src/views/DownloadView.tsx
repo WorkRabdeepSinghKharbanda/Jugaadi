@@ -1,11 +1,12 @@
 import type { Locale } from "@/lib/locale";
-import { APK_DOWNLOAD_URL, APK_DRIVE_VIEW_URL } from "@/lib/site";
-import { breadcrumbList, faqPage } from "@/lib/jsonld";
+import { APK_DRIVE_VIEW_URL } from "@/lib/site";
+import { breadcrumbList, faqPage, softwareApplication } from "@/lib/jsonld";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faqs } from "@/components/Faqs";
 import { JsonLd } from "@/components/JsonLd";
+import { ApkDownloadLink } from "@/components/ApkDownloadLink";
 
 const COPY: Record<Locale, {
   home: string;
@@ -123,7 +124,7 @@ export function DownloadView({ locale }: { locale: Locale }) {
   const prefix = locale === "en" ? "" : `/${locale}`;
   const path = `${prefix}/download`;
   const crumbs = [{ name: t.home, path: locale === "en" ? "/" : `/${locale}` }, { name: t.title, path }];
-  const jsonld = [breadcrumbList(crumbs), faqPage(t.faqs)].filter((n): n is NonNullable<typeof n> => n !== null);
+  const jsonld = [breadcrumbList(crumbs), faqPage(t.faqs), softwareApplication(path)].filter((n): n is NonNullable<typeof n> => n !== null);
 
   return (
     <>
@@ -135,9 +136,7 @@ export function DownloadView({ locale }: { locale: Locale }) {
           <h1>{t.title}</h1>
           <p>{t.intro}</p>
           <p>
-            <a className="btn" data-cta="download-apk" href={APK_DOWNLOAD_URL} rel="noopener noreferrer">
-              {t.downloadBtn}
-            </a>
+            <ApkDownloadLink>{t.downloadBtn}</ApkDownloadLink>
           </p>
           <p>
             {t.fallback}{" "}

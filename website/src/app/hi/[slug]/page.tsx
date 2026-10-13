@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getAllContent, getContent, hreflangFor } from "@/lib/content";
+import { getAllContent } from "@/lib/content";
+import { contentMetadata } from "@/lib/seo";
 import { ContentPageView } from "@/views/ContentPageView";
 
 export function generateStaticParams() {
@@ -12,9 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const page = await getContent("landing", slug, "hi");
-  if (!page) return {};
-  return { title: page.title, description: page.description, alternates: { languages: hreflangFor("landing", slug) } };
+  return contentMetadata("landing", slug, "hi");
 }
 
 export default async function LandingPageHi({ params }: { params: Promise<{ slug: string }> }) {

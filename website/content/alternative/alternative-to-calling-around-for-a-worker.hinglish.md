@@ -24,9 +24,9 @@ Ek baar post karo, jo skill aur dates chahiye unke saath. Paas ke workers jinhon
 
 ## Kya nahi badalta
 
-Jugaadi aapki samajh ki jagah nahi leta — aap phir bhi jo dekhte ho uske basis par decide karte ho kise hire karna hai, jaise poochtaach karne mein karte ho. Yeh coverage ki guarantee bhi nahi deta; ek single-city pilot ka matlab hai kuch areas mein doosron se zyada workers sign up hain.
+Jugaadi aapki samajh ki jagah nahi leta — aap phir bhi jo dekhte ho uske basis par decide karte ho kise book karna hai, jaise poochtaach karne mein karte ho. Yeh coverage ki guarantee bhi nahi deta; ek single-city pilot ka matlab hai kuch areas mein doosron se zyada workers sign up hain.
 
 ## Next steps
 
-- Dekho [direct hire](/hinglish/features/hire-instantly) post karne ke baad actually kaise kaam karta hai.
+- Dekho [instant booking](/hinglish/features/book-instantly) post karne ke baad actually kaise kaam karta hai.
 - [Temporary worker near me](/hinglish/temporary-worker-near-me) ya [shop helper near me](/hinglish/shop-helper-near-me) se start karo.

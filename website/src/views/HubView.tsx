@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { PageList } from "@/components/PageList";
 import { FeatureCard } from "@/components/FeatureCard";
+import { RelatedLinks } from "@/components/RelatedLinks";
 
 export const TITLES: Record<"feature" | "alternative" | "blog", Record<Locale, string>> = {
   feature: { en: "Features", hi: "सुविधाएं", hinglish: "Features" },
@@ -13,7 +14,7 @@ export const TITLES: Record<"feature" | "alternative" | "blog", Record<Locale, s
 
 const ICONS: Record<string, string> = {
   "verified-workers": "✅",
-  "hire-instantly": "⚡",
+  "book-instantly": "⚡",
   "alternative-to-calling-around-for-a-worker": "📞",
 };
 
@@ -37,6 +38,7 @@ export function HubView({ type, locale }: { type: "feature" | "alternative" | "b
             ))}
           </div>
         )}
+        <RelatedLinks locale={locale} />
       </main>
       <Footer locale={locale} />
     </>

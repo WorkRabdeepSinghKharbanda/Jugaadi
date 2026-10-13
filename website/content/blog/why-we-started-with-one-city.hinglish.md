@@ -9,11 +9,11 @@ Jugaadi ke landing page ko aisa dikhana easy hota jaise yeh har jagah available 
 
 ## Har jagah jaane ka lalach
 
-Ek marketplace zyada credible lagta hai jab woh bada dikhe — zyada cities, zyada workers, zyada posted tasks. Problem yeh hai ki ek two-sided marketplace sirf utna hi useful hota hai jitni ek jagah dono side ki density. Bees cities mein failey sau workers kisi ki madad nahi karte; ek mohalle mein pachaas workers kaafi hain taaki core loop — post, respond, hire — aaj kisi ke liye actually kaam kare.
+Ek marketplace zyada credible lagta hai jab woh bada dikhe — zyada cities, zyada workers, zyada posted tasks. Problem yeh hai ki ek two-sided marketplace sirf utna hi useful hota hai jitni ek jagah dono side ki density. Bees cities mein failey sau workers kisi ki madad nahi karte; ek mohalle mein pachaas workers kaafi hain taaki core loop — post, respond, book — aaj kisi ke liye actually kaam kare.
 
 ## "Ek city" se kya milta hai
 
-Ek chhota, dense pilot matlab verification ek phone call hai, queue nahi. Iska matlab hai jab hiring flow mein kuch toota hai, humein mutthi bhar real users se pata chalta hai, hazaar mein chupchaap debug karne ke bajaye. Iska matlab hai manual hisse — kisi worker ki identity check karna, ek edge case handle karna — ek banda ke liye manageable rehte hain.
+Ek chhota, dense pilot matlab verification ek phone call hai, queue nahi. Iska matlab hai jab booking flow mein kuch toota hai, humein mutthi bhar real users se pata chalta hai, hazaar mein chupchaap debug karne ke bajaye. Iska matlab hai manual hisse — kisi worker ki identity check karna, ek edge case handle karna — ek banda ke liye manageable rehte hain.
 
 ## Expand karne se pehle kya sach hona chahiye
 

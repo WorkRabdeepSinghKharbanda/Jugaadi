@@ -17,8 +17,8 @@ Yeh police verification nahi hai, credit check nahi hai, automated KYC pipeline 
 
 ## Humne launch ke liye bhaari system kyun nahi banaya
 
-Ek zyada automated verification system real infrastructure hai — ek vendor integration, ek review queue, har check ki ek cost. Yeh banana isse pehle ki humein pata chale core hiring loop logon ke liye kaam bhi karta hai ya nahi, ek aisi problem solve karna hoga jo hamare paas abhi hai hi nahi. Manual check shuruaat ke liye kaafi hai, aur agar aur jab worker signup ka volume human bottleneck ban jaaye, tab hum isse dobara dekhenge.
+Ek zyada automated verification system real infrastructure hai — ek vendor integration, ek review queue, har check ki ek cost. Yeh banana isse pehle ki humein pata chale core booking loop logon ke liye kaam bhi karta hai ya nahi, ek aisi problem solve karna hoga jo hamare paas abhi hai hi nahi. Manual check shuruaat ke liye kaafi hai, aur agar aur jab worker signup ka volume human bottleneck ban jaaye, tab hum isse dobara dekhenge.
 
 ## Aapko phir bhi kya karna chahiye
 
-Badge ko ek input maano, guarantee nahi. Banda se milo, apni samajh ka istemaal karo, jaise kisi bhi aur hire ke liye karte ho — Jugaadi aapki search chhoti karta hai, yeh hiring ke un hisson ki jagah nahi leta jo actually aapka apna faisla hain.
+Badge ko ek input maano, guarantee nahi. Banda se milo, apni samajh ka istemaal karo, jaise kisi bhi aur helper ke liye karte ho — Jugaadi aapki search chhoti karta hai, yeh chunne ke un hisson ki jagah nahi leta jo actually aapka apna faisla hain.
