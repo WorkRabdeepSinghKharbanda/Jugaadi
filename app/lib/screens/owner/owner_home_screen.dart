@@ -134,7 +134,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ErrorStrip('${snapshot.error}'),
+                      ErrorStrip(errorMessage(context, snapshot.error!)),
                       const SizedBox(height: AppSpacing.md),
                       NeuButton(label: context.tr('retry'), expand: false, onPressed: _refresh),
                     ],

@@ -84,7 +84,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            ErrorStrip('${snapshot.error}'),
+                            ErrorStrip(errorMessage(context, snapshot.error!)),
                             const SizedBox(height: AppSpacing.md),
                             NeuButton(
                               label: context.tr('retry'),

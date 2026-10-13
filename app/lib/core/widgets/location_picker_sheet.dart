@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import '../i18n/strings.dart';
 import '../location.dart';
 import '../services/place_gateway.dart';
 import '../theme/tokens.dart';
@@ -29,6 +31,7 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
   final _query = TextEditingController();
   List<PlaceHit> _hits = const [];
   String? _error;
+  bool _permissionBlocked = false;
   bool _busyGps = false;
   bool _busySearch = false;
 
@@ -42,6 +45,7 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
     setState(() {
       _busyGps = true;
       _error = null;
+      _permissionBlocked = false;
     });
     try {
       final position = await getCurrentPositionOrThrow();
@@ -49,7 +53,12 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
       if (!mounted) return;
       Navigator.of(context).pop(PlaceHit(label: label, latitude: position.latitude, longitude: position.longitude));
     } catch (e) {
-      if (mounted) setState(() => _error = '$e');
+      if (mounted) {
+        setState(() {
+          _error = errorMessage(context, e);
+          _permissionBlocked = e is LocationException && e.key == 'location_permission_denied';
+        });
+      }
     } finally {
       if (mounted) setState(() => _busyGps = false);
     }
@@ -107,7 +116,14 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
                   child: Text(h.label, style: AppText.body.copyWith(color: c.accent)),
                 ),
               ),
-            if (_error != null) ...[const SizedBox(height: AppSpacing.sm), ErrorStrip(_error!)],
+            if (_error != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              ErrorStrip(_error!),
+              if (_permissionBlocked) ...[
+                const SizedBox(height: AppSpacing.sm),
+                NeuButton(label: context.tr('open_settings'), icon: Icons.settings_outlined, variant: NeuButtonVariant.ghost, onPressed: Geolocator.openAppSettings),
+              ],
+            ],
           ],
         ),
       ),

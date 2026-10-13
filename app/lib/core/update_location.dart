@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'i18n/strings.dart';
 import '../api_client.dart';
 import '../config.dart';
 import 'widgets/widgets.dart';
@@ -27,6 +28,6 @@ Future<void> editLocation(BuildContext context) async {
 
     if (context.mounted) showAppToast(context, 'Location updated');
   } catch (e) {
-    if (context.mounted) showAppToast(context, '$e', tone: ToastTone.error);
+    if (context.mounted) showAppToast(context, errorMessage(context, e), tone: ToastTone.error);
   }
 }

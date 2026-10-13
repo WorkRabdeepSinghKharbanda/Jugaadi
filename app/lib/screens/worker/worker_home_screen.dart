@@ -126,7 +126,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ErrorStrip('${snapshot.error}'),
+                      ErrorStrip(errorMessage(context, snapshot.error!)),
                       const SizedBox(height: AppSpacing.md),
                       NeuButton(label: context.tr('retry'), expand: false, onPressed: _refresh),
                     ],

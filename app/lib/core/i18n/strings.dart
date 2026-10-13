@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import '../../api_client.dart';
+import '../location.dart';
 import 'lang.dart';
 
 /// Translation dictionary. One entry per user-facing string, keyed by a short snake_case name —
@@ -7,6 +9,18 @@ import 'lang.dart';
 /// screens don't collide on the same region of the map.
 const Map<String, Map<Lang, String>> _strings = {
   // Shared
+  'something_went_wrong': {Lang.en: 'Something went wrong. Please try again.', Lang.hi: 'कुछ गलत हो गया। कृपया फिर कोशिश करें।', Lang.hinglish: 'Kuch galat ho gaya. Please phir try karo.'},
+  'location_permission_denied': {
+    Lang.en: 'Location permission is off. Please allow location access from the app settings.',
+    Lang.hi: 'लोकेशन की अनुमति बंद है। कृपया ऐप सेटिंग से लोकेशन एक्सेस की अनुमति दें।',
+    Lang.hinglish: 'Location permission off hai. Please app settings se location access allow karo.',
+  },
+  'location_services_off': {
+    Lang.en: 'Location is turned off. Please turn on location and try again.',
+    Lang.hi: 'लोकेशन बंद है। कृपया लोकेशन चालू करके फिर कोशिश करें।',
+    Lang.hinglish: 'Location band hai. Please location on karke phir try karo.',
+  },
+  'open_settings': {Lang.en: 'Open settings', Lang.hi: 'सेटिंग खोलें', Lang.hinglish: 'Settings kholo'},
   'retry': {Lang.en: 'Retry', Lang.hi: 'फिर कोशिश करें', Lang.hinglish: 'Phir try karo'},
   'cancel': {Lang.en: 'Cancel', Lang.hi: 'रद्द करें', Lang.hinglish: 'Cancel karo'},
   'save': {Lang.en: 'Save', Lang.hi: 'सेव करें', Lang.hinglish: 'Save karo'},
@@ -290,6 +304,12 @@ const Map<String, Map<Lang, String>> _strings = {
     Lang.hinglish: 'Jugaadi pe apne paas daily-wage kaam dhoondo. App install karo:',
   },
 };
+
+String errorMessage(BuildContext context, Object error) {
+  if (error is ApiException) return error.message;
+  if (error is LocationException) return context.tr(error.key);
+  return context.tr('something_went_wrong');
+}
 
 String tr(Lang lang, String key) {
   final entry = _strings[key];

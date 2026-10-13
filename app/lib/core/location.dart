@@ -1,11 +1,19 @@
 import 'package:geolocator/geolocator.dart';
 
+/// [key] is a strings.dart translation key, so the UI can show it in the user's language.
+class LocationException implements Exception {
+  const LocationException(this.key);
+  final String key;
+  @override
+  String toString() => key;
+}
+
 /// Checks permission/service state explicitly (instead of letting
 /// getCurrentPosition silently hang) and times out instead of waiting forever
 /// for a GPS fix that may never arrive indoors/on an emulator.
 Future<Position> getCurrentPositionOrThrow() async {
   if (!await Geolocator.isLocationServiceEnabled()) {
-    throw Exception('Location services are off. Turn on location and try again.');
+    throw const LocationException('location_services_off');
   }
 
   var permission = await Geolocator.checkPermission();
@@ -13,7 +21,7 @@ Future<Position> getCurrentPositionOrThrow() async {
     permission = await Geolocator.requestPermission();
   }
   if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-    throw Exception('Location permission denied. Allow location access in app settings.');
+    throw const LocationException('location_permission_denied');
   }
 
   return Geolocator.getCurrentPosition(

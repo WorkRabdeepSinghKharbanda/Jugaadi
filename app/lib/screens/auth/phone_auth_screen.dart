@@ -40,7 +40,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         MaterialPageRoute(builder: (_) => OtpVerifyScreen(phone: _e164Phone)),
       );
     } catch (e) {
-      setState(() => _error = '$e');
+      setState(() => _error = errorMessage(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }

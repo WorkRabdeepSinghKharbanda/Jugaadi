@@ -72,7 +72,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             return Center(child: CircularProgressIndicator(color: c.accent));
           }
           if (snapshot.hasError) {
-            return Center(child: ErrorStrip('${snapshot.error}'));
+            return Center(child: ErrorStrip(errorMessage(context, snapshot.error!)));
           }
           final users = snapshot.data!;
           if (users.isEmpty) return EmptyState(icon: Icons.people_outline_rounded, text: context.tr('no_users'));

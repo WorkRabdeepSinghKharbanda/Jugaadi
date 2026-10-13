@@ -178,7 +178,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         setState(() => _error = e.message);
       }
     } catch (e) {
-      setState(() => _error = '$e');
+      setState(() => _error = errorMessage(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }

@@ -152,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _future = _load();
       });
     } catch (e) {
-      setState(() => _error = '$e');
+      setState(() => _error = errorMessage(context, e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -176,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ErrorStrip('${snapshot.error}'),
+                ErrorStrip(errorMessage(context, snapshot.error!)),
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(label: context.tr('retry'), expand: false, onPressed: () => setState(() { _future = _load(); })),
               ],

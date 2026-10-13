@@ -74,7 +74,7 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
             return Center(child: CircularProgressIndicator(color: c.accent));
           }
           if (snapshot.hasError) {
-            return Center(child: ErrorStrip('${snapshot.error}'));
+            return Center(child: ErrorStrip(errorMessage(context, snapshot.error!)));
           }
           final jobs = snapshot.data!;
           if (jobs.isEmpty) return EmptyState(icon: Icons.work_outline_rounded, text: context.tr('no_jobs'));

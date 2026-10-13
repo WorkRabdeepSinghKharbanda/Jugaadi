@@ -99,7 +99,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         (route) => false,
       );
     } catch (e) {
-      setState(() => _error = '$e');
+      setState(() => _error = errorMessage(context, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
