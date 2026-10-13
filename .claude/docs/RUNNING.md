@@ -52,6 +52,18 @@ flutter run --dart-define-from-file=.env.production
 
 `flutter devices` lists available simulators/emulators; add `-d <device-id>` to target one. Release build for distribution is the same flag with `flutter build apk --release` instead of `flutter run`.
 
+### Release signing and Play Store bundle
+
+Release builds sign with the upload key in `app/android/upload-keystore.jks`, configured by `app/android/key.properties` (both gitignored — back them up outside the repo; losing the upload key means asking Google Play to reset it). Without `key.properties` Gradle falls back to the debug key, which is fine for `flutter run --release` but not for distribution.
+
+```
+cd app
+flutter build apk --release --dart-define-from-file=.env.production        # sideload / Drive
+flutter build appbundle --release --dart-define-from-file=.env.production  # Play Store upload
+```
+
+Outputs: `build/app/outputs/flutter-apk/app-release.apk` and `build/app/outputs/bundle/release/app-release.aab`. Bump the `+N` build number in `pubspec.yaml` for every upload (Play rejects a repeated versionCode). Changing the signing key means an older debug-signed APK cannot be updated in place — users reinstall once.
+
 ## website/
 
 ```

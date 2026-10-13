@@ -1,5 +1,5 @@
 import { supabase } from '../config/db.js';
-import { JobStatus } from '../types.js';
+import { ApplicationStatus, JobStatus } from '../types.js';
 
 export interface ProfileInput {
   role: 'owner' | 'worker';
@@ -55,7 +55,7 @@ export async function softDeleteProfile(userId: string) {
 }
 
 // Shared by a user deleting their own account and an admin deleting someone else's: scrub PII,
-// drop skills, take down their still-open tasks, then BAN the auth identity so they can't sign in.
+// drop skills and pending responses, take down their still-open tasks, then BAN the auth identity so they can't sign in.
 // Must be a ban, never auth.admin.deleteUser: profiles.id -> auth.users ON DELETE CASCADE, and
 // jobs/applications/reviews cascade from profiles, so a hard delete would wipe other users' history.
 // The ban is best-effort: if it fails the profile is still fully scrubbed.
@@ -65,6 +65,14 @@ export async function deactivateAccount(userId: string): Promise<{ error: { mess
 
   const { error: skillsError } = await supabase.from('worker_skills').delete().eq('worker_id', userId);
   if (skillsError) console.warn('[profile] worker_skills cleanup failed:', skillsError.message);
+
+  // A deleted worker's pending responses would still show the owner a placeholder phone.
+  const { error: appsError } = await supabase
+    .from('job_applications')
+    .delete()
+    .eq('worker_id', userId)
+    .eq('status', ApplicationStatus.PENDING);
+  if (appsError) console.warn('[profile] pending applications cleanup failed:', appsError.message);
 
   const { error: jobsError } = await supabase
     .from('jobs')
