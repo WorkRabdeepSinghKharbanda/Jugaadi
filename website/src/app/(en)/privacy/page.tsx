@@ -59,9 +59,10 @@ export default function PrivacyPage() {
           its dates, and payment reference IDs. We never see or store your card, UPI PIN, or bank details.
         </li>
         <li>
-          <strong>Usage and device data:</strong> with Microsoft Clarity (app and website) and Google
-          Analytics (website) we collect anonymised usage information such as screens and pages viewed,
-          taps, device type and approximate region, to find bugs and improve the product.
+          <strong>Usage and device data:</strong> Microsoft Clarity (app and website) and Google Analytics
+          (website) collect usage and interaction information such as screens and pages viewed, taps and
+          scrolls, device type and approximate region, to find bugs and improve the product. On the website
+          these tools use cookies.
         </li>
       </ul>
 
@@ -78,14 +79,18 @@ export default function PrivacyPage() {
       <h2>Who can see what</h2>
       <ul>
         <li>
-          <strong>Your phone number stays private until a booking is confirmed.</strong> When an owner books a
-          worker, each side can see the other&apos;s name and contact number — the separate contact number
-          if one was set, otherwise the sign-in number. Nobody else sees it.
+          <strong>Workers who respond to a task:</strong> the owner of that task sees the worker&apos;s name,
+          mobile number, skills, city, verification badge and bio. The worker&apos;s optional email and
+          separate contact number are shared only once the owner books them.
         </li>
         <li>
-          Owners see a worker&apos;s name, skills, city, verification badge, bio and ratings when the worker
-          responds to a task. Workers nearby see a task&apos;s title, skill, dates, pay, address, shop or
-          landmark line, and photos.
+          <strong>Owners:</strong> an owner&apos;s name and contact number are shared with a worker only
+          after that worker is booked — the separate contact number if one was set, otherwise the sign-in
+          number. Other users do not see it.
+        </li>
+        <li>
+          Workers nearby see a task&apos;s title, skill, dates, pay, address, shop or landmark line, and
+          photos.
         </li>
         <li>Reviews you write are shown on the reviewed person&apos;s profile with your name.</li>
         <li>We do not sell personal data and do not use it for third-party advertising.</li>
@@ -108,9 +113,10 @@ export default function PrivacyPage() {
 
       <h2>How long we keep it</h2>
       <p>
-        We keep your account data while your account is active. When you delete your account we remove your
-        personal details (see below). Records needed to keep other users&apos; history intact, such as a
-        review or a completed booking, are kept without your personal details.
+        We keep your account data while your account is active. When you delete your account we erase your
+        personal details (see below). Task records, reviews and booking history involving other people are
+        kept so their history stays intact, but they show you only as &quot;Deleted user&quot;. We also keep
+        payment reference IDs for accounting and legal reasons.
       </p>
 
       <h2>Your choices and deleting your data</h2>
@@ -120,9 +126,12 @@ export default function PrivacyPage() {
           anytime in Profile.
         </li>
         <li>
-          <strong>Delete your account:</strong> in the app go to Profile → Delete account. Your name, number,
-          email, bio, photo and contact number are erased or replaced with &quot;Deleted user&quot;, and
-          you can no longer sign in with that number.
+          <strong>Delete your account:</strong> in the app go to Profile → Delete account. Your name, mobile
+          number, contact number, email, bio, profile photo link, city, saved location and skills are erased
+          (your name becomes &quot;Deleted user&quot;), tasks you posted that are still open are taken down,
+          and you can no longer sign in with that number. Text you wrote in a review and the details or
+          photos of tasks you posted stay as part of the other person&apos;s record; if you want those
+          removed too, email us and we will review the request.
         </li>
         <li>
           <strong>Other requests:</strong> to see, correct or remove data, or to withdraw consent, email{" "}
