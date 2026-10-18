@@ -35,7 +35,7 @@ const COPY: Record<Locale, {
     downloadBtn: "Download for Android (APK)",
     fallback: "If the download doesn't start,",
     openDrive: "open the file on Google Drive",
-    details: ["Version: 1.0.0 (6)", "Platform: Android. iOS is not available yet.", "Hosted on Google Drive — the button downloads directly; the backup link opens the Drive page."],
+    details: ["Version: 1.0.0 (7)", "Platform: Android. iOS is not available yet.", "Hosted on Google Drive — the button downloads directly; the backup link opens the Drive page."],
     whatsNewHeading: "What's in this build",
     whatsNew: [
       "Post tasks (single or multiple workers needed) and manage who's responded",
@@ -43,6 +43,7 @@ const COPY: Record<Locale, {
       "In-app profile, reviews, and admin tools",
       "New: use the app in English, Hindi, or Hinglish (set it in Profile)",
       "New: share a task as an image or copy its details, add a shop name or landmark, edit your review, and filter your responses by date",
+      "New: filter nearby tasks by skill, pay and distance, see pay and distance on each card, post a task again in one tap, and report or block anyone you do not want to deal with",
     ],
     stepsHeading: "Install steps",
     steps: [
@@ -66,7 +67,7 @@ const COPY: Record<Locale, {
     downloadBtn: "एंड्रॉइड के लिए डाउनलोड करें (APK)",
     fallback: "अगर डाउनलोड शुरू नहीं होता, तो",
     openDrive: "Google Drive पर फ़ाइल खोलें",
-    details: ["वर्शन: 1.0.0 (6)", "प्लेटफ़ॉर्म: एंड्रॉइड। iOS अभी उपलब्ध नहीं है।", "Google Drive पर होस्टेड — बटन सीधे डाउनलोड करता है; बैकअप लिंक Drive पेज खोलता है।"],
+    details: ["वर्शन: 1.0.0 (7)", "प्लेटफ़ॉर्म: एंड्रॉइड। iOS अभी उपलब्ध नहीं है।", "Google Drive पर होस्टेड — बटन सीधे डाउनलोड करता है; बैकअप लिंक Drive पेज खोलता है।"],
     whatsNewHeading: "इस बिल्ड में क्या है",
     whatsNew: [
       "टास्क पोस्ट करें (एक या कई वर्कर चाहिए) और रिस्पॉन्ड करने वालों को मैनेज करें",
@@ -74,6 +75,7 @@ const COPY: Record<Locale, {
       "इन-ऐप प्रोफ़ाइल, रिव्यू, और एडमिन टूल्स",
       "नया: ऐप को अंग्रेज़ी, हिंदी या हिंग्लिश में इस्तेमाल करें (प्रोफ़ाइल में सेट करें)",
       "नया: टास्क को इमेज के रूप में शेयर करें या डिटेल्स कॉपी करें, दुकान का नाम या लैंडमार्क जोड़ें, अपना रिव्यू एडिट करें, और रिस्पॉन्स को तारीख से फ़िल्टर करें",
+      "नया: पास के टास्क को स्किल, वेतन और दूरी से फ़िल्टर करें, हर कार्ड पर वेतन और दूरी देखें, एक टैप में टास्क दोबारा पोस्ट करें, और जिससे बात नहीं करनी उसे रिपोर्ट या ब्लॉक करें",
     ],
     stepsHeading: "इंस्टॉल स्टेप्स",
     steps: [
@@ -97,7 +99,7 @@ const COPY: Record<Locale, {
     downloadBtn: "Android ke liye download karo (APK)",
     fallback: "Agar download start nahi hota, toh",
     openDrive: "Google Drive pe file kholo",
-    details: ["Version: 1.0.0 (6)", "Platform: Android. iOS abhi available nahi hai.", "Google Drive pe hosted — button seedha download karta hai; backup link Drive page kholta hai."],
+    details: ["Version: 1.0.0 (7)", "Platform: Android. iOS abhi available nahi hai.", "Google Drive pe hosted — button seedha download karta hai; backup link Drive page kholta hai."],
     whatsNewHeading: "Is build mein kya hai",
     whatsNew: [
       "Task post karo (ek ya multiple workers chahiye) aur jinhone respond kiya unhe manage karo",
@@ -105,6 +107,7 @@ const COPY: Record<Locale, {
       "In-app profile, reviews, aur admin tools",
       "Naya: app ko English, Hindi ya Hinglish mein use karo (Profile mein set karo)",
       "Naya: task ko image ke roop mein share karo ya details copy karo, shop ka naam ya landmark add karo, apna review edit karo, aur responses ko date se filter karo",
+      "Naya: nearby tasks ko skill, pay aur distance se filter karo, har card pe pay aur distance dekho, task ek tap mein dobara post karo, aur jisse baat nahi karni use report ya block karo",
     ],
     stepsHeading: "Install steps",
     steps: [
