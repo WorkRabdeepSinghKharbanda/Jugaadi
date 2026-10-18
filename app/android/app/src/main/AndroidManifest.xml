@@ -7,6 +7,11 @@
         android:label="jugaadi"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- ADS OFF. To enable (see RUNNING.md "Enabling Free-plan ads"), uncomment:
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+        -->
         <!-- geolocator declares a foreground location service for background tracking, which Jugaadi
              never starts (it only reads location on demand while the app is open). Removing it keeps
              Play from requiring a FOREGROUND_SERVICE_LOCATION declaration. -->

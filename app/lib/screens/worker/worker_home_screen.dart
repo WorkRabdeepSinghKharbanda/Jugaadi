@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
+import '../../core/ads.dart';
 import '../../core/i18n/strings.dart';
 import '../../core/location.dart';
 import '../../core/paginated_list.dart';
+import '../../core/skeleton.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
 import '../../core/widgets/widgets.dart';
@@ -12,6 +14,7 @@ import '../job_detail_screen.dart';
 import '../owner/owner_home_screen.dart';
 import '../plans_screen.dart';
 import '../profile_screen.dart';
+import 'nearby_filters.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
   const WorkerHomeScreen({super.key});
@@ -25,6 +28,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   late final _pager = PaginatedList<dynamic>(fetchPage: _fetchPage);
   final _scrollController = ScrollController();
   bool _isAdmin = false;
+  NearbyFilters _filters = const NearbyFilters();
+  bool _showAds = false;
+  static const _adEvery = 8;
   double? _lat, _lng;
 
   @override
@@ -33,6 +39,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     _pager.attachScrollController(_scrollController, () => setState(() {}));
     _future = _loadFirst();
     _checkAdmin();
+    _checkAds();
   }
 
   @override
@@ -50,8 +57,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     }
   }
 
+  Future<void> _checkAds() async {
+    final show = await shouldShowAds();
+    if (mounted && show != _showAds) setState(() => _showAds = show);
+  }
+
   Future<List<dynamic>> _fetchPage(int offset, int limit) async {
-    final data = await ApiClient(Config.apiBaseUrl).get('/jobs/nearby', {'lat': _lat, 'lng': _lng, 'limit': limit, 'offset': offset});
+    final data = await ApiClient(Config.apiBaseUrl).get('/jobs/nearby', {'lat': _lat, 'lng': _lng, 'limit': limit, 'offset': offset, ..._filters.toQuery()});
     return data as List<dynamic>;
   }
 
@@ -71,7 +83,10 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     await _pager.loadFirstPage();
   }
 
-  void _refresh() => setState(() { _future = _loadFirst(); });
+  void _refresh() {
+    _checkAds();
+    setState(() { _future = _loadFirst(); });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,9 +107,22 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
         ),
         NeuIconButton(
+          icon: _filters.isActive ? Icons.filter_alt_rounded : Icons.filter_alt_outlined,
+          semanticLabel: context.tr('filters'),
+          onPressed: () async {
+            final picked = await showNearbyFiltersSheet(context, _filters);
+            if (picked == null) return;
+            _filters = picked;
+            _refresh();
+          },
+        ),
+        NeuIconButton(
           icon: Icons.bolt_outlined,
           semanticLabel: context.tr('plan'),
-          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'worker'))),
+          onPressed: () async {
+            await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'worker')));
+            _checkAds();
+          },
         ),
         NeuIconButton(
           icon: Icons.location_on_outlined,
@@ -117,7 +145,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           future: _future,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return Center(child: CircularProgressIndicator(color: c.accent));
+              return const SkeletonList();
             }
             if (snapshot.hasError) {
               return Center(
@@ -135,19 +163,22 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               );
             }
             final jobs = _pager.items;
-            if (jobs.isEmpty) return EmptyState(icon: Icons.search_off_rounded, text: context.tr('no_open_jobs_nearby'));
+            if (jobs.isEmpty) return EmptyState(icon: Icons.search_off_rounded, text: context.tr(_filters.isActive ? 'no_jobs_match_filters' : 'no_open_jobs_nearby'));
+            // One ad after every _adEvery jobs on the Free plan; Pro sees none.
+            final adSlots = _showAds ? jobs.length ~/ _adEvery : 0;
             return ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
-              itemCount: jobs.length + (_pager.hasMore ? 1 : 0),
+              itemCount: jobs.length + adSlots + (_pager.hasMore ? 1 : 0),
               itemBuilder: (context, i) {
-                if (i == jobs.length) {
+                if (i == jobs.length + adSlots) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                     child: Center(child: CircularProgressIndicator(color: c.accent)),
                   );
                 }
-                final job = jobs[i] as Map<String, dynamic>;
+                if (_showAds && i % (_adEvery + 1) == _adEvery) return const NativeAdCard();
+                final job = jobs[_showAds ? i - i ~/ (_adEvery + 1) : i] as Map<String, dynamic>;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),
                   child: NeuCard(
@@ -173,6 +204,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                               Text(job['skill_needed'] as String, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                               const SizedBox(height: 4),
                               Text('${job['start_date']} → ${job['end_date']}', style: AppText.bodySmall.copyWith(color: c.textTertiary)),
+                              const SizedBox(height: 4),
+                              Text(
+                                [
+                                  if (job['daily_wage'] != null) '₹${job['daily_wage']}/${context.tr('share_per_day')}',
+                                  if (job['distance_km'] != null) '${job['distance_km']} ${context.tr('km_away')}',
+                                ].join('  ·  '),
+                                style: AppText.bodySmall.copyWith(color: c.accent, fontWeight: FontWeight.w600),
+                              ),
                             ],
                           ),
                         ),

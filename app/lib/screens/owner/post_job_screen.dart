@@ -13,9 +13,12 @@ const _kMaxJobPhotos = 6;
 
 /// Create mode when [existingJob] is null; edit mode (PATCH, open jobs only) otherwise.
 class PostJobScreen extends StatefulWidget {
-  const PostJobScreen({super.key, this.existingJob});
+  const PostJobScreen({super.key, this.existingJob, this.repostFrom});
 
   final Map<String, dynamic>? existingJob;
+
+  /// Prefills a NEW job from an old one (dates and photos are not copied).
+  final Map<String, dynamic>? repostFrom;
 
   @override
   State<PostJobScreen> createState() => _PostJobScreenState();
@@ -24,14 +27,14 @@ class PostJobScreen extends StatefulWidget {
 const _kOtherSkill = 'Other';
 
 class _PostJobScreenState extends State<PostJobScreen> {
-  late final _titleController = TextEditingController(text: widget.existingJob?['title'] as String?);
-  late final _addressLine2Controller = TextEditingController(text: widget.existingJob?['address_line2'] as String?);
-  late final _wageController = TextEditingController(text: widget.existingJob?['daily_wage']?.toString());
-  late final _workersNeededController = TextEditingController(text: '${widget.existingJob?['workers_needed'] ?? 1}');
+  late final _titleController = TextEditingController(text: _seed?['title'] as String?);
+  late final _addressLine2Controller = TextEditingController(text: _seed?['address_line2'] as String?);
+  late final _wageController = TextEditingController(text: _seed?['daily_wage']?.toString());
+  late final _workersNeededController = TextEditingController(text: '${_seed?['workers_needed'] ?? 1}');
   late final _customSkillController = TextEditingController(
-    text: _initialSkillIsCustom ? (widget.existingJob?['skill_needed'] as String?) : null,
+    text: _initialSkillIsCustom ? (_seed?['skill_needed'] as String?) : null,
   );
-  late String _skill = _initialSkillIsCustom ? _kOtherSkill : (widget.existingJob?['skill_needed'] as String? ?? kSkillOptions.first);
+  late String _skill = _initialSkillIsCustom ? _kOtherSkill : (_seed?['skill_needed'] as String? ?? kSkillOptions.first);
   DateTimeRange? _range;
   PlaceHit? _place;
   bool _loading = false;
@@ -44,11 +47,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   // Whether this screen started in edit mode (controls title/copy — "workers needed" stays
   // create-only regardless of whether a job got silently created via the photo flow below).
+  Map<String, dynamic>? get _seed => widget.existingJob ?? widget.repostFrom;
   bool get _isEdit => widget.existingJob != null;
   Map<String, dynamic>? get _job => widget.existingJob ?? _createdJob;
   bool get _hasJobId => _job != null;
   bool get _initialSkillIsCustom {
-    final existing = widget.existingJob?['skill_needed'] as String?;
+    final existing = _seed?['skill_needed'] as String?;
     return existing != null && !kSkillOptions.contains(existing);
   }
 
@@ -76,9 +80,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
   @override
   void initState() {
     super.initState();
-    final job = widget.existingJob;
+    final job = _seed;
     if (job != null) {
-      _range = DateTimeRange(start: DateTime.parse(job['start_date'] as String), end: DateTime.parse(job['end_date'] as String));
+      final existing = widget.existingJob;
+      if (existing != null) {
+        _range = DateTimeRange(start: DateTime.parse(existing['start_date'] as String), end: DateTime.parse(existing['end_date'] as String));
+      }
       _place = PlaceHit(label: job['address_text'] as String? ?? '', latitude: (job['lat'] as num).toDouble(), longitude: (job['lng'] as num).toDouble());
     }
   }

@@ -153,6 +153,7 @@ class _PlansScreenState extends State<PlansScreen> {
                     if (!isPro) Text('${context.tr('trial_then_price')} $priceLabel', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
                     const SizedBox(height: AppSpacing.lg),
                     _Benefit(isOwner ? Icons.post_add_rounded : Icons.send_rounded, benefit),
+                    // ADS OFF — uncomment with ads: _Benefit(Icons.block_rounded, context.tr('no_ads')),
                     if (!isPro) ...[
                       const SizedBox(height: AppSpacing.md),
                       NeuButton(label: context.tr('upgrade_to_pro'), icon: Icons.bolt_rounded, loading: _checkingOut, onPressed: _upgrade),

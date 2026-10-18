@@ -3,6 +3,7 @@ import '../../api_client.dart';
 import '../../config.dart';
 import '../../core/i18n/strings.dart';
 import '../../core/paginated_list.dart';
+import '../../core/skeleton.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 import '../job_detail_screen.dart';
@@ -93,7 +94,7 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
           future: _future,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return Center(child: CircularProgressIndicator(color: c.accent));
+              return const SkeletonList();
             }
             if (snapshot.hasError) {
               return Center(

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import * as jobRepo from '../repositories/job.repository.js';
 import * as planRepo from '../repositories/plan.repository.js';
+import * as safetyRepo from '../repositories/safety.repository.js';
 import * as reviewRepo from '../repositories/review.repository.js';
 import { JobStatus } from '../types.js';
 
@@ -60,6 +61,12 @@ function parsePageParams(query: Request['query']): { error: string } | { limit: 
   return { limit, offset };
 }
 
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const a = Math.sin(rad(lat2 - lat1) / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(rad(lng2 - lng1) / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
 export async function getNearbyJobs(req: Request, res: Response) {
   const lat = Number(req.query.lat);
   const lng = Number(req.query.lng);
@@ -71,7 +78,13 @@ export async function getNearbyJobs(req: Request, res: Response) {
   const page = parsePageParams(req.query);
   if ('error' in page) return res.status(400).json({ error: page.error });
 
-  const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius, page.limit, page.offset);
+  const skill = typeof req.query.skill === 'string' && req.query.skill.trim() ? req.query.skill.trim() : undefined;
+  const minWage = req.query.min_wage != null && req.query.min_wage !== '' ? Number(req.query.min_wage) : undefined;
+  if (minWage != null && (Number.isNaN(minWage) || minWage < 0)) return res.status(400).json({ error: 'min_wage must be a non-negative number' });
+  if (req.query.sort != null && req.query.sort !== 'nearest' && req.query.sort !== 'pay') return res.status(400).json({ error: 'sort must be nearest or pay' });
+  const sort = req.query.sort === 'pay' ? 'pay' : 'nearest';
+
+  const { data, error } = await jobRepo.nearbyJobs(lat, lng, radius, page.limit, page.offset, { skill, minWage, sort, viewerId: req.userId });
   if (error) return res.status(500).json({ error: error.message });
 
   // Carry the worker's own application status onto each card so "Apply" doesn't flash back
@@ -80,7 +93,10 @@ export async function getNearbyJobs(req: Request, res: Response) {
   if (jobs.length > 0) {
     const { data: myApps } = await jobRepo.applicationStatusesForWorker(req.userId, jobs.map((j: { id: string }) => j.id));
     const statusByJob = new Map((myApps ?? []).map((a) => [a.job_id, a.status]));
-    for (const job of jobs) job.my_application_status = statusByJob.get(job.id) ?? null;
+    for (const job of jobs) {
+      job.my_application_status = statusByJob.get(job.id) ?? null;
+      job.distance_km = Math.round(haversineKm(lat, lng, job.lat, job.lng) * 10) / 10;
+    }
   }
   res.json(jobs);
 }
@@ -181,7 +197,8 @@ export async function getApplicants(req: Request, res: Response) {
 
   const { data, error } = await jobRepo.pendingApplicants(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  const hidden = await safetyRepo.blockedEitherWay(req.userId);
+  res.json((data ?? []).filter((a: { worker_id: string }) => !hidden.has(a.worker_id)));
 }
 
 export async function hireApplicant(req: Request, res: Response) {

@@ -5,6 +5,7 @@ import jobRoutes from './routes/job.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 import billingRoutes from './routes/billing.routes.js';
+import safetyRoutes from './routes/safety.routes.js';
 
 const app = express();
 // Stash the raw request body so the webhook route can HMAC-verify Razorpay's signature against
@@ -17,5 +18,6 @@ app.use(jobRoutes);
 app.use(adminRoutes);
 app.use(reviewRoutes);
 app.use(billingRoutes);
+app.use(safetyRoutes);
 
 export default app;

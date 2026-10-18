@@ -1,0 +1,84 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../api_client.dart';
+import '../config.dart';
+import 'theme/tokens.dart';
+
+// Google's public test native ad unit — debug builds only.
+const _testNativeUnit = 'ca-app-pub-3940256099942544/2247696110';
+
+String? get _nativeUnitId {
+  if (Config.admobNativeUnitId.isNotEmpty) return Config.admobNativeUnitId;
+  return kDebugMode ? _testNativeUnit : null;
+}
+
+/// Ads show only on the Free plan (Pro and the 7-day trial are ad-free) and only when an ad unit
+/// is configured. Any failure reads as "no ads" — an ad must never block the app.
+Future<bool> shouldShowAds() async {
+  if (_nativeUnitId == null) return false;
+  try {
+    final billing = await ApiClient(Config.apiBaseUrl).get('/billing/me') as Map<String, dynamic>;
+    if (billing['plan'] != 'free') return false;
+    await MobileAds.instance.initialize();
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// One native ad styled like a job card. Renders nothing until the ad loads (or if it fails).
+class NativeAdCard extends StatefulWidget {
+  const NativeAdCard({super.key});
+
+  @override
+  State<NativeAdCard> createState() => _NativeAdCardState();
+}
+
+class _NativeAdCardState extends State<NativeAdCard> {
+  NativeAd? _ad;
+  bool _loaded = false;
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    final c = context.colors;
+    _ad = NativeAd(
+      adUnitId: _nativeUnitId!,
+      request: const AdRequest(nonPersonalizedAds: true),
+      nativeTemplateStyle: NativeTemplateStyle(
+        templateType: TemplateType.small,
+        mainBackgroundColor: c.surface,
+        cornerRadius: 16,
+        primaryTextStyle: NativeTemplateTextStyle(textColor: c.textPrimary),
+        secondaryTextStyle: NativeTemplateTextStyle(textColor: c.textSecondary),
+        callToActionTextStyle: NativeTemplateTextStyle(textColor: Colors.white, backgroundColor: c.accent),
+      ),
+      listener: NativeAdListener(
+        onAdLoaded: (_) { if (mounted) setState(() => _loaded = true); },
+        onAdFailedToLoad: (ad, _) { ad.dispose(); _ad = null; if (mounted) setState(() => _loaded = false); },
+      ),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    _ad?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded || _ad == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 90, maxHeight: 120),
+        child: AdWidget(ad: _ad!),
+      ),
+    );
+  }
+}

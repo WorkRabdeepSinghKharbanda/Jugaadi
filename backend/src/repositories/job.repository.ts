@@ -20,8 +20,18 @@ export async function createJob(ownerId: string, job: JobInput) {
   return supabase.from('jobs').insert({ owner_id: ownerId, ...job }).select().single();
 }
 
-export async function nearbyJobs(lat: number, lng: number, radiusM: number, limit: number, offset: number) {
-  return supabase.rpc('nearby_jobs', { in_lat: lat, in_lng: lng, radius_m: radiusM, in_limit: limit, in_offset: offset });
+export interface NearbyFilters {
+  skill?: string;
+  minWage?: number;
+  sort?: 'nearest' | 'pay';
+  viewerId?: string;
+}
+
+export async function nearbyJobs(lat: number, lng: number, radiusM: number, limit: number, offset: number, f: NearbyFilters = {}) {
+  return supabase.rpc('nearby_jobs', {
+    in_lat: lat, in_lng: lng, radius_m: radiusM, in_limit: limit, in_offset: offset,
+    in_skill: f.skill ?? null, in_min_wage: f.minWage ?? null, in_sort: f.sort ?? 'nearest', in_viewer: f.viewerId ?? null,
+  });
 }
 
 export async function applicationStatusesForWorker(workerId: string, jobIds: string[]) {

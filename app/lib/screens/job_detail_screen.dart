@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import '../api_client.dart';
 import '../config.dart';
 import '../core/i18n/lang.dart';
+import '../core/safety.dart';
 import '../core/i18n/strings.dart';
 import '../core/job_status.dart';
 import '../core/share_job.dart';
@@ -205,6 +206,22 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       onBack: () => Navigator.of(context).pop(),
       scroll: true,
       actions: [
+        if (!widget.isOwner && job['owner_id'] != null)
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
+            onSelected: (action) async {
+              final navigator = Navigator.of(context);
+              if (action == 'report') {
+                await showReportSheet(context, targetType: 'job', targetId: job['id']);
+              } else if (await confirmAndBlock(context, userId: job['owner_id'] as String)) {
+                navigator.pop();
+              }
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(value: 'report', child: Text(context.tr('report_job'))),
+              PopupMenuItem(value: 'block', child: Text(context.tr('block_user'))),
+            ],
+          ),
         if (status == JobStatus.open.name)
           _sharing
               ? const Padding(padding: EdgeInsets.all(AppSpacing.sm), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))

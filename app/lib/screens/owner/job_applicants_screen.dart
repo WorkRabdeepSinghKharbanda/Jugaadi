@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
 import '../../core/i18n/strings.dart';
+import '../../core/safety.dart';
+import '../../core/skeleton.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/widgets.dart';
 
@@ -75,7 +77,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 future: _future,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
-                    return Center(child: CircularProgressIndicator(color: c.accent));
+                    return const SkeletonList();
                   }
                   if (snapshot.hasError) {
                     return Center(
@@ -207,6 +209,21 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                         verified ? const PillBadge.verified() : PillBadge(label: context.tr('pending_verification')),
                                       ],
                                     ),
+                                  ),
+                                  PopupMenuButton<String>(
+                                    icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
+                                    onSelected: (action) async {
+                                      final workerId = a['worker_id'] as String;
+                                      if (action == 'report') {
+                                        await showReportSheet(context, targetType: 'user', targetId: workerId);
+                                      } else if (await confirmAndBlock(context, userId: workerId)) {
+                                        setState(() { _future = _load(); });
+                                      }
+                                    },
+                                    itemBuilder: (_) => [
+                                      PopupMenuItem(value: 'report', child: Text(context.tr('report'))),
+                                      PopupMenuItem(value: 'block', child: Text(context.tr('block_user'))),
+                                    ],
                                   ),
                                 ],
                               ),

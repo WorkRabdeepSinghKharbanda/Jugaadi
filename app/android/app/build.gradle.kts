@@ -35,6 +35,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // ADS OFF. Uncomment with the manifest meta-data to enable. AdMob app id: key.properties `admobAppId=`, else Google's test id.
+        // manifestPlaceholders["admobAppId"] = keystoreProperties.getProperty("admobAppId") ?: "ca-app-pub-3940256099942544~3347511713"
     }
 
     signingConfigs {

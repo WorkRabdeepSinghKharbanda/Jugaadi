@@ -64,6 +64,19 @@ flutter build appbundle --release --dart-define-from-file=.env.production  # Pla
 
 Outputs: `build/app/outputs/flutter-apk/app-release.apk` and `build/app/outputs/bundle/release/app-release.aab`. Bump the `+N` build number in `pubspec.yaml` for every upload (Play rejects a repeated versionCode). The app's `AndroidManifest.xml` removes geolocator's `GeolocatorLocationService` (`tools:node="remove"`): Jugaadi never runs location in a foreground service, and leaving it in makes Play Console ask for a FOREGROUND_SERVICE_LOCATION declaration. Re-add it only if background location is ever built. Changing the signing key means an older debug-signed APK cannot be updated in place — users reinstall once.
 
+## Enabling Free-plan ads (currently OFF)
+
+Built, then disabled on request. Free-plan workers would see a native AdMob card after every 8 jobs in the nearby list; Pro and the 7-day trial see none. To turn on:
+
+1. `cd app && flutter pub add google_mobile_ads`.
+2. `cp ../.claude/docs/ads/ads.dart.disabled lib/core/ads.dart` (replaces the stub).
+3. Uncomment `admobNativeUnitId` in `lib/config.dart`; add `ADMOB_NATIVE_UNIT_ID=ca-app-pub-…/…` to `app/.env.production`.
+4. Uncomment the `meta-data` in `AndroidManifest.xml` and the `manifestPlaceholders` line in `build.gradle.kts`; add `admobAppId=ca-app-pub-…~…` to `android/key.properties`.
+5. Uncomment the `no_ads` benefit in `plans_screen.dart` (string key already exists).
+6. Website: add "Shows ads" to the Free plan and "No ads" to the Pro plan in `website/src/lib/home-copy.ts` (en/hi/hinglish); add an "Ads (Free plan)" row and Google AdMob to the provider list in the privacy page; mention ads in the terms "Plans and payments"; add to `LISTING.md`.
+7. Play Console: App content, Ads, "Contains ads" = Yes; Data safety, Device or other IDs (advertising ID) = collected, shared, for advertising; Advertising ID declaration = Yes.
+8. In AdMob console block sensitive categories (jobs, loans, gambling, dating). Bump the build number and rebuild.
+
 ## website/
 
 ```

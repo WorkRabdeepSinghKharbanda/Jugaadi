@@ -8,6 +8,7 @@
 | [003-backend-admin](003-backend-admin.md) | `/admin/verify/:userId`, `/admin/users*`, `/admin/jobs*` |
 | [008-backend-billing](008-backend-billing.md) | `GET /billing/me`, `POST /billing/checkout`, `POST /billing/verify`, `POST /billing/webhook` |
 | [009-backend-reviews](009-backend-reviews.md) | `POST/PATCH /jobs/:id/review`, `GET /profiles/:id/reviews` |
+| [012-safety-report-block](012-safety-report-block.md) | `POST /reports`, `/blocks*`, `GET /admin/reports` |
 
 ## app
 | File | Route |

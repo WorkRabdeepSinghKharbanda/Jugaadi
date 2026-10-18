@@ -4,6 +4,7 @@ import '../api_client.dart';
 import '../config.dart';
 import '../core/i18n/lang.dart';
 import '../core/i18n/strings.dart';
+import '../core/safety.dart';
 import '../core/theme/tokens.dart';
 import '../core/widgets/widgets.dart';
 import 'auth/phone_auth_screen.dart';
@@ -285,6 +286,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(label: context.tr('edit_profile'), icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
+                const SizedBox(height: AppSpacing.md),
+                NeuButton(
+                  label: context.tr('blocked_users'),
+                  icon: Icons.block_rounded,
+                  variant: NeuButtonVariant.ghost,
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BlockedUsersScreen())),
+                ),
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(label: context.tr('log_out'), icon: Icons.logout_rounded, variant: NeuButtonVariant.ghost, onPressed: _logout),
                 const SizedBox(height: AppSpacing.md),

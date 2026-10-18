@@ -43,6 +43,7 @@ const SECTIONS: LegalSectionItem[] = [
             { label: "Task content", cells: [<>Task title, skill needed, dates, daily pay, address and shop or landmark details, and any photos you upload for a task.</>] },
             { label: "Activity", cells: [<>Tasks you respond to, who was booked, task status, and reviews and star ratings you give or receive.</>] },
             { label: "Payments", cells: [<>If you buy a Pro plan, payment is handled by Razorpay. We store the plan, its dates, and payment reference IDs. We never see or store your card, UPI PIN, or bank details.</>] },
+            { label: "Reports and blocks", cells: [<>If you report a task or person, or block someone, we store who reported or blocked whom, the reason and any details you add, so we can review it and hide that person from you.</>] },
             { label: "Usage and device data", cells: [<>Microsoft Clarity (app and website) and Google Analytics (website) collect usage and interaction information such as screens and pages viewed, taps and scrolls, device type and approximate region, to find bugs and improve the product. On the website these tools use cookies.</>] },
           ]} />
         </>

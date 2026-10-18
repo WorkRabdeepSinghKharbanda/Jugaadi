@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../api_client.dart';
 import '../../config.dart';
 import '../../core/i18n/strings.dart';
+import '../../core/skeleton.dart';
 import '../../core/job_status.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/update_location.dart';
@@ -53,6 +54,13 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
       MaterialPageRoute(builder: (_) => PostJobScreen(existingJob: job)),
     );
     if (updated == true) _refresh();
+  }
+
+  Future<void> _repost(Map<String, dynamic> job) async {
+    final posted = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => PostJobScreen(repostFrom: job)),
+    );
+    if (posted == true) _refresh();
   }
 
   Future<void> _remove(dynamic jobId) async {
@@ -125,7 +133,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
           future: _future,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return Center(child: CircularProgressIndicator(color: c.accent));
+              return const SkeletonList();
             }
             if (snapshot.hasError) {
               return Center(
@@ -187,18 +195,19 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                           ),
                         ),
                         PillBadge.status(job['status'] as String),
-                        if (job['status'] == JobStatus.open.name)
-                          PopupMenuButton<String>(
-                            icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
-                            onSelected: (action) {
-                              if (action == 'edit') _edit(job);
-                              if (action == 'remove') _remove(job['id']);
-                            },
-                            itemBuilder: (_) => [
-                              PopupMenuItem(value: 'edit', child: Text(context.tr('edit'))),
-                              PopupMenuItem(value: 'remove', child: Text(context.tr('remove'))),
-                            ],
-                          ),
+                        PopupMenuButton<String>(
+                          icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
+                          onSelected: (action) {
+                            if (action == 'edit') _edit(job);
+                            if (action == 'remove') _remove(job['id']);
+                            if (action == 'repost') _repost(job);
+                          },
+                          itemBuilder: (_) => [
+                            if (job['status'] == JobStatus.open.name) PopupMenuItem(value: 'edit', child: Text(context.tr('edit'))),
+                            PopupMenuItem(value: 'repost', child: Text(context.tr('repost'))),
+                            if (job['status'] == JobStatus.open.name) PopupMenuItem(value: 'remove', child: Text(context.tr('remove'))),
+                          ],
+                        ),
                       ],
                     ),
                   ),
