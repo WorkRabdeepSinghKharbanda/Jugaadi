@@ -64,6 +64,10 @@ flutter build appbundle --release --dart-define-from-file=.env.production  # Pla
 
 Outputs: `build/app/outputs/flutter-apk/app-release.apk` and `build/app/outputs/bundle/release/app-release.aab`. Bump the `+N` build number in `pubspec.yaml` for every upload (Play rejects a repeated versionCode). The app's `AndroidManifest.xml` removes geolocator's `GeolocatorLocationService` (`tools:node="remove"`): Jugaadi never runs location in a foreground service, and leaving it in makes Play Console ask for a FOREGROUND_SERVICE_LOCATION declaration. Re-add it only if background location is ever built. Changing the signing key means an older debug-signed APK cannot be updated in place — users reinstall once.
 
+## Deploy order for migrations that change an RPC
+
+Apply the SQL migration (psql) BEFORE pushing the backend that calls it. Migration 0018 recreates `nearby_jobs` with new params; a backend deployed first returns 500 on `/jobs/nearby` until the migration lands. Roll back by re-running 0017 (restores the old function; the new backend then breaks, so revert it too).
+
 ## Enabling Free-plan ads (currently OFF)
 
 Built, then disabled on request. Free-plan workers would see a native AdMob card after every 8 jobs in the nearby list; Pro and the 7-day trial see none. To turn on:

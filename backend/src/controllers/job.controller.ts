@@ -80,7 +80,7 @@ export async function getNearbyJobs(req: Request, res: Response) {
 
   const skill = typeof req.query.skill === 'string' && req.query.skill.trim() ? req.query.skill.trim() : undefined;
   const minWage = req.query.min_wage != null && req.query.min_wage !== '' ? Number(req.query.min_wage) : undefined;
-  if (minWage != null && (Number.isNaN(minWage) || minWage < 0)) return res.status(400).json({ error: 'min_wage must be a non-negative number' });
+  if (minWage != null && (!Number.isFinite(minWage) || minWage < 0)) return res.status(400).json({ error: 'min_wage must be a non-negative number' });
   if (req.query.sort != null && req.query.sort !== 'nearest' && req.query.sort !== 'pay') return res.status(400).json({ error: 'sort must be nearest or pay' });
   const sort = req.query.sort === 'pay' ? 'pay' : 'nearest';
 
@@ -145,6 +145,11 @@ export async function getJobDetail(req: Request, res: Response) {
   if (!job) return res.status(404).json({ error: 'not found' });
 
   const isOwner = job.owner_id === req.userId;
+  if (!isOwner) {
+    const { blocked, error: blockError } = await safetyRepo.isBlockedBetween(req.userId, job.owner_id);
+    if (blockError) return res.status(500).json({ error: blockError.message });
+    if (blocked) return res.status(404).json({ error: 'not found' });
+  }
 
   const { data: accepted, error: acceptedError } = await jobRepo.acceptedWorkersForJob(req.params.id);
   if (acceptedError) return res.status(500).json({ error: acceptedError.message });
@@ -174,6 +179,14 @@ export async function getJobDetail(req: Request, res: Response) {
 }
 
 export async function applyToJob(req: Request, res: Response) {
+  // Fail closed: a blocked pair (either direction) can't apply, and the job looks like it doesn't exist.
+  const { data: target, error: targetError } = await jobRepo.getJobOwnerAndStatus(req.params.id);
+  if (targetError) return res.status(500).json({ error: targetError.message });
+  if (!target) return res.status(404).json({ error: 'not found' });
+  const { blocked, error: blockError } = await safetyRepo.isBlockedBetween(req.userId, target.owner_id);
+  if (blockError) return res.status(500).json({ error: blockError.message });
+  if (blocked) return res.status(404).json({ error: 'not found' });
+
   const limitError = await planLimitError(req.userId, 'worker');
   if (limitError) return res.status(409).json({ error: limitError, code: 'plan_limit' });
 
@@ -197,7 +210,8 @@ export async function getApplicants(req: Request, res: Response) {
 
   const { data, error } = await jobRepo.pendingApplicants(req.params.id);
   if (error) return res.status(500).json({ error: error.message });
-  const hidden = await safetyRepo.blockedEitherWay(req.userId);
+  const { ids: hidden, error: blockError } = await safetyRepo.blockedEitherWay(req.userId);
+  if (blockError) return res.status(500).json({ error: blockError.message });
   res.json((data ?? []).filter((a: { worker_id: string }) => !hidden.has(a.worker_id)));
 }
 

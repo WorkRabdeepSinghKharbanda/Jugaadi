@@ -7,12 +7,14 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export async function postReport(req: Request, res: Response) {
   const { target_type, target_id, reason, details } = req.body;
   if (target_type !== 'job' && target_type !== 'user') return res.status(400).json({ error: 'target_type must be job or user' });
-  if (target_id == null || String(target_id).length === 0 || String(target_id).length > 64) return res.status(400).json({ error: 'target_id is required' });
+  const id = String(target_id ?? '');
+  if (target_type === 'user' ? !UUID_RE.test(id) : !/^\d{1,18}$/.test(id)) return res.status(400).json({ error: 'invalid target_id' });
   if (!REASONS.includes(reason)) return res.status(400).json({ error: 'invalid reason' });
   if (details != null && (typeof details !== 'string' || details.length > 500)) return res.status(400).json({ error: 'details must be 500 characters or fewer' });
 
-  const { error } = await safetyRepo.createReport({ reporter_id: req.userId, target_type, target_id: String(target_id), reason, details: details?.trim() || undefined });
-  if (error) return res.status(500).json({ error: error.message });
+  const { error } = await safetyRepo.createReport({ reporter_id: req.userId, target_type, target_id: id, reason, details: details?.trim() || undefined });
+  // Same reporter + same target again (unique index): already on file, treat as success.
+  if (error && !('code' in error && error.code === '23505')) return res.status(500).json({ error: error.message });
   res.status(201).json({ ok: true });
 }
 
@@ -26,6 +28,7 @@ export async function blockUser(req: Request, res: Response) {
 }
 
 export async function unblockUser(req: Request, res: Response) {
+  if (!UUID_RE.test(req.params.userId)) return res.status(400).json({ error: 'invalid user id' });
   const { error } = await safetyRepo.removeBlock(req.userId, req.params.userId);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });

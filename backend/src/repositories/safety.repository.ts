@@ -13,9 +13,24 @@ export async function blockedProfiles(blockerId: string) {
 }
 
 // Ids hidden from `userId` in either direction (they blocked, or were blocked by).
-export async function blockedEitherWay(userId: string): Promise<Set<string>> {
-  const { data } = await supabase.from('blocks').select('blocker_id, blocked_id').or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
-  return new Set((data ?? []).map((b) => (b.blocker_id === userId ? b.blocked_id : b.blocker_id)));
+export async function blockedEitherWay(userId: string): Promise<{ ids: Set<string>; error: { message: string } | null }> {
+  const [mine, theirs] = await Promise.all([
+    supabase.from('blocks').select('blocked_id').eq('blocker_id', userId).limit(10000),
+    supabase.from('blocks').select('blocker_id').eq('blocked_id', userId).limit(10000),
+  ]);
+  const error = mine.error ?? theirs.error;
+  const ids = new Set<string>([...(mine.data ?? []).map((b) => b.blocked_id), ...(theirs.data ?? []).map((b) => b.blocker_id)]);
+  return { ids, error };
+}
+
+// True if either of the two has blocked the other. Throws-as-error so callers can fail closed.
+export async function isBlockedBetween(a: string, b: string): Promise<{ blocked: boolean; error: { message: string } | null }> {
+  const { data, error } = await supabase
+    .from('blocks')
+    .select('blocker_id')
+    .or(`and(blocker_id.eq.${a},blocked_id.eq.${b}),and(blocker_id.eq.${b},blocked_id.eq.${a})`)
+    .limit(1);
+  return { blocked: (data?.length ?? 0) > 0, error };
 }
 
 export async function createReport(r: { reporter_id: string; target_type: string; target_id: string; reason: string; details?: string }) {

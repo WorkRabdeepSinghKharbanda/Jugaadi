@@ -1,5 +1,5 @@
 -- Report / block (Play UGC policy) + filtered, sortable nearby_jobs that hides blocked users.
-create table blocks (
+create table if not exists blocks (
   blocker_id uuid not null references profiles(id) on delete cascade,
   blocked_id uuid not null references profiles(id) on delete cascade,
   created_at timestamptz not null default now(),
@@ -7,14 +7,17 @@ create table blocks (
   check (blocker_id <> blocked_id)
 );
 
-create table reports (
+create index if not exists blocks_blocked_id_idx on blocks (blocked_id);
+
+create table if not exists reports (
   id bigint generated always as identity primary key,
   reporter_id uuid not null references profiles(id) on delete cascade,
   target_type text not null check (target_type in ('job', 'user')),
   target_id text not null,
   reason text not null check (reason in ('spam', 'scam', 'abusive', 'wrong_info', 'other')),
   details text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  unique (reporter_id, target_type, target_id)
 );
 
 -- Backend (service role) is the only reader/writer; no policies = no direct client access.
