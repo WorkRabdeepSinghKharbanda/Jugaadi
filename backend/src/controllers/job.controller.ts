@@ -223,6 +223,10 @@ export async function hireApplicant(req: Request, res: Response) {
   if (!job || job.owner_id !== req.userId) return res.status(403).json({ error: 'forbidden' });
   if (job.status !== JobStatus.OPEN) return res.status(409).json({ error: 'job is not open' });
 
+  const { blocked, error: blockError } = await safetyRepo.isBlockedBetween(req.userId, workerId);
+  if (blockError) return res.status(500).json({ error: blockError.message });
+  if (blocked) return res.status(404).json({ error: 'worker not found' });
+
   const { error, conflict } = await jobRepo.hireWorker(id, workerId);
   if (conflict) return res.status(409).json({ error: error!.message });
   if (error) return res.status(500).json({ error: error.message });

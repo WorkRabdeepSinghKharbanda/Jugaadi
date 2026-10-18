@@ -216,7 +216,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                       final workerId = a['worker_id'] as String;
                                       if (action == 'report') {
                                         await showReportSheet(context, targetType: 'user', targetId: workerId);
-                                      } else if (await confirmAndBlock(context, userId: workerId)) {
+                                      } else if (await confirmAndBlock(context, userId: workerId) && mounted) {
                                         setState(() { _future = _load(); });
                                       }
                                     },
