@@ -19,6 +19,7 @@ import 'package:jugaadi/api_client.dart';
 import 'package:jugaadi/config.dart';
 import 'package:jugaadi/core/i18n/lang.dart';
 import 'package:jugaadi/core/theme/app_theme.dart';
+import 'package:jugaadi/core/theme/theme_controller.dart';
 import 'package:jugaadi/main.dart' show WorkerTabs;
 import 'package:jugaadi/screens/job_detail_screen.dart';
 import 'package:jugaadi/screens/owner/job_applicants_screen.dart';
@@ -29,6 +30,7 @@ import 'package:jugaadi/screens/profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final _nav = GlobalKey<NavigatorState>();
+late ThemeController _theme;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,14 +38,25 @@ Future<void> main() async {
   await Supabase.initialize(url: Config.supabaseUrl, anonKey: Config.supabaseAnonKey);
   final lang = await LangController.load();
   await lang.setLang(Lang.en);
-  runApp(LangScope(
-    controller: lang,
-    child: MaterialApp(
-      navigatorKey: _nav,
-      title: 'Jugaadi',
-      theme: AppTheme.dark,
-      debugShowCheckedModeBanner: false,
-      home: const Scaffold(),
+  final theme = await ThemeController.load();
+  await theme.setDark(true);
+  _theme = theme;
+  // ThemeScope: Profile/WorkerTabs read it. Screen numbers >= 20 show the light-theme
+  // variant of screen n-20.
+  runApp(ThemeScope(
+    controller: theme,
+    child: LangScope(
+      controller: lang,
+      child: ListenableBuilder(
+        listenable: theme,
+        builder: (_, __) => MaterialApp(
+          navigatorKey: _nav,
+          title: 'Jugaadi',
+          theme: theme.isDark ? AppTheme.dark : AppTheme.light,
+          debugShowCheckedModeBanner: false,
+          home: const Scaffold(),
+        ),
+      ),
     ),
   ));
   _poll();
@@ -63,7 +76,10 @@ Future<void> _poll() async {
       }
       if (s['rev'] == seen) continue;
       seen = s['rev'] as int;
-      final screen = await _build(s['n'] as int);
+      var n = s['n'] as int;
+      await _theme.setDark(n < 20);
+      if (n >= 20) n -= 20;
+      final screen = await _build(n);
       if (screen != null) {
         _nav.currentState?.pushAndRemoveUntil(PageRouteBuilder<void>(pageBuilder: (_, __, ___) => screen, transitionDuration: Duration.zero), (_) => false);
       }
