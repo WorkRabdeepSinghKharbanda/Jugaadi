@@ -41,7 +41,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     return (applicants, hiredWorkers);
   }
 
+  String? _hiringWorkerId;
+
   Future<void> _hire(String workerId) async {
+    setState(() => _hiringWorkerId = workerId);
     try {
       await ApiClient(
         Config.apiBaseUrl,
@@ -56,6 +59,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       if (mounted) {
         showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
       }
+    } finally {
+      // Clearing this flips the slider's `loading` true->false, which springs the thumb
+      // back after a failed hire so the owner can retry.
+      if (mounted) setState(() => _hiringWorkerId = null);
     }
   }
 
@@ -394,7 +401,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               const SizedBox(height: AppSpacing.md),
                               SlideToConfirm(
                                 label: context.tr('slide_to_hire'),
-                                enabled: !full,
+                                enabled: !full && _hiringWorkerId == null,
+                                loading:
+                                    _hiringWorkerId == a['worker_id'],
                                 onConfirmed: () =>
                                     _hire(a['worker_id'] as String),
                               ),

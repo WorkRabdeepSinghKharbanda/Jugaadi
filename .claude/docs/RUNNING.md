@@ -81,6 +81,10 @@ Built, then disabled on request. Free-plan workers would see a native AdMob card
 7. Play Console: App content, Ads, "Contains ads" = Yes; Data safety, Device or other IDs (advertising ID) = collected, shared, for advertising; Advertising ID declaration = Yes.
 8. In AdMob console block sensitive categories (jobs, loans, gambling, dating). Bump the build number and rebuild.
 
+## Store screenshots tool
+
+`app/tool/store_screenshots/` regenerates the Play Store screenshots: `mock_server.py` serves demo data, `main.dart` drives the real app through its screens, `capture.sh` shoots phone/7"/10" sizes on the Android emulator. Outputs land in `.claude/docs/play-store/screenshots/`.
+
 ## website/
 
 ```
