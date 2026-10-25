@@ -81,9 +81,13 @@ Built, then disabled on request. Free-plan workers would see a native AdMob card
 7. Play Console: App content, Ads, "Contains ads" = Yes; Data safety, Device or other IDs (advertising ID) = collected, shared, for advertising; Advertising ID declaration = Yes.
 8. In AdMob console block sensitive categories (jobs, loans, gambling, dating). Bump the build number and rebuild.
 
+## Golden tests
+
+`app/test/theme_golden_test.dart` renders the design-system widgets in dark and light themes against `app/test/goldens/*.png`. The goldens are macOS-generated; font rasterisation differs per OS, so expect failures elsewhere. Regenerate after an intentional visual change: `flutter test --update-goldens`.
+
 ## Store screenshots tool
 
-`app/tool/store_screenshots/` regenerates the Play Store screenshots: `mock_server.py` serves demo data, `main.dart` drives the real app through its screens, `capture.sh` shoots phone/7"/10" sizes on the Android emulator. Outputs land in `.claude/docs/play-store/screenshots/`.
+`app/tool/store_screenshots/` regenerates the Play Store screenshots: `mock_server.py` serves demo data, `main.dart` drives the real app through its screens, `capture.sh` shoots phone/7"/10" sizes on the Android emulator. Outputs land in `.claude/docs/play-store/screenshots/`. A screen number of 20+n captures the light-theme variant of screen n.
 
 ## website/
 
