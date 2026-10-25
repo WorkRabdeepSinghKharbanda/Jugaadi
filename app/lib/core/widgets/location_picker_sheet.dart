@@ -49,14 +49,24 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
     });
     try {
       final position = await getCurrentPositionOrThrow();
-      final label = await _places.labelFor(position.latitude, position.longitude);
+      final label = await _places.labelFor(
+        position.latitude,
+        position.longitude,
+      );
       if (!mounted) return;
-      Navigator.of(context).pop(PlaceHit(label: label, latitude: position.latitude, longitude: position.longitude));
+      Navigator.of(context).pop(
+        PlaceHit(
+          label: label,
+          latitude: position.latitude,
+          longitude: position.longitude,
+        ),
+      );
     } catch (e) {
       if (mounted) {
         setState(() {
           _error = errorMessage(context, e);
-          _permissionBlocked = e is LocationException && e.key == 'location_permission_denied';
+          _permissionBlocked =
+              e is LocationException && e.key == 'location_permission_denied';
         });
       }
     } finally {
@@ -67,7 +77,9 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
   Future<void> _search() async {
     final q = _query.text.trim();
     if (q.length < 3) {
-      setState(() => _error = 'Type at least 3 letters of the place or landmark.');
+      setState(
+        () => _error = 'Type at least 3 letters of the place or landmark.',
+      );
       return;
     }
     setState(() {
@@ -80,7 +92,9 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
     setState(() {
       _busySearch = false;
       _hits = hits;
-      _error = hits.isEmpty ? 'No place found. Try a nearby landmark or area name.' : null;
+      _error = hits.isEmpty
+          ? 'No place found. Try a nearby landmark or area name.'
+          : null;
     });
   }
 
@@ -88,24 +102,64 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
   Widget build(BuildContext context) {
     final c = context.colors;
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.lg, AppSpacing.gutter, AppSpacing.lg),
-        decoration: BoxDecoration(color: c.surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.lg))),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.gutter,
+          AppSpacing.lg,
+          AppSpacing.gutter,
+          AppSpacing.lg,
+        ),
+        decoration: BoxDecoration(
+          color: c.surface,
+          borderRadius: AppRadius.sheetTop,
+          border: Border(top: BorderSide(color: c.edge)),
+          boxShadow: AppShadows.floating(c),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Center(
-              child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: AppSpacing.lg), decoration: BoxDecoration(color: c.outline, borderRadius: BorderRadius.circular(2))),
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: c.outline,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
             Text('Set your location', style: AppText.title),
             const SizedBox(height: AppSpacing.lg),
-            NeuButton(label: 'Use my current location', icon: Icons.gps_fixed_rounded, variant: NeuButtonVariant.ghost, height: 48, loading: _busyGps, onPressed: _useCurrent),
+            NeuButton(
+              label: 'Use my current location',
+              icon: Icons.gps_fixed_rounded,
+              variant: NeuButtonVariant.ghost,
+              height: 48,
+              loading: _busyGps,
+              onPressed: _useCurrent,
+            ),
             const SizedBox(height: AppSpacing.md),
-            NeuTextField(label: 'Search place or landmark', hint: 'e.g. Connaught Place, Delhi', icon: Icons.search_rounded, controller: _query, onSubmitted: (_) => _search()),
+            NeuTextField(
+              label: 'Search place or landmark',
+              hint: 'e.g. Connaught Place, Delhi',
+              icon: Icons.search_rounded,
+              controller: _query,
+              onSubmitted: (_) => _search(),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            NeuButton(label: 'Search', icon: Icons.search_rounded, variant: NeuButtonVariant.ghost, height: 48, loading: _busySearch, onPressed: _search),
+            NeuButton(
+              label: 'Search',
+              icon: Icons.search_rounded,
+              variant: NeuButtonVariant.ghost,
+              height: 48,
+              loading: _busySearch,
+              onPressed: _search,
+            ),
             for (final h in _hits)
               InkWell(
                 onTap: () => Navigator.of(context).pop(h),
@@ -113,7 +167,10 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
                   constraints: const BoxConstraints(minHeight: 48),
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                  child: Text(h.label, style: AppText.body.copyWith(color: c.accent)),
+                  child: Text(
+                    h.label,
+                    style: AppText.body.copyWith(color: c.accent),
+                  ),
                 ),
               ),
             if (_error != null) ...[
@@ -121,7 +178,12 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
               ErrorStrip(_error!),
               if (_permissionBlocked) ...[
                 const SizedBox(height: AppSpacing.sm),
-                NeuButton(label: context.tr('open_settings'), icon: Icons.settings_outlined, variant: NeuButtonVariant.ghost, onPressed: Geolocator.openAppSettings),
+                NeuButton(
+                  label: context.tr('open_settings'),
+                  icon: Icons.settings_outlined,
+                  variant: NeuButtonVariant.ghost,
+                  onPressed: Geolocator.openAppSettings,
+                ),
               ],
             ],
           ],

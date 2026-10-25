@@ -14,7 +14,12 @@ class SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.sm + 2),
       child: Row(
         children: [
-          Expanded(child: Text(title.toUpperCase(), style: AppText.label.copyWith(color: c.textSecondary))),
+          Expanded(
+            child: Text(
+              title.toUpperCase(),
+              style: AppText.label.copyWith(color: c.textSecondary),
+            ),
+          ),
           if (trailing != null) trailing!,
         ],
       ),

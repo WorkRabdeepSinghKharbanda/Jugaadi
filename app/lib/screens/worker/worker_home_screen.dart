@@ -50,7 +50,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   Future<void> _checkAdmin() async {
     try {
-      final profile = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
+      final profile =
+          await ApiClient(Config.apiBaseUrl).get('/profile/me')
+              as Map<String, dynamic>;
       if (mounted) setState(() => _isAdmin = profile['is_admin'] == true);
     } catch (_) {
       // not critical — the admin icon just stays hidden
@@ -63,7 +65,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Future<List<dynamic>> _fetchPage(int offset, int limit) async {
-    final data = await ApiClient(Config.apiBaseUrl).get('/jobs/nearby', {'lat': _lat, 'lng': _lng, 'limit': limit, 'offset': offset, ..._filters.toQuery()});
+    final data = await ApiClient(Config.apiBaseUrl).get('/jobs/nearby', {
+      'lat': _lat,
+      'lng': _lng,
+      'limit': limit,
+      'offset': offset,
+      ..._filters.toQuery(),
+    });
     return data as List<dynamic>;
   }
 
@@ -71,7 +79,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     final api = ApiClient(Config.apiBaseUrl);
     try {
       final profile = await api.get('/profile/me') as Map<String, dynamic>;
-      if (profile['lat'] == null || profile['lng'] == null) throw Exception('no saved location');
+      if (profile['lat'] == null || profile['lng'] == null) {
+        throw Exception('no saved location');
+      }
       _lat = (profile['lat'] as num).toDouble();
       _lng = (profile['lng'] as num).toDouble();
     } catch (_) {
@@ -85,7 +95,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   void _refresh() {
     _checkAds();
-    setState(() { _future = _loadFirst(); });
+    setState(() {
+      _future = _loadFirst();
+    });
   }
 
   @override
@@ -99,15 +111,21 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           NeuIconButton(
             icon: Icons.admin_panel_settings_outlined,
             semanticLabel: context.tr('admin_console'),
-            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
+            onPressed: () => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+            ),
           ),
         NeuIconButton(
           icon: Icons.swap_horiz_rounded,
           semanticLabel: context.tr('post_job_instead'),
-          onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const OwnerHomeScreen())),
+          onPressed: () => Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const OwnerHomeScreen()),
+          ),
         ),
         NeuIconButton(
-          icon: _filters.isActive ? Icons.filter_alt_rounded : Icons.filter_alt_outlined,
+          icon: _filters.isActive
+              ? Icons.filter_alt_rounded
+              : Icons.filter_alt_outlined,
           semanticLabel: context.tr('filters'),
           onPressed: () async {
             final picked = await showNearbyFiltersSheet(context, _filters);
@@ -120,7 +138,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           icon: Icons.bolt_outlined,
           semanticLabel: context.tr('plan'),
           onPressed: () async {
-            await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'worker')));
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const PlansScreen(role: 'worker'),
+              ),
+            );
             _checkAds();
           },
         ),
@@ -135,7 +157,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         NeuIconButton(
           icon: Icons.person_outline_rounded,
           semanticLabel: context.tr('profile_title'),
-          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
+          onPressed: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
         ),
       ],
       body: RefreshIndicator(
@@ -156,67 +180,126 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                     children: [
                       ErrorStrip(errorMessage(context, snapshot.error!)),
                       const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: context.tr('retry'), expand: false, onPressed: _refresh),
+                      NeuButton(
+                        label: context.tr('retry'),
+                        expand: false,
+                        onPressed: _refresh,
+                      ),
                     ],
                   ),
                 ),
               );
             }
             final jobs = _pager.items;
-            if (jobs.isEmpty) return EmptyState(icon: Icons.search_off_rounded, text: context.tr(_filters.isActive ? 'no_jobs_match_filters' : 'no_open_jobs_nearby'));
+            if (jobs.isEmpty) {
+              return EmptyState(
+                icon: Icons.search_off_rounded,
+                text: context.tr(
+                  _filters.isActive
+                      ? 'no_jobs_match_filters'
+                      : 'no_open_jobs_nearby',
+                ),
+              );
+            }
             // One ad after every _adEvery jobs on the Free plan; Pro sees none.
             final adSlots = _showAds ? jobs.length ~/ _adEvery : 0;
             return ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.gutter,
+                AppSpacing.md,
+                AppSpacing.gutter,
+                GlassNavBar.height + AppSpacing.md,
+              ),
               itemCount: jobs.length + adSlots + (_pager.hasMore ? 1 : 0),
               itemBuilder: (context, i) {
                 if (i == jobs.length + adSlots) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                    child: Center(child: CircularProgressIndicator(color: c.accent)),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.lg,
+                    ),
+                    child: Center(
+                      child: CircularProgressIndicator(color: c.accent),
+                    ),
                   );
                 }
-                if (_showAds && i % (_adEvery + 1) == _adEvery) return const NativeAdCard();
-                final job = jobs[_showAds ? i - i ~/ (_adEvery + 1) : i] as Map<String, dynamic>;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: NeuCard(
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => JobDetailScreen(job: job, isOwner: false)),
-                      );
-                      _refresh();
-                    },
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(child: Text(job['title'] as String, style: AppText.title)),
-                                  if (job['my_application_status'] != null) PillBadge.status(job['my_application_status'] as String),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(job['skill_needed'] as String, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
-                              const SizedBox(height: 4),
-                              Text('${job['start_date']} → ${job['end_date']}', style: AppText.bodySmall.copyWith(color: c.textTertiary)),
-                              const SizedBox(height: 4),
-                              Text(
-                                [
-                                  if (job['daily_wage'] != null) '₹${job['daily_wage']}/${context.tr('share_per_day')}',
-                                  if (job['distance_km'] != null) '${job['distance_km']} ${context.tr('km_away')}',
-                                ].join('  ·  '),
-                                style: AppText.bodySmall.copyWith(color: c.accent, fontWeight: FontWeight.w600),
-                              ),
-                            ],
+                if (_showAds && i % (_adEvery + 1) == _adEvery) {
+                  return const NativeAdCard();
+                }
+                final job =
+                    jobs[_showAds ? i - i ~/ (_adEvery + 1) : i]
+                        as Map<String, dynamic>;
+                return FadeSlideIn(
+                  index: i,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: NeuCard(
+                      onTap: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                JobDetailScreen(job: job, isOwner: false),
                           ),
-                        ),
-                        Icon(Icons.arrow_forward_ios_rounded, size: 16, color: c.textTertiary),
-                      ],
+                        );
+                        _refresh();
+                      },
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        job['title'] as String,
+                                        style: AppText.title,
+                                      ),
+                                    ),
+                                    if (job['my_application_status'] != null)
+                                      PillBadge.status(
+                                        job['my_application_status'] as String,
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  job['skill_needed'] as String,
+                                  style: AppText.bodySmall.copyWith(
+                                    color: c.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${job['start_date']} → ${job['end_date']}',
+                                  style: AppText.bodySmall.copyWith(
+                                    color: c.textTertiary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  [
+                                    if (job['daily_wage'] != null)
+                                      '₹${job['daily_wage']}/${context.tr('share_per_day')}',
+                                    if (job['distance_km'] != null)
+                                      '${job['distance_km']} ${context.tr('km_away')}',
+                                  ].join('  ·  '),
+                                  style: AppText.bodySmall.copyWith(
+                                    color: c.accent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 16,
+                            color: c.textTertiary,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

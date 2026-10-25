@@ -88,7 +88,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         'city': _place!.label,
         'lat': _place!.latitude,
         'lng': _place!.longitude,
-        if (_emailController.text.trim().isNotEmpty) 'email': _emailController.text.trim(),
+        if (_emailController.text.trim().isNotEmpty)
+          'email': _emailController.text.trim(),
         if (widget.role == 'worker') 'skills': _selectedSkills.toList(),
       });
 
@@ -116,9 +117,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          NeuTextField(label: context.tr('full_name'), controller: _nameController, icon: Icons.person_outline_rounded),
+          NeuTextField(
+            label: context.tr('full_name'),
+            controller: _nameController,
+            icon: Icons.person_outline_rounded,
+          ),
           const SizedBox(height: AppSpacing.md),
-          NeuTextField(label: context.tr('phone'), controller: _phoneController, icon: Icons.phone_rounded, keyboardType: TextInputType.phone),
+          NeuTextField(
+            label: context.tr('phone'),
+            controller: _phoneController,
+            icon: Icons.phone_rounded,
+            keyboardType: TextInputType.phone,
+          ),
           const SizedBox(height: AppSpacing.md),
           NeuTextField(
             label: context.tr('email_optional'),
@@ -127,18 +137,26 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(context.tr('location_label'), style: AppText.label.copyWith(color: c.textSecondary)),
+          Text(
+            context.tr('location_label'),
+            style: AppText.label.copyWith(color: c.textSecondary),
+          ),
           const SizedBox(height: AppSpacing.sm),
           NeuCard(
             onTap: _pickLocation,
             child: Row(
               children: [
-                Icon(Icons.location_on_outlined, color: _place == null ? c.textSecondary : c.accent),
+                Icon(
+                  Icons.location_on_outlined,
+                  color: _place == null ? c.textSecondary : c.accent,
+                ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     _place?.label ?? context.tr('tap_to_set_location'),
-                    style: AppText.body.copyWith(color: _place == null ? c.textTertiary : c.textPrimary),
+                    style: AppText.body.copyWith(
+                      color: _place == null ? c.textTertiary : c.textPrimary,
+                    ),
                   ),
                 ),
                 Icon(Icons.chevron_right_rounded, color: c.textTertiary),
@@ -152,13 +170,17 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: kSkillOptions
-                  .map((skill) => FilterChip(
-                        label: Text(skill),
-                        selected: _selectedSkills.contains(skill),
-                        onSelected: (selected) => setState(() {
-                          selected ? _selectedSkills.add(skill) : _selectedSkills.remove(skill);
-                        }),
-                      ))
+                  .map(
+                    (skill) => FilterChip(
+                      label: Text(skill),
+                      selected: _selectedSkills.contains(skill),
+                      onSelected: (selected) => setState(() {
+                        selected
+                            ? _selectedSkills.add(skill)
+                            : _selectedSkills.remove(skill);
+                      }),
+                    ),
+                  )
                   .toList(),
             ),
             if (_selectedSkills.any((s) => !kSkillOptions.contains(s))) ...[
@@ -168,7 +190,13 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                 runSpacing: AppSpacing.sm,
                 children: _selectedSkills
                     .where((s) => !kSkillOptions.contains(s))
-                    .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _selectedSkills.remove(s))))
+                    .map(
+                      (s) => Chip(
+                        label: Text(s),
+                        onDeleted: () =>
+                            setState(() => _selectedSkills.remove(s)),
+                      ),
+                    )
                     .toList(),
               ),
             ],
@@ -184,7 +212,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                NeuButton(label: context.tr('add'), expand: false, height: 48, onPressed: _addCustomSkill),
+                NeuButton(
+                  label: context.tr('add'),
+                  expand: false,
+                  height: 48,
+                  onPressed: _addCustomSkill,
+                ),
               ],
             ),
           ],
@@ -193,7 +226,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             ErrorStrip(_error!),
             const SizedBox(height: AppSpacing.lg),
           ],
-          NeuButton(label: context.tr('continue'), icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _save),
+          NeuButton(
+            label: context.tr('continue'),
+            icon: Icons.arrow_forward_rounded,
+            loading: _loading,
+            onPressed: _save,
+          ),
         ],
       ),
     );

@@ -3,7 +3,7 @@
 Inspired by the ThelaWala site (structure only, no copied text/code). Dark-first, no light theme. Lives in `website/`.
 
 ## Tokens
-`website/src/styles/tokens.css` mirrors `app/lib/core/theme/tokens.dart` (AppColors.dark): bg `#0B0B0F`, surface `#17171A`, surface-high `#1E1E22`, accent `#E8A33D` / deep `#C17B1D`, on-accent `#0B0B0F`, text `#F5F5F7`, text-2 `#A6A6B3`, live `#3DDC97`, danger `#FF5A5F`, warning `#FFB547`. Radii 12/20/28, spacing 4-48, shadows `--raised/--floating/--glow`, fluid type (`--fs-display/h1/h2/h3/lede`), `--container` 1200px, `--section` rhythm, `--tap` 44px, reduced-motion zeroes `--dur`. `--text-3` is `#8A8A97` on the web (AA on bg). Font: Inter via `next/font` in `RootShell` (`--font-inter`).
+`website/src/styles/tokens.css` mirrors `app/lib/core/theme/tokens.dart` (AppColors.dark; the app also has an opt-in light palette — Profile toggle, `AppColors.light`, burnt-amber accent `#8F5A00` for contrast on white — which the site does not mirror): bg `#0B0B0F`, surface `#17171A`, surface-high `#1E1E22`, accent `#E8A33D` / deep `#C17B1D`, on-accent `#0B0B0F`, text `#F5F5F7`, text-2 `#A6A6B3`, live `#3DDC97`, danger `#FF5A5F`, warning `#FFB547`. Radii 12/20/28, spacing 4-48, shadows `--raised/--floating/--glow`, fluid type (`--fs-display/h1/h2/h3/lede`), `--container` 1200px, `--section` rhythm, `--tap` 44px, reduced-motion zeroes `--dur`. `--text-3` is `#8A8A97` on the web (AA on bg). Font: Inter via `next/font` in `RootShell` (`--font-inter`).
 
 ## Styling
 One scoped stylesheet `src/components/ui/ui.css` (classes prefixed `u-`), imported from `globals.css`. No inline styles, no Tailwind, no new dependencies. Zero client JS in the kit; only `ApkDownloadLink` is a client component (gtag `apk_download`).
@@ -45,3 +45,11 @@ Free: limit 3 per month (owner task posts / worker responses) (`plan.repository.
 - No raster images; explicit sizes on SVGs; no client JS unless needed.
 - Copy: use task / respond / book / choose. Never job(s), hire, apply/application, vacancy, recruit, gig (RazorPay review). `npm run check` greps visible text.
 - `npm run check` (needs a running server, `BASE_URL` default `http://localhost:3000`): every sitemap URL returns 200, one H1, title 30-65, description 70-165, canonical, 4+ hreflang, html lang, `<main>`, no banned words.
+
+## App design language (BookedIn parity, 2026-10)
+The Flutter app follows the same CRED-style language as the BookedIn app (`New project/bookedin`), adapted to Jugaadi's amber. In `app/lib/core/`:
+- `theme/tokens.dart`: dark default + opt-in light theme (`ThemeScope`/`ThemeController`, persisted per device); 4-step surface ladder (`surfaceLow→surface→surfaceHigh→surfaceTop`); 1px `hairline`/`edge` gradient borders; `compressed` press shadows; `sheet` radius 32; `minTap` 48; `AppText.figure` for hero numbers.
+- `widgets/motion.dart`: `AppHaptics` (tick/success), `Pressable` (0.97 scale + shadow compress), `FadeSlideIn` (staggered list entrance, reduce-motion safe).
+- `widgets/`: `ShimmerBox` skeletons, `BottomSheetShell`/`showAppSheet`, `SlideToConfirm` (apply/hire commits), `StatusStepper` (applied→hired→done), `GlassNavBar` (blurred pill bottom bar, worker tabs), `UnreadDot`.
+Sheets use 32px top radius + edge border + floating shadow. Every tappable gives a haptic tick; committed actions a success pulse.
+

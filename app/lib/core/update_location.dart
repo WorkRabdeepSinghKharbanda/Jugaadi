@@ -14,7 +14,9 @@ Future<void> editLocation(BuildContext context) async {
   try {
     final api = ApiClient(Config.apiBaseUrl);
     final profile = await api.get('/profile/me') as Map<String, dynamic>;
-    final skills = (profile['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String).toList();
+    final skills = (profile['worker_skills'] as List<dynamic>?)
+        ?.map((s) => s['skill'] as String)
+        .toList();
 
     await api.post('/profile', {
       'role': profile['role'],
@@ -28,6 +30,8 @@ Future<void> editLocation(BuildContext context) async {
 
     if (context.mounted) showAppToast(context, 'Location updated');
   } catch (e) {
-    if (context.mounted) showAppToast(context, errorMessage(context, e), tone: ToastTone.error);
+    if (context.mounted) {
+      showAppToast(context, errorMessage(context, e), tone: ToastTone.error);
+    }
   }
 }

@@ -27,15 +27,23 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
     return data as List<dynamic>;
   }
 
-  void _refresh() => setState(() { _future = _load(); });
+  void _refresh() => setState(() {
+    _future = _load();
+  });
 
   Future<void> _forceStatus(Map<String, dynamic> job, String status) async {
     try {
-      await ApiClient(Config.apiBaseUrl).patch('/admin/jobs/${job['id']}', {'status': status});
-      if (mounted) showAppToast(context, '${context.tr('status_set_to')} $status');
+      await ApiClient(
+        Config.apiBaseUrl,
+      ).patch('/admin/jobs/${job['id']}', {'status': status});
+      if (mounted) {
+        showAppToast(context, '${context.tr('status_set_to')} $status');
+      }
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     }
   }
 
@@ -46,8 +54,14 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
         title: Text(ctx.tr('delete_job_permanently_title')),
         content: Text(ctx.tr('delete_job_permanently_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('delete'))),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('delete')),
+          ),
         ],
       ),
     );
@@ -57,7 +71,9 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
       if (mounted) showAppToast(context, context.tr('job_deleted'));
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     }
   }
 
@@ -74,12 +90,24 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
             return Center(child: CircularProgressIndicator(color: c.accent));
           }
           if (snapshot.hasError) {
-            return Center(child: ErrorStrip(errorMessage(context, snapshot.error!)));
+            return Center(
+              child: ErrorStrip(errorMessage(context, snapshot.error!)),
+            );
           }
           final jobs = snapshot.data!;
-          if (jobs.isEmpty) return EmptyState(icon: Icons.work_outline_rounded, text: context.tr('no_jobs'));
+          if (jobs.isEmpty) {
+            return EmptyState(
+              icon: Icons.work_outline_rounded,
+              text: context.tr('no_jobs'),
+            );
+          }
           return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.gutter,
+              AppSpacing.md,
+              AppSpacing.gutter,
+              AppSpacing.md,
+            ),
             itemCount: jobs.length,
             itemBuilder: (context, i) {
               final job = jobs[i] as Map<String, dynamic>;
@@ -91,7 +119,12 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
                     children: [
                       Row(
                         children: [
-                          Expanded(child: Text(job['title'] as String? ?? '-', style: AppText.title)),
+                          Expanded(
+                            child: Text(
+                              job['title'] as String? ?? '-',
+                              style: AppText.title,
+                            ),
+                          ),
                           PillBadge.status(job['status'] as String),
                         ],
                       ),
@@ -103,15 +136,27 @@ class _AdminJobsScreenState extends State<AdminJobsScreen> {
                               isExpanded: true,
                               value: job['status'] as String,
                               dropdownColor: c.surfaceHigh,
-                              items: JobStatus.values.map((s) => DropdownMenuItem(value: s.name, child: Text(s.name))).toList(),
+                              items: JobStatus.values
+                                  .map(
+                                    (s) => DropdownMenuItem(
+                                      value: s.name,
+                                      child: Text(s.name),
+                                    ),
+                                  )
+                                  .toList(),
                               onChanged: (v) {
-                                if (v != null && v != job['status']) _forceStatus(job, v);
+                                if (v != null && v != job['status']) {
+                                  _forceStatus(job, v);
+                                }
                               },
                             ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           IconButton(
-                            icon: Icon(Icons.delete_outline_rounded, color: c.danger),
+                            icon: Icon(
+                              Icons.delete_outline_rounded,
+                              color: c.danger,
+                            ),
                             onPressed: () => _delete(job),
                           ),
                         ],

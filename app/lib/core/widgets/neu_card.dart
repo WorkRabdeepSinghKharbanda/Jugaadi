@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
+import 'motion.dart';
 
 enum NeuVariant { raised, pressed, flat }
 
-/// Charcoal neumorphic card. `gradientBorder` paints an accent gradient edge
-/// (CRED reward-card look). `onTap` makes it a tappable surface with press feedback.
-class NeuCard extends StatelessWidget {
+/// Charcoal neumorphic card with a 1 px gradient hairline edge. `gradientBorder` paints an
+/// accent gradient edge (CRED reward-card look). `onTap` makes it a tappable surface with
+/// scale + shadow-compress press feedback.
+class NeuCard extends StatefulWidget {
   const NeuCard({
     super.key,
     required this.child,
@@ -26,70 +28,64 @@ class NeuCard extends StatelessWidget {
   final Color? color;
 
   @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    final fill = color ??
-        switch (variant) {
-          NeuVariant.raised => c.surface,
-          NeuVariant.pressed => c.surfaceLow,
-          NeuVariant.flat => c.surface,
-        };
-    final shadows = variant == NeuVariant.raised ? AppShadows.raised(c) : AppShadows.none;
-    final border = variant == NeuVariant.pressed ? Border.all(color: c.outline) : null;
-
-    Widget body = AnimatedContainer(
-      duration: AppDurations.of(context),
-      curve: AppDurations.curve,
-      padding: padding,
-      decoration: BoxDecoration(color: fill, borderRadius: BorderRadius.circular(radius), boxShadow: shadows, border: border),
-      child: child,
-    );
-
-    if (gradientBorder) {
-      body = Container(
-        padding: const EdgeInsets.all(1.5),
-        decoration: BoxDecoration(gradient: c.accentGradient, borderRadius: BorderRadius.circular(radius + 1.5), boxShadow: AppShadows.accentGlow(c)),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(color: fill, borderRadius: BorderRadius.circular(radius)),
-          child: child,
-        ),
-      );
-    }
-
-    if (onTap == null) return body;
-    return _Pressable(onTap: onTap!, child: body);
-  }
+  State<NeuCard> createState() => _NeuCardState();
 }
 
-class _Pressable extends StatefulWidget {
-  const _Pressable({required this.onTap, required this.child});
-  final VoidCallback onTap;
-  final Widget child;
-
-  @override
-  State<_Pressable> createState() => _PressableState();
-}
-
-class _PressableState extends State<_Pressable> {
+class _NeuCardState extends State<NeuCard> {
   bool _down = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTapDown: (_) => setState(() => _down = true),
-      onTapCancel: () => setState(() => _down = false),
-      onTapUp: (_) => setState(() => _down = false),
-      onTap: widget.onTap,
-      child: AnimatedScale(
-        scale: _down ? 0.97 : 1,
-        duration: AppDurations.of(context, AppDurations.fast),
-        curve: AppDurations.curve,
+    final c = context.colors;
+    final fill =
+        widget.color ??
+        switch (widget.variant) {
+          NeuVariant.raised => c.surface,
+          NeuVariant.pressed => c.surfaceLow,
+          NeuVariant.flat => c.surface,
+        };
+    final shadows = widget.variant != NeuVariant.raised
+        ? AppShadows.none
+        : (_down ? AppShadows.compressed(c) : AppShadows.raised(c));
+    final edgeGradient = widget.gradientBorder ? c.accentGradient : c.hairline;
+
+    final body = AnimatedContainer(
+      duration: AppDurations.of(context, AppDurations.fast),
+      curve: AppDurations.curve,
+      padding: EdgeInsets.all(widget.gradientBorder ? 1.5 : 1),
+      decoration: BoxDecoration(
+        gradient: edgeGradient,
+        borderRadius: BorderRadius.circular(widget.radius),
+        boxShadow: widget.gradientBorder ? AppShadows.accentGlow(c) : shadows,
+      ),
+      child: Container(
+        padding: widget.padding,
+        decoration: BoxDecoration(
+          color: fill,
+          borderRadius: BorderRadius.circular(widget.radius - 1),
+        ),
         child: widget.child,
       ),
+    );
+
+    if (widget.onTap == null) return body;
+    return Pressable(
+      onTap: () {
+        AppHaptics.tick();
+        widget.onTap!();
+      },
+      onPressedChanged: (v) => setState(() => _down = v),
+      child: body,
     );
   }
 }
 
-Widget pressable({required VoidCallback onTap, required Widget child}) => _Pressable(onTap: onTap, child: child);
+/// Scale-on-press wrapper with a selection haptic; kept for callers outside NeuCard.
+Widget pressable({required VoidCallback onTap, required Widget child}) =>
+    Pressable(
+      onTap: () {
+        AppHaptics.tick();
+        onTap();
+      },
+      child: child,
+    );

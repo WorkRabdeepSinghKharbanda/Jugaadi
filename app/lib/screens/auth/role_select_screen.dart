@@ -18,11 +18,17 @@ class RoleSelectScreen extends StatelessWidget {
           NeuCard(
             gradientBorder: true,
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ProfileSetupScreen(role: 'owner')),
+              MaterialPageRoute(
+                builder: (_) => const ProfileSetupScreen(role: 'owner'),
+              ),
             ),
             child: Row(
               children: [
-                Icon(Icons.storefront_rounded, color: context.colors.accent, size: 32),
+                Icon(
+                  Icons.storefront_rounded,
+                  color: context.colors.accent,
+                  size: 32,
+                ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
@@ -30,22 +36,37 @@ class RoleSelectScreen extends StatelessWidget {
                     children: [
                       Text(context.tr('i_need_workers'), style: AppText.title),
                       const SizedBox(height: 4),
-                      Text(context.tr('post_job_hire_nearby'), style: AppText.bodySmall.copyWith(color: context.colors.textSecondary)),
+                      Text(
+                        context.tr('post_job_hire_nearby'),
+                        style: AppText.bodySmall.copyWith(
+                          color: context.colors.textSecondary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios_rounded, size: 16, color: context.colors.textTertiary),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: context.colors.textTertiary,
+                ),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.md),
           NeuCard(
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ProfileSetupScreen(role: 'worker')),
+              MaterialPageRoute(
+                builder: (_) => const ProfileSetupScreen(role: 'worker'),
+              ),
             ),
             child: Row(
               children: [
-                Icon(Icons.badge_outlined, color: context.colors.textPrimary, size: 32),
+                Icon(
+                  Icons.badge_outlined,
+                  color: context.colors.textPrimary,
+                  size: 32,
+                ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
@@ -53,11 +74,20 @@ class RoleSelectScreen extends StatelessWidget {
                     children: [
                       Text(context.tr('i_want_work'), style: AppText.title),
                       const SizedBox(height: 4),
-                      Text(context.tr('find_jobs_apply_fast'), style: AppText.bodySmall.copyWith(color: context.colors.textSecondary)),
+                      Text(
+                        context.tr('find_jobs_apply_fast'),
+                        style: AppText.bodySmall.copyWith(
+                          color: context.colors.textSecondary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios_rounded, size: 16, color: context.colors.textTertiary),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: context.colors.textTertiary,
+                ),
               ],
             ),
           ),

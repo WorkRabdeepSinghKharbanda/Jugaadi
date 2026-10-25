@@ -1,4 +1,11 @@
 export 'app_scaffold.dart';
+export 'bottom_sheet_shell.dart';
+export 'glass_nav_bar.dart';
+export 'motion.dart';
+export 'shimmer_box.dart';
+export 'slide_to_confirm.dart';
+export 'status_stepper.dart';
+export 'unread_dot.dart';
 export 'app_toast.dart';
 export 'empty_state.dart';
 export 'error_strip.dart';

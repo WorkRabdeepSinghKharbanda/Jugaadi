@@ -27,19 +27,31 @@ class PostJobScreen extends StatefulWidget {
 const _kOtherSkill = 'Other';
 
 class _PostJobScreenState extends State<PostJobScreen> {
-  late final _titleController = TextEditingController(text: _seed?['title'] as String?);
-  late final _addressLine2Controller = TextEditingController(text: _seed?['address_line2'] as String?);
-  late final _wageController = TextEditingController(text: _seed?['daily_wage']?.toString());
-  late final _workersNeededController = TextEditingController(text: '${_seed?['workers_needed'] ?? 1}');
+  late final _titleController = TextEditingController(
+    text: _seed?['title'] as String?,
+  );
+  late final _addressLine2Controller = TextEditingController(
+    text: _seed?['address_line2'] as String?,
+  );
+  late final _wageController = TextEditingController(
+    text: _seed?['daily_wage']?.toString(),
+  );
+  late final _workersNeededController = TextEditingController(
+    text: '${_seed?['workers_needed'] ?? 1}',
+  );
   late final _customSkillController = TextEditingController(
     text: _initialSkillIsCustom ? (_seed?['skill_needed'] as String?) : null,
   );
-  late String _skill = _initialSkillIsCustom ? _kOtherSkill : (_seed?['skill_needed'] as String? ?? kSkillOptions.first);
+  late String _skill = _initialSkillIsCustom
+      ? _kOtherSkill
+      : (_seed?['skill_needed'] as String? ?? kSkillOptions.first);
   DateTimeRange? _range;
   PlaceHit? _place;
   bool _loading = false;
   String? _error;
-  late final _photoUrls = <String>[...(widget.existingJob?['photo_urls'] as List<dynamic>? ?? const [])];
+  late final _photoUrls = <String>[
+    ...(widget.existingJob?['photo_urls'] as List<dynamic>? ?? const []),
+  ];
   bool _uploadingPhotos = false;
   // Set once a brand-new job gets silently created (first "Add photos" tap needs a job id to
   // attach to) — from then on this screen behaves like edit mode even though it started as create.
@@ -60,8 +72,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
   /// [_buildBodyOrShowError], kept separate so the button/photos gate can run without
   /// triggering the inline `_error` strip on every keystroke.
   String? get _missingField {
-    if (_titleController.text.trim().isEmpty) return context.tr('title_required');
-    if (_skill == _kOtherSkill && _customSkillController.text.trim().isEmpty) return context.tr('specify_skill_needed');
+    if (_titleController.text.trim().isEmpty) {
+      return context.tr('title_required');
+    }
+    if (_skill == _kOtherSkill && _customSkillController.text.trim().isEmpty) {
+      return context.tr('specify_skill_needed');
+    }
     if (_place == null) return context.tr('set_job_location');
     if (_range == null) return context.tr('pick_start_end_dates');
     return null;
@@ -84,9 +100,16 @@ class _PostJobScreenState extends State<PostJobScreen> {
     if (job != null) {
       final existing = widget.existingJob;
       if (existing != null) {
-        _range = DateTimeRange(start: DateTime.parse(existing['start_date'] as String), end: DateTime.parse(existing['end_date'] as String));
+        _range = DateTimeRange(
+          start: DateTime.parse(existing['start_date'] as String),
+          end: DateTime.parse(existing['end_date'] as String),
+        );
       }
-      _place = PlaceHit(label: job['address_text'] as String? ?? '', latitude: (job['lat'] as num).toDouble(), longitude: (job['lng'] as num).toDouble());
+      _place = PlaceHit(
+        label: job['address_text'] as String? ?? '',
+        latitude: (job['lat'] as num).toDouble(),
+        longitude: (job['lng'] as num).toDouble(),
+      );
     }
   }
 
@@ -113,18 +136,25 @@ class _PostJobScreenState extends State<PostJobScreen> {
       showAppToast(context, missing, tone: ToastTone.error);
       return null;
     }
-    final skillNeeded = _skill == _kOtherSkill ? _customSkillController.text.trim() : _skill;
+    final skillNeeded = _skill == _kOtherSkill
+        ? _customSkillController.text.trim()
+        : _skill;
     return {
       'title': _titleController.text.trim(),
       'skill_needed': skillNeeded,
       'lat': _place!.latitude,
       'lng': _place!.longitude,
       'address_text': _place!.label,
-      'address_line2': _addressLine2Controller.text.trim().isEmpty ? null : _addressLine2Controller.text.trim(),
+      'address_line2': _addressLine2Controller.text.trim().isEmpty
+          ? null
+          : _addressLine2Controller.text.trim(),
       'start_date': _range!.start.toIso8601String().split('T').first,
       'end_date': _range!.end.toIso8601String().split('T').first,
-      if (_wageController.text.trim().isNotEmpty) 'daily_wage': num.tryParse(_wageController.text.trim()),
-      if (!_isEdit) 'workers_needed': int.tryParse(_workersNeededController.text.trim()) ?? 1,
+      if (_wageController.text.trim().isNotEmpty)
+        'daily_wage': num.tryParse(_wageController.text.trim()),
+      if (!_isEdit)
+        'workers_needed':
+            int.tryParse(_workersNeededController.text.trim()) ?? 1,
     };
   }
 
@@ -139,10 +169,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
       if (body == null) return;
       setState(() => _uploadingPhotos = true);
       try {
-        final created = await ApiClient(Config.apiBaseUrl).post('/jobs', body) as Map<String, dynamic>;
+        final created =
+            await ApiClient(Config.apiBaseUrl).post('/jobs', body)
+                as Map<String, dynamic>;
         setState(() => _createdJob = created);
       } catch (e) {
-        if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+        if (mounted) {
+          showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+        }
         if (mounted) setState(() => _uploadingPhotos = false);
         return;
       }
@@ -150,10 +184,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
       setState(() => _uploadingPhotos = true);
     }
     try {
-      final uploaded = await pickAndUploadJobPhotos('${_job!['id']}', remaining: _kMaxJobPhotos - _photoUrls.length);
+      final uploaded = await pickAndUploadJobPhotos(
+        '${_job!['id']}',
+        remaining: _kMaxJobPhotos - _photoUrls.length,
+      );
       if (mounted) setState(() => _photoUrls.addAll(uploaded));
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     } finally {
       if (mounted) setState(() => _uploadingPhotos = false);
     }
@@ -174,13 +213,20 @@ class _PostJobScreenState extends State<PostJobScreen> {
         await api.post('/jobs', body);
       }
       if (!mounted) return;
-      showAppToast(context, _hasJobId ? context.tr('job_updated') : context.tr('job_posted_successfully'));
+      showAppToast(
+        context,
+        _hasJobId
+            ? context.tr('job_updated')
+            : context.tr('job_posted_successfully'),
+      );
       Navigator.of(context).pop(true);
     } on ApiException catch (e) {
       if (!mounted) return;
       if (e.code == 'plan_limit') {
         showAppToast(context, e.message, tone: ToastTone.error);
-        await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'owner')));
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const PlansScreen(role: 'owner')),
+        );
       } else {
         setState(() => _error = e.message);
       }
@@ -196,39 +242,63 @@ class _PostJobScreenState extends State<PostJobScreen> {
     final c = context.colors;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: _isEdit ? context.tr('edit_job_title') : context.tr('post_a_job_title'),
+      title: _isEdit
+          ? context.tr('edit_job_title')
+          : context.tr('post_a_job_title'),
       scroll: true,
       resizeForKeyboard: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          NeuTextField(label: context.tr('title_label'), controller: _titleController, icon: Icons.title_rounded),
+          NeuTextField(
+            label: context.tr('title_label'),
+            controller: _titleController,
+            icon: Icons.title_rounded,
+          ),
           const SizedBox(height: AppSpacing.md),
-          Text(context.tr('skill_needed_label'), style: AppText.label.copyWith(color: c.textSecondary)),
+          Text(
+            context.tr('skill_needed_label'),
+            style: AppText.label.copyWith(color: c.textSecondary),
+          ),
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
             initialValue: _skill,
-            items: [...kSkillOptions, _kOtherSkill].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            items: [
+              ...kSkillOptions,
+              _kOtherSkill,
+            ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
             onChanged: (v) => setState(() => _skill = v!),
             dropdownColor: c.surfaceHigh,
           ),
           if (_skill == _kOtherSkill) ...[
             const SizedBox(height: AppSpacing.md),
-            NeuTextField(label: context.tr('specify_skill'), controller: _customSkillController, hint: context.tr('type_skill_needed')),
+            NeuTextField(
+              label: context.tr('specify_skill'),
+              controller: _customSkillController,
+              hint: context.tr('type_skill_needed'),
+            ),
           ],
           const SizedBox(height: AppSpacing.md),
-          Text(context.tr('location_label'), style: AppText.label.copyWith(color: c.textSecondary)),
+          Text(
+            context.tr('location_label'),
+            style: AppText.label.copyWith(color: c.textSecondary),
+          ),
           const SizedBox(height: AppSpacing.sm),
           NeuCard(
             onTap: _pickLocation,
             child: Row(
               children: [
-                Icon(Icons.location_on_outlined, color: _place == null ? c.textSecondary : c.accent),
+                Icon(
+                  Icons.location_on_outlined,
+                  color: _place == null ? c.textSecondary : c.accent,
+                ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     _place?.label ?? context.tr('tap_to_set_job_location'),
-                    style: AppText.body.copyWith(color: _place == null ? c.textTertiary : c.textPrimary),
+                    style: AppText.body.copyWith(
+                      color: _place == null ? c.textTertiary : c.textPrimary,
+                    ),
                   ),
                 ),
                 Icon(Icons.chevron_right_rounded, color: c.textTertiary),
@@ -243,7 +313,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
             icon: Icons.storefront_outlined,
           ),
           const SizedBox(height: AppSpacing.md),
-          NeuTextField(label: context.tr('daily_wage_optional'), controller: _wageController, icon: Icons.payments_outlined, keyboardType: TextInputType.number),
+          NeuTextField(
+            label: context.tr('daily_wage_optional'),
+            controller: _wageController,
+            icon: Icons.payments_outlined,
+            keyboardType: TextInputType.number,
+          ),
           if (!_isEdit) ...[
             const SizedBox(height: AppSpacing.md),
             NeuTextField(
@@ -254,7 +329,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
             ),
           ],
           const SizedBox(height: AppSpacing.lg),
-          SectionHeader('${context.tr('photos_label')} (${_photoUrls.length}/$_kMaxJobPhotos)'),
+          SectionHeader(
+            '${context.tr('photos_label')} (${_photoUrls.length}/$_kMaxJobPhotos)',
+          ),
           Wrap(
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
@@ -262,7 +339,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
               for (final url in _photoUrls)
                 ClipRRect(
                   borderRadius: AppRadius.smAll,
-                  child: Image.network(url, width: 88, height: 88, fit: BoxFit.cover),
+                  child: Image.network(
+                    url,
+                    width: 88,
+                    height: 88,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               if (_photoUrls.length < _kMaxJobPhotos)
                 NeuButton(
@@ -291,9 +373,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
             const SizedBox(height: AppSpacing.lg),
           ],
           AnimatedBuilder(
-            animation: Listenable.merge([_titleController, _customSkillController]),
+            animation: Listenable.merge([
+              _titleController,
+              _customSkillController,
+            ]),
             builder: (_, __) => NeuButton(
-              label: _hasJobId ? context.tr('save_changes') : context.tr('post_job'),
+              label: _hasJobId
+                  ? context.tr('save_changes')
+                  : context.tr('post_job'),
               icon: Icons.check_rounded,
               loading: _loading,
               onPressed: _missingField != null ? null : _submit,

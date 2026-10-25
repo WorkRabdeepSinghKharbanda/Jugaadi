@@ -2,7 +2,11 @@ import 'package:geocoding/geocoding.dart';
 
 /// A resolved place: a label plus coordinates, either from search or GPS.
 class PlaceHit {
-  const PlaceHit({required this.label, required this.latitude, required this.longitude});
+  const PlaceHit({
+    required this.label,
+    required this.latitude,
+    required this.longitude,
+  });
   final String label;
   final double latitude;
   final double longitude;
@@ -24,7 +28,13 @@ class PlaceGateway {
     }
     final hits = <PlaceHit>[];
     for (final l in locs.take(5)) {
-      hits.add(PlaceHit(label: await labelFor(l.latitude, l.longitude, fallback: query), latitude: l.latitude, longitude: l.longitude));
+      hits.add(
+        PlaceHit(
+          label: await labelFor(l.latitude, l.longitude, fallback: query),
+          latitude: l.latitude,
+          longitude: l.longitude,
+        ),
+      );
     }
     return hits;
   }
@@ -32,10 +42,15 @@ class PlaceGateway {
   /// "Locality, Administrative area" for coordinates, else [fallback]. Never throws.
   Future<String> labelFor(double lat, double lng, {String? fallback}) async {
     try {
-      final marks = await Geocoding().placemarkFromCoordinates(lat, lng).timeout(const Duration(seconds: 3));
+      final marks = await Geocoding()
+          .placemarkFromCoordinates(lat, lng)
+          .timeout(const Duration(seconds: 3));
       if (marks.isNotEmpty) {
         final m = marks.first;
-        final parts = [m.locality, m.administrativeArea].where((s) => s != null && s.isNotEmpty);
+        final parts = [
+          m.locality,
+          m.administrativeArea,
+        ].where((s) => s != null && s.isNotEmpty);
         if (parts.isNotEmpty) return parts.join(', ');
       }
     } catch (_) {

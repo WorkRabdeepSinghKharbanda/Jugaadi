@@ -40,10 +40,16 @@ class PaginatedList<T> {
 
   /// Triggers [loadMore] once the list is scrolled within 300px of the bottom ("hard scroll
   /// past the end"), then calls [onChanged] to rebuild once the new page lands.
-  void attachScrollController(ScrollController controller, VoidCallback onChanged) {
+  void attachScrollController(
+    ScrollController controller,
+    VoidCallback onChanged,
+  ) {
     controller.addListener(() {
       if (!hasMore || isLoadingMore) return;
-      if (controller.position.pixels < controller.position.maxScrollExtent - 300) return;
+      if (controller.position.pixels <
+          controller.position.maxScrollExtent - 300) {
+        return;
+      }
       loadMore().then((loaded) {
         if (loaded) onChanged();
       });

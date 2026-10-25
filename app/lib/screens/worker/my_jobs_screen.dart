@@ -42,15 +42,19 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
     final data = await ApiClient(Config.apiBaseUrl).get('/applications/mine', {
       'limit': limit,
       'offset': offset,
-      if (!_lifetimeOn && _filterRange != null) 'from': _filterRange!.start.toIso8601String().split('T').first,
-      if (!_lifetimeOn && _filterRange != null) 'to': _filterRange!.end.toIso8601String().split('T').first,
+      if (!_lifetimeOn && _filterRange != null)
+        'from': _filterRange!.start.toIso8601String().split('T').first,
+      if (!_lifetimeOn && _filterRange != null)
+        'to': _filterRange!.end.toIso8601String().split('T').first,
     });
     return data as List<dynamic>;
   }
 
   Future<void> _reload() => _pager.loadFirstPage();
 
-  void _refresh() => setState(() { _future = _reload(); });
+  void _refresh() => setState(() {
+    _future = _reload();
+  });
 
   Future<void> _pickFilterRange() async {
     final now = DateTime.now();
@@ -69,10 +73,10 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
   }
 
   void _clearFilter() => setState(() {
-        _filterRange = null;
-        _lifetimeOn = true;
-        _future = _reload();
-      });
+    _filterRange = null;
+    _lifetimeOn = true;
+    _future = _reload();
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +86,9 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
       fullBleed: true,
       actions: [
         NeuIconButton(
-          icon: _lifetimeOn ? Icons.filter_alt_outlined : Icons.filter_alt_rounded,
+          icon: _lifetimeOn
+              ? Icons.filter_alt_outlined
+              : Icons.filter_alt_rounded,
           semanticLabel: context.tr('filter_by_date'),
           onPressed: _pickFilterRange,
         ),
@@ -105,7 +111,11 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
                     children: [
                       ErrorStrip(errorMessage(context, snapshot.error!)),
                       const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: context.tr('retry'), expand: false, onPressed: _refresh),
+                      NeuButton(
+                        label: context.tr('retry'),
+                        expand: false,
+                        onPressed: _refresh,
+                      ),
                     ],
                   ),
                 ),
@@ -117,7 +127,12 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
               children: [
                 if (hasFilter)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, 0),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.gutter,
+                      AppSpacing.sm,
+                      AppSpacing.gutter,
+                      0,
+                    ),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Chip(
@@ -134,45 +149,78 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
                       ? Center(
                           child: EmptyState(
                             icon: Icons.inbox_outlined,
-                            text: hasFilter ? context.tr('no_applications_in_range') : context.tr('no_applications_yet'),
+                            text: hasFilter
+                                ? context.tr('no_applications_in_range')
+                                : context.tr('no_applications_yet'),
                           ),
                         )
                       : ListView.builder(
                           controller: _scrollController,
-                          padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
-                          itemCount: applications.length + (_pager.hasMore ? 1 : 0),
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.gutter,
+                            AppSpacing.md,
+                            AppSpacing.gutter,
+                            GlassNavBar.height + AppSpacing.md,
+                          ),
+                          itemCount:
+                              applications.length + (_pager.hasMore ? 1 : 0),
                           itemBuilder: (context, i) {
                             if (i == applications.length) {
                               return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                                child: Center(child: CircularProgressIndicator(color: c.accent)),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.lg,
+                                ),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: c.accent,
+                                  ),
+                                ),
                               );
                             }
-                            final entry = applications[i] as Map<String, dynamic>;
+                            final entry =
+                                applications[i] as Map<String, dynamic>;
                             final job = entry['job'] as Map<String, dynamic>;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                              child: NeuCard(
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (_) => JobDetailScreen(job: job, isOwner: false)),
+                            return FadeSlideIn(
+                              index: i,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.md,
                                 ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(job['title'] as String, style: AppText.title),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${context.tr('job_status_prefix')} ${job['status']}',
-                                            style: AppText.bodySmall.copyWith(color: c.textSecondary),
-                                          ),
-                                        ],
+                                child: NeuCard(
+                                  onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => JobDetailScreen(
+                                        job: job,
+                                        isOwner: false,
                                       ),
                                     ),
-                                    PillBadge.status(entry['status'] as String),
-                                  ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              job['title'] as String,
+                                              style: AppText.title,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${context.tr('job_status_prefix')} ${job['status']}',
+                                              style: AppText.bodySmall.copyWith(
+                                                color: c.textSecondary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PillBadge.status(
+                                        entry['status'] as String,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

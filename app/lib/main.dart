@@ -4,7 +4,9 @@ import 'package:clarity_flutter/clarity_flutter.dart';
 import 'api_client.dart';
 import 'config.dart';
 import 'core/i18n/lang.dart';
+import 'core/i18n/strings.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_controller.dart';
 import 'core/theme/tokens.dart';
 import 'core/widgets/widgets.dart';
 import 'screens/admin/admin_home_screen.dart';
@@ -14,23 +16,43 @@ import 'screens/owner/owner_home_screen.dart';
 import 'screens/worker/my_jobs_screen.dart';
 import 'screens/worker/worker_home_screen.dart';
 
-final _clarityConfig = ClarityConfig(projectId: Config.clarityProjectId, logLevel: LogLevel.None);
+final _clarityConfig = ClarityConfig(
+  projectId: Config.clarityProjectId,
+  logLevel: LogLevel.None,
+);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final langController = await LangController.load();
+  final themeController = await ThemeController.load();
   if (Config.supabaseUrl.isEmpty || Config.supabaseAnonKey.isEmpty) {
-    runApp(ClarityWidget(
-      app: LangScope(controller: langController, child: const _NotConfiguredApp()),
-      clarityConfig: _clarityConfig,
-    ));
+    runApp(
+      ClarityWidget(
+        app: ThemeScope(
+          controller: themeController,
+          child: LangScope(
+            controller: langController,
+            child: const _NotConfiguredApp(),
+          ),
+        ),
+        clarityConfig: _clarityConfig,
+      ),
+    );
     return;
   }
-  await Supabase.initialize(url: Config.supabaseUrl, anonKey: Config.supabaseAnonKey);
-  runApp(ClarityWidget(
-    app: LangScope(controller: langController, child: const JugaadiApp()),
-    clarityConfig: _clarityConfig,
-  ));
+  await Supabase.initialize(
+    url: Config.supabaseUrl,
+    anonKey: Config.supabaseAnonKey,
+  );
+  runApp(
+    ClarityWidget(
+      app: ThemeScope(
+        controller: themeController,
+        child: LangScope(controller: langController, child: const JugaadiApp()),
+      ),
+      clarityConfig: _clarityConfig,
+    ),
+  );
 }
 
 class _NotConfiguredApp extends StatelessWidget {
@@ -39,7 +61,7 @@ class _NotConfiguredApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: AppTheme.dark,
+      theme: ThemeScope.of(context).isDark ? AppTheme.dark : AppTheme.light,
       home: AppScaffold(
         body: Center(
           child: Text(
@@ -62,9 +84,10 @@ class JugaadiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeScope.of(context);
     return MaterialApp(
       title: 'Jugaadi',
-      theme: AppTheme.dark,
+      theme: theme.isDark ? AppTheme.dark : AppTheme.light,
       home: const RootRouter(),
     );
   }
@@ -90,8 +113,14 @@ class _RootRouterState extends State<RootRouter> {
   Future<Map<String, dynamic>?> _loadProfile() async {
     if (Supabase.instance.client.auth.currentSession == null) return null;
     try {
-      final data = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
-      if (mounted) LangScope.controllerOf(context).syncFromProfile(data['lang'] as String?);
+      final data =
+          await ApiClient(Config.apiBaseUrl).get('/profile/me')
+              as Map<String, dynamic>;
+      if (mounted) {
+        LangScope.controllerOf(
+          context,
+        ).syncFromProfile(data['lang'] as String?);
+      }
       return data;
     } on ApiException catch (e) {
       if (e.statusCode == 404) return {};
@@ -107,9 +136,13 @@ class _RootRouterState extends State<RootRouter> {
     return FutureBuilder<Map<String, dynamic>?>(
       future: _profileFuture,
       builder: (context, snapshot) {
-        if (!snapshot.hasData && snapshot.connectionState != ConnectionState.done) {
+        if (!snapshot.hasData &&
+            snapshot.connectionState != ConnectionState.done) {
           final c = context.colors;
-          return Scaffold(backgroundColor: c.bg, body: Center(child: CircularProgressIndicator(color: c.accent)));
+          return Scaffold(
+            backgroundColor: c.bg,
+            body: Center(child: CircularProgressIndicator(color: c.accent)),
+          );
         }
         if (snapshot.hasError) {
           final c = context.colors;
@@ -121,12 +154,16 @@ class _RootRouterState extends State<RootRouter> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ErrorStrip('Couldn\'t load your profile. Check your connection.'),
+                    ErrorStrip(
+                      'Couldn\'t load your profile. Check your connection.',
+                    ),
                     const SizedBox(height: AppSpacing.md),
                     NeuButton(
                       label: 'Retry',
                       expand: false,
-                      onPressed: () => setState(() { _profileFuture = _loadProfile(); }),
+                      onPressed: () => setState(() {
+                        _profileFuture = _loadProfile();
+                      }),
                     ),
                   ],
                 ),
@@ -137,7 +174,9 @@ class _RootRouterState extends State<RootRouter> {
         final profile = snapshot.data;
         if (profile == null || profile.isEmpty) return const RoleSelectScreen();
         if (profile['is_admin'] == true) return const AdminHomeScreen();
-        return profile['role'] == 'owner' ? const OwnerHomeScreen() : const WorkerTabs();
+        return profile['role'] == 'owner'
+            ? const OwnerHomeScreen()
+            : const WorkerTabs();
       },
     );
   }
@@ -160,20 +199,32 @@ class _WorkerTabsState extends State<WorkerTabs> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [WorkerHomeScreen(key: ValueKey(_nearbyGen)), MyJobsScreen(key: ValueKey(_myJobsGen))];
+    final pages = [
+      WorkerHomeScreen(key: ValueKey(_nearbyGen)),
+      MyJobsScreen(key: ValueKey(_myJobsGen)),
+    ];
     return Scaffold(
       backgroundColor: context.colors.bg,
+      extendBody: true,
       body: pages[_index],
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: GlassNavBar(
         selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() {
+        onSelected: (i) => setState(() {
           if (i == 0) _nearbyGen++;
           if (i == 1) _myJobsGen++;
           _index = i;
         }),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.search_rounded), label: 'Nearby'),
-          NavigationDestination(icon: Icon(Icons.work_outline_rounded), label: 'My jobs'),
+        items: [
+          GlassNavItem(
+            icon: Icons.search_rounded,
+            activeIcon: Icons.search_rounded,
+            label: context.tr('tab_nearby'),
+          ),
+          GlassNavItem(
+            icon: Icons.work_outline_rounded,
+            activeIcon: Icons.work_rounded,
+            label: context.tr('tab_my_jobs'),
+          ),
         ],
       ),
     );

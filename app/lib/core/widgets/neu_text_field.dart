@@ -37,7 +37,10 @@ class NeuTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: AppText.label.copyWith(color: c.textSecondary)),
+        Text(
+          label.toUpperCase(),
+          style: AppText.label.copyWith(color: c.textSecondary),
+        ),
         const SizedBox(height: AppSpacing.sm),
         TextFormField(
           controller: controller,
@@ -51,7 +54,9 @@ class NeuTextField extends StatelessWidget {
           style: AppText.body.copyWith(color: c.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: icon == null ? null : Icon(icon, color: c.textSecondary, size: 20),
+            prefixIcon: icon == null
+                ? null
+                : Icon(icon, color: c.textSecondary, size: 20),
           ),
         ),
       ],

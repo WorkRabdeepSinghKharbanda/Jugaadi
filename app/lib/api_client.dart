@@ -24,9 +24,9 @@ class ApiClient {
   }
 
   Future<dynamic> get(String path, [Map<String, dynamic>? query]) async {
-    final uri = Uri.parse('$baseUrl$path').replace(
-      queryParameters: query?.map((k, v) => MapEntry(k, '$v')),
-    );
+    final uri = Uri.parse(
+      '$baseUrl$path',
+    ).replace(queryParameters: query?.map((k, v) => MapEntry(k, '$v')));
     final res = await http.get(uri, headers: await _headers());
     return _decode(res);
   }
@@ -50,7 +50,10 @@ class ApiClient {
   }
 
   Future<dynamic> delete(String path) async {
-    final res = await http.delete(Uri.parse('$baseUrl$path'), headers: await _headers());
+    final res = await http.delete(
+      Uri.parse('$baseUrl$path'),
+      headers: await _headers(),
+    );
     return _decode(res);
   }
 }
@@ -64,7 +67,9 @@ class ApiException implements Exception {
   String get message {
     try {
       final decoded = jsonDecode(body);
-      if (decoded is Map && decoded['error'] is String) return decoded['error'] as String;
+      if (decoded is Map && decoded['error'] is String) {
+        return decoded['error'] as String;
+      }
     } catch (_) {
       // not JSON — fall through to the raw body
     }
@@ -75,7 +80,9 @@ class ApiException implements Exception {
   String? get code {
     try {
       final decoded = jsonDecode(body);
-      if (decoded is Map && decoded['code'] is String) return decoded['code'] as String;
+      if (decoded is Map && decoded['code'] is String) {
+        return decoded['code'] as String;
+      }
     } catch (_) {
       // not JSON
     }
@@ -88,4 +95,5 @@ class ApiException implements Exception {
 
 /// User-facing message for an error caught from an API call — never the raw exception
 /// toString() (e.g. `ApiException(500): {"error": "..."}`), which leaks backend internals.
-String apiErrorMessage(Object error) => error is ApiException ? error.message : 'Something went wrong';
+String apiErrorMessage(Object error) =>
+    error is ApiException ? error.message : 'Something went wrong';

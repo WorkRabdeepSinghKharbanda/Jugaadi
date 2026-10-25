@@ -20,14 +20,23 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   Future<void> _viewAsOwnRole() async {
     try {
-      final profile = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
+      final profile =
+          await ApiClient(Config.apiBaseUrl).get('/profile/me')
+              as Map<String, dynamic>;
       if (!mounted) return;
       final isOwner = profile['role'] == 'owner';
       await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => isOwner ? const OwnerHomeScreen() : const WorkerTabs()),
+        MaterialPageRoute(
+          builder: (_) =>
+              isOwner ? const OwnerHomeScreen() : const WorkerTabs(),
+        ),
       );
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(apiErrorMessage(e))));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(apiErrorMessage(e))));
+      }
     }
   }
 
@@ -38,9 +47,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Scaffold(
       backgroundColor: c.bg,
       appBar: AppBar(
-        title: Text(_index == 0 ? context.tr('admin_users_title') : context.tr('admin_jobs_title')),
+        title: Text(
+          _index == 0
+              ? context.tr('admin_users_title')
+              : context.tr('admin_jobs_title'),
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.swap_horiz_rounded), tooltip: context.tr('view_as_my_role'), onPressed: _viewAsOwnRole),
+          IconButton(
+            icon: const Icon(Icons.swap_horiz_rounded),
+            tooltip: context.tr('view_as_my_role'),
+            onPressed: _viewAsOwnRole,
+          ),
         ],
       ),
       body: pages[_index],
@@ -48,8 +65,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: [
-          NavigationDestination(icon: const Icon(Icons.people_outline_rounded), label: context.tr('users')),
-          NavigationDestination(icon: const Icon(Icons.work_outline_rounded), label: context.tr('jobs')),
+          NavigationDestination(
+            icon: const Icon(Icons.people_outline_rounded),
+            label: context.tr('users'),
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.work_outline_rounded),
+            label: context.tr('jobs'),
+          ),
         ],
       ),
     );

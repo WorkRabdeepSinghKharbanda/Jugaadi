@@ -36,7 +36,12 @@ class AppScaffold extends StatelessWidget {
     final header = title == null && onBack == null && actions.isEmpty
         ? null
         : Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.gutter,
+              AppSpacing.md,
+              AppSpacing.gutter,
+              AppSpacing.lg,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -45,22 +50,40 @@ class AppScaffold extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
                     child: Row(
                       children: [
-                        if (onBack != null) NeuIconButton(icon: Icons.arrow_back_rounded, semanticLabel: 'Back', onPressed: onBack),
+                        if (onBack != null)
+                          NeuIconButton(
+                            icon: Icons.arrow_back_rounded,
+                            semanticLabel: 'Back',
+                            onPressed: onBack,
+                          ),
                         const Spacer(),
-                        for (final a in actions) Padding(padding: const EdgeInsets.only(left: AppSpacing.sm), child: a),
+                        for (final a in actions)
+                          Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.sm),
+                            child: a,
+                          ),
                       ],
                     ),
                   ),
-                if (title != null) Text(title!, style: AppText.headline.copyWith(color: c.textPrimary)),
+                if (title != null)
+                  Text(
+                    title!,
+                    style: AppText.headline.copyWith(color: c.textPrimary),
+                  ),
                 if (subtitle != null) ...[
                   const SizedBox(height: AppSpacing.sm),
-                  Text(subtitle!, style: AppText.body.copyWith(color: c.textSecondary)),
+                  Text(
+                    subtitle!,
+                    style: AppText.body.copyWith(color: c.textSecondary),
+                  ),
                 ],
               ],
             ),
           );
 
-    Widget content = fullBleed ? body : Padding(padding: AppSpacing.screen, child: body);
+    Widget content = fullBleed
+        ? body
+        : Padding(padding: AppSpacing.screen, child: body);
     if (scroll) content = SingleChildScrollView(child: content);
 
     return Scaffold(
@@ -77,7 +100,15 @@ class AppScaffold extends StatelessWidget {
             if (bottom != null)
               SafeArea(
                 top: false,
-                child: Padding(padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md), child: bottom),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.gutter,
+                    AppSpacing.md,
+                    AppSpacing.gutter,
+                    AppSpacing.md,
+                  ),
+                  child: bottom,
+                ),
               ),
           ],
         ),

@@ -20,11 +20,15 @@ Future<Position> getCurrentPositionOrThrow() async {
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
   }
-  if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+  if (permission == LocationPermission.denied ||
+      permission == LocationPermission.deniedForever) {
     throw const LocationException('location_permission_denied');
   }
 
   return Geolocator.getCurrentPosition(
-    locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)),
+    locationSettings: const LocationSettings(
+      accuracy: LocationAccuracy.medium,
+      timeLimit: Duration(seconds: 15),
+    ),
   );
 }

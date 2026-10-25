@@ -6,12 +6,17 @@ enum PillTone { accent, live, neutral, danger }
 
 /// Small uppercase status pill (job status, verification, applicant state).
 class PillBadge extends StatelessWidget {
-  const PillBadge({super.key, required this.label, this.tone = PillTone.neutral, this.icon});
+  const PillBadge({
+    super.key,
+    required this.label,
+    this.tone = PillTone.neutral,
+    this.icon,
+  });
 
   const PillBadge.verified({super.key})
-      : label = 'Verified',
-        tone = PillTone.live,
-        icon = Icons.verified_rounded;
+    : label = 'Verified',
+      tone = PillTone.live,
+      icon = Icons.verified_rounded;
 
   /// Maps a jobs/job_applications `status` column value to a styled pill. Accepts either a
   /// [JobStatus] or [ApplicationStatus] name — they're the only two status concepts this is
@@ -23,10 +28,10 @@ class PillBadge extends StatelessWidget {
       JobStatus.removed => PillTone.danger,
       JobStatus.done => PillTone.neutral,
       null => switch (ApplicationStatus.fromString(status)) {
-          ApplicationStatus.accepted => PillTone.live,
-          ApplicationStatus.rejected => PillTone.danger,
-          ApplicationStatus.pending || null => PillTone.neutral,
-        },
+        ApplicationStatus.accepted => PillTone.live,
+        ApplicationStatus.rejected => PillTone.danger,
+        ApplicationStatus.pending || null => PillTone.neutral,
+      },
     };
     return PillBadge(label: status, tone: tone);
   }
@@ -45,12 +50,18 @@ class PillBadge extends StatelessWidget {
       PillTone.neutral => (c.surfaceHigh, c.textSecondary),
     };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm + 2, vertical: AppSpacing.xs + 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm + 2,
+        vertical: AppSpacing.xs + 1,
+      ),
       decoration: BoxDecoration(color: bg, borderRadius: AppRadius.pillAll),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[Icon(icon, size: 12, color: fg), const SizedBox(width: 3)],
+          if (icon != null) ...[
+            Icon(icon, size: 12, color: fg),
+            const SizedBox(width: 3),
+          ],
           Text(label.toUpperCase(), style: AppText.label.copyWith(color: fg)),
         ],
       ),

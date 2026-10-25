@@ -35,7 +35,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
 
   Future<void> _checkAdmin() async {
     try {
-      final profile = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
+      final profile =
+          await ApiClient(Config.apiBaseUrl).get('/profile/me')
+              as Map<String, dynamic>;
       if (mounted) setState(() => _isAdmin = profile['is_admin'] == true);
     } catch (_) {
       // not critical — the admin icon just stays hidden
@@ -47,19 +49,21 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
     return data as List<dynamic>;
   }
 
-  void _refresh() => setState(() { _future = _load(); });
+  void _refresh() => setState(() {
+    _future = _load();
+  });
 
   Future<void> _edit(Map<String, dynamic> job) async {
-    final updated = await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => PostJobScreen(existingJob: job)),
-    );
+    final updated = await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => PostJobScreen(existingJob: job)));
     if (updated == true) _refresh();
   }
 
   Future<void> _repost(Map<String, dynamic> job) async {
-    final posted = await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => PostJobScreen(repostFrom: job)),
-    );
+    final posted = await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => PostJobScreen(repostFrom: job)));
     if (posted == true) _refresh();
   }
 
@@ -70,8 +74,14 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         title: Text(ctx.tr('remove_job_title')),
         content: Text(ctx.tr('remove_job_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('remove'))),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('remove')),
+          ),
         ],
       ),
     );
@@ -81,7 +91,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
       if (mounted) showAppToast(context, context.tr('job_removed'));
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     }
   }
 
@@ -96,32 +108,44 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
           NeuIconButton(
             icon: Icons.admin_panel_settings_outlined,
             semanticLabel: context.tr('admin_console'),
-            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const AdminHomeScreen())),
+            onPressed: () => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+            ),
           ),
         NeuIconButton(
           icon: Icons.swap_horiz_rounded,
           semanticLabel: context.tr('find_work_instead'),
-          onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const WorkerTabs())),
+          onPressed: () => Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const WorkerTabs()),
+          ),
         ),
         NeuIconButton(
           icon: Icons.bolt_outlined,
           semanticLabel: context.tr('plan'),
-          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlansScreen(role: 'owner'))),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PlansScreen(role: 'owner')),
+          ),
         ),
-        NeuIconButton(icon: Icons.location_on_outlined, semanticLabel: context.tr('update_location'), onPressed: () => editLocation(context)),
+        NeuIconButton(
+          icon: Icons.location_on_outlined,
+          semanticLabel: context.tr('update_location'),
+          onPressed: () => editLocation(context),
+        ),
         NeuIconButton(
           icon: Icons.person_outline_rounded,
           semanticLabel: context.tr('profile_title'),
-          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
+          onPressed: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
         ),
       ],
       floatingActionButton: FloatingActionButton(
         backgroundColor: c.accent,
         foregroundColor: c.onAccent,
         onPressed: () async {
-          final posted = await Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PostJobScreen()),
-          );
+          final posted = await Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const PostJobScreen()));
           if (posted == true) _refresh();
         },
         child: const Icon(Icons.add_rounded),
@@ -144,7 +168,11 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     children: [
                       ErrorStrip(errorMessage(context, snapshot.error!)),
                       const SizedBox(height: AppSpacing.md),
-                      NeuButton(label: context.tr('retry'), expand: false, onPressed: _refresh),
+                      NeuButton(
+                        label: context.tr('retry'),
+                        expand: false,
+                        onPressed: _refresh,
+                      ),
                     ],
                   ),
                 ),
@@ -152,63 +180,104 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
             }
             final jobs = snapshot.data!;
             if (jobs.isEmpty) {
-              return EmptyState(icon: Icons.work_outline_rounded, text: context.tr('no_jobs_posted_yet'));
+              return EmptyState(
+                icon: Icons.work_outline_rounded,
+                text: context.tr('no_jobs_posted_yet'),
+              );
             }
             return ListView.builder(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.gutter,
+                AppSpacing.md,
+                AppSpacing.gutter,
+                AppSpacing.md,
+              ),
               itemCount: jobs.length,
               itemBuilder: (context, i) {
                 final job = jobs[i] as Map<String, dynamic>;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: NeuCard(
-                    onTap: () async {
-                      if (job['status'] == JobStatus.open.name) {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => JobApplicantsScreen(job: job)),
-                        );
-                        _refresh();
-                      } else {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => JobDetailScreen(job: job, isOwner: true)),
-                        );
-                        _refresh();
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(job['title'] as String, style: AppText.title),
-                              const SizedBox(height: 4),
-                              Text(job['skill_needed'] as String, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
-                              if ((job['workers_needed'] as int? ?? 1) > 1) ...[
+                return FadeSlideIn(
+                  index: i,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: NeuCard(
+                      onTap: () async {
+                        if (job['status'] == JobStatus.open.name) {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => JobApplicantsScreen(job: job),
+                            ),
+                          );
+                          _refresh();
+                        } else {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  JobDetailScreen(job: job, isOwner: true),
+                            ),
+                          );
+                          _refresh();
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  job['title'] as String,
+                                  style: AppText.title,
+                                ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${job['hired_count'] ?? 0}/${job['workers_needed']} ${context.tr('hired_suffix')}',
-                                  style: AppText.bodySmall.copyWith(color: c.textTertiary),
+                                  job['skill_needed'] as String,
+                                  style: AppText.bodySmall.copyWith(
+                                    color: c.textSecondary,
+                                  ),
                                 ),
+                                if ((job['workers_needed'] as int? ?? 1) >
+                                    1) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${job['hired_count'] ?? 0}/${job['workers_needed']} ${context.tr('hired_suffix')}',
+                                    style: AppText.bodySmall.copyWith(
+                                      color: c.textTertiary,
+                                    ),
+                                  ),
+                                ],
                               ],
+                            ),
+                          ),
+                          PillBadge.status(job['status'] as String),
+                          PopupMenuButton<String>(
+                            icon: Icon(
+                              Icons.more_vert_rounded,
+                              color: c.textSecondary,
+                            ),
+                            onSelected: (action) {
+                              if (action == 'edit') _edit(job);
+                              if (action == 'remove') _remove(job['id']);
+                              if (action == 'repost') _repost(job);
+                            },
+                            itemBuilder: (_) => [
+                              if (job['status'] == JobStatus.open.name)
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text(context.tr('edit')),
+                                ),
+                              PopupMenuItem(
+                                value: 'repost',
+                                child: Text(context.tr('repost')),
+                              ),
+                              if (job['status'] == JobStatus.open.name)
+                                PopupMenuItem(
+                                  value: 'remove',
+                                  child: Text(context.tr('remove')),
+                                ),
                             ],
                           ),
-                        ),
-                        PillBadge.status(job['status'] as String),
-                        PopupMenuButton<String>(
-                          icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
-                          onSelected: (action) {
-                            if (action == 'edit') _edit(job);
-                            if (action == 'remove') _remove(job['id']);
-                            if (action == 'repost') _repost(job);
-                          },
-                          itemBuilder: (_) => [
-                            if (job['status'] == JobStatus.open.name) PopupMenuItem(value: 'edit', child: Text(context.tr('edit'))),
-                            PopupMenuItem(value: 'repost', child: Text(context.tr('repost'))),
-                            if (job['status'] == JobStatus.open.name) PopupMenuItem(value: 'remove', child: Text(context.tr('remove'))),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );

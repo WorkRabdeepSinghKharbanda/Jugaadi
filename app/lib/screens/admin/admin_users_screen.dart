@@ -26,14 +26,20 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     return data as List<dynamic>;
   }
 
-  void _refresh() => setState(() { _future = _load(); });
+  void _refresh() => setState(() {
+    _future = _load();
+  });
 
   Future<void> _toggleVerified(Map<String, dynamic> user) async {
     try {
-      await ApiClient(Config.apiBaseUrl).patch('/admin/users/${user['id']}', {'is_verified': !(user['is_verified'] == true)});
+      await ApiClient(Config.apiBaseUrl).patch('/admin/users/${user['id']}', {
+        'is_verified': !(user['is_verified'] == true),
+      });
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     }
   }
 
@@ -44,18 +50,28 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         title: Text(ctx.tr('deactivate_user_title')),
         content: Text('${user['full_name']} ${ctx.tr('deactivate_user_body')}'),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('deactivate'))),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('deactivate')),
+          ),
         ],
       ),
     );
     if (confirmed != true) return;
     try {
-      await ApiClient(Config.apiBaseUrl).post('/admin/users/${user['id']}/delete');
+      await ApiClient(
+        Config.apiBaseUrl,
+      ).post('/admin/users/${user['id']}/delete');
       if (mounted) showAppToast(context, context.tr('user_deactivated'));
       _refresh();
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     }
   }
 
@@ -72,12 +88,24 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             return Center(child: CircularProgressIndicator(color: c.accent));
           }
           if (snapshot.hasError) {
-            return Center(child: ErrorStrip(errorMessage(context, snapshot.error!)));
+            return Center(
+              child: ErrorStrip(errorMessage(context, snapshot.error!)),
+            );
           }
           final users = snapshot.data!;
-          if (users.isEmpty) return EmptyState(icon: Icons.people_outline_rounded, text: context.tr('no_users'));
+          if (users.isEmpty) {
+            return EmptyState(
+              icon: Icons.people_outline_rounded,
+              text: context.tr('no_users'),
+            );
+          }
           return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.gutter,
+              AppSpacing.md,
+              AppSpacing.gutter,
+              AppSpacing.md,
+            ),
             itemCount: users.length,
             itemBuilder: (context, i) {
               final user = users[i] as Map<String, dynamic>;
@@ -94,15 +122,32 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(user['full_name'] as String? ?? '-', style: AppText.title),
+                                Text(
+                                  user['full_name'] as String? ?? '-',
+                                  style: AppText.title,
+                                ),
                                 const SizedBox(height: 2),
-                                Text('${user['role']} · ${user['phone']}', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                Text(
+                                  '${user['role']} · ${user['phone']}',
+                                  style: AppText.bodySmall.copyWith(
+                                    color: c.textSecondary,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          if (user['is_admin'] == true) PillBadge(label: context.tr('admin_label'), tone: PillTone.accent),
-                          if (deleted) PillBadge(label: context.tr('deleted_label'), tone: PillTone.danger),
-                          if (user['is_verified'] == true && !deleted) const PillBadge.verified(),
+                          if (user['is_admin'] == true)
+                            PillBadge(
+                              label: context.tr('admin_label'),
+                              tone: PillTone.accent,
+                            ),
+                          if (deleted)
+                            PillBadge(
+                              label: context.tr('deleted_label'),
+                              tone: PillTone.danger,
+                            ),
+                          if (user['is_verified'] == true && !deleted)
+                            const PillBadge.verified(),
                         ],
                       ),
                       if (!deleted) ...[
@@ -111,7 +156,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                           children: [
                             Expanded(
                               child: NeuButton(
-                                label: user['is_verified'] == true ? context.tr('unverify') : context.tr('verify'),
+                                label: user['is_verified'] == true
+                                    ? context.tr('unverify')
+                                    : context.tr('verify'),
                                 variant: NeuButtonVariant.ghost,
                                 height: 40,
                                 onPressed: () => _toggleVerified(user),
@@ -119,7 +166,12 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
-                              child: NeuButton(label: context.tr('deactivate'), variant: NeuButtonVariant.danger, height: 40, onPressed: () => _delete(user)),
+                              child: NeuButton(
+                                label: context.tr('deactivate'),
+                                variant: NeuButtonVariant.danger,
+                                height: 40,
+                                onPressed: () => _delete(user),
+                              ),
                             ),
                           ],
                         ),

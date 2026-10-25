@@ -34,13 +34,18 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       api.get('/jobs/${widget.job['id']}'),
     ]);
     final applicants = results[0] as List<dynamic>;
-    final hiredWorkers = (results[1] as Map<String, dynamic>)['hired_workers'] as List<dynamic>? ?? const [];
+    final hiredWorkers =
+        (results[1] as Map<String, dynamic>)['hired_workers']
+            as List<dynamic>? ??
+        const [];
     return (applicants, hiredWorkers);
   }
 
   Future<void> _hire(String workerId) async {
     try {
-      await ApiClient(Config.apiBaseUrl).post('/jobs/${widget.job['id']}/hire/$workerId');
+      await ApiClient(
+        Config.apiBaseUrl,
+      ).post('/jobs/${widget.job['id']}/hire/$workerId');
       if (!mounted) return;
       showAppToast(context, context.tr('worker_hired'));
       setState(() {
@@ -48,7 +53,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         _future = _load();
       });
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     }
   }
 
@@ -58,13 +65,20 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     final full = _hiredCount >= _workersNeeded;
     return AppScaffold(
       onBack: () => Navigator.of(context).pop(),
-      title: _workersNeeded > 1 ? '${context.tr('applicants_title')} ($_hiredCount/$_workersNeeded ${context.tr('hired_suffix')})' : context.tr('applicants_title'),
+      title: _workersNeeded > 1
+          ? '${context.tr('applicants_title')} ($_hiredCount/$_workersNeeded ${context.tr('hired_suffix')})'
+          : context.tr('applicants_title'),
       fullBleed: true,
       body: Column(
         children: [
           if (full)
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.gutter,
+                AppSpacing.md,
+                AppSpacing.gutter,
+                0,
+              ),
               child: ErrorStrip(context.tr('all_slots_filled'), warning: true),
             ),
           Expanded(
@@ -102,19 +116,38 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   }
                   final (applicants, hiredWorkers) = snapshot.data!;
                   if (applicants.isEmpty && hiredWorkers.isEmpty) {
-                    return EmptyState(icon: Icons.people_outline_rounded, text: context.tr('no_applicants_yet'));
+                    return EmptyState(
+                      icon: Icons.people_outline_rounded,
+                      text: context.tr('no_applicants_yet'),
+                    );
                   }
-                  final hiredSection = hiredWorkers.isNotEmpty ? hiredWorkers.length + 1 : 0;
+                  final hiredSection = hiredWorkers.isNotEmpty
+                      ? hiredWorkers.length + 1
+                      : 0;
                   final pendingSection = applicants.isNotEmpty ? 1 : 0;
                   return ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.md),
-                    itemCount: hiredSection + pendingSection + applicants.length,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.gutter,
+                      AppSpacing.md,
+                      AppSpacing.gutter,
+                      AppSpacing.md,
+                    ),
+                    itemCount:
+                        hiredSection + pendingSection + applicants.length,
                     itemBuilder: (context, i) {
                       if (i < hiredSection) {
-                        if (i == 0) return SectionHeader('${context.tr('hired_section')} (${hiredWorkers.length})');
+                        if (i == 0) {
+                          return SectionHeader(
+                            '${context.tr('hired_section')} (${hiredWorkers.length})',
+                          );
+                        }
                         final w = hiredWorkers[i - 1] as Map<String, dynamic>;
                         final wVerified = w['is_verified'] == true;
-                        final wSkills = (w['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String).toList() ?? const [];
+                        final wSkills =
+                            (w['worker_skills'] as List<dynamic>?)
+                                ?.map((s) => s['skill'] as String)
+                                .toList() ??
+                            const [];
                         final wBio = w['bio'] as String?;
                         final wCity = w['city'] as String?;
                         return Padding(
@@ -126,19 +159,36 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.check_circle_rounded, color: c.live),
+                                    Icon(
+                                      Icons.check_circle_rounded,
+                                      color: c.live,
+                                    ),
                                     const SizedBox(width: AppSpacing.md),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(w['full_name'] as String? ?? '-', style: AppText.title),
+                                          Text(
+                                            w['full_name'] as String? ?? '-',
+                                            style: AppText.title,
+                                          ),
                                           const SizedBox(height: 4),
                                           Row(
                                             children: [
-                                              Icon(Icons.phone_rounded, size: 14, color: c.textTertiary),
+                                              Icon(
+                                                Icons.phone_rounded,
+                                                size: 14,
+                                                color: c.textTertiary,
+                                              ),
                                               const SizedBox(width: 4),
-                                              Text(w['phone'] as String? ?? '-', style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                              Text(
+                                                w['phone'] as String? ?? '-',
+                                                style: AppText.bodySmall
+                                                    .copyWith(
+                                                      color: c.textSecondary,
+                                                    ),
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -151,22 +201,38 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                   const SizedBox(height: AppSpacing.sm),
                                   Row(
                                     children: [
-                                      Icon(Icons.location_city_rounded, size: 16, color: c.textTertiary),
+                                      Icon(
+                                        Icons.location_city_rounded,
+                                        size: 16,
+                                        color: c.textTertiary,
+                                      ),
                                       const SizedBox(width: 4),
-                                      Text(wCity, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                      Text(
+                                        wCity,
+                                        style: AppText.bodySmall.copyWith(
+                                          color: c.textSecondary,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
                                 if (wBio != null && wBio.isNotEmpty) ...[
                                   const SizedBox(height: AppSpacing.sm),
-                                  Text(wBio, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                  Text(
+                                    wBio,
+                                    style: AppText.bodySmall.copyWith(
+                                      color: c.textSecondary,
+                                    ),
+                                  ),
                                 ],
                                 if (wSkills.isNotEmpty) ...[
                                   const SizedBox(height: AppSpacing.sm),
                                   Wrap(
                                     spacing: AppSpacing.xs,
                                     runSpacing: AppSpacing.xs,
-                                    children: wSkills.map((s) => PillBadge(label: s)).toList(),
+                                    children: wSkills
+                                        .map((s) => PillBadge(label: s))
+                                        .toList(),
                                   ),
                                 ],
                               ],
@@ -176,13 +242,21 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       }
                       var i2 = i - hiredSection;
                       if (pendingSection == 1) {
-                        if (i2 == 0) return SectionHeader('${context.tr('pending_section')} (${applicants.length})');
+                        if (i2 == 0) {
+                          return SectionHeader(
+                            '${context.tr('pending_section')} (${applicants.length})',
+                          );
+                        }
                         i2 -= 1;
                       }
                       final a = applicants[i2] as Map<String, dynamic>;
                       final worker = a['worker'] as Map<String, dynamic>?;
                       final verified = worker?['is_verified'] == true;
-                      final skills = (worker?['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String).toList() ?? const [];
+                      final skills =
+                          (worker?['worker_skills'] as List<dynamic>?)
+                              ?.map((s) => s['skill'] as String)
+                              .toList() ??
+                          const [];
                       final bio = worker?['bio'] as String?;
                       final city = worker?['city'] as String?;
                       final phone = worker?['phone'] as String?;
@@ -197,32 +271,65 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                   CircleAvatar(
                                     radius: 22,
                                     backgroundColor: c.surfaceHigh,
-                                    child: Icon(Icons.person_rounded, color: c.textSecondary),
+                                    child: Icon(
+                                      Icons.person_rounded,
+                                      color: c.textSecondary,
+                                    ),
                                   ),
                                   const SizedBox(width: AppSpacing.md),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(worker?['full_name'] as String? ?? context.tr('unknown'), style: AppText.title),
+                                        Text(
+                                          worker?['full_name'] as String? ??
+                                              context.tr('unknown'),
+                                          style: AppText.title,
+                                        ),
                                         const SizedBox(height: 4),
-                                        verified ? const PillBadge.verified() : PillBadge(label: context.tr('pending_verification')),
+                                        verified
+                                            ? const PillBadge.verified()
+                                            : PillBadge(
+                                                label: context.tr(
+                                                  'pending_verification',
+                                                ),
+                                              ),
                                       ],
                                     ),
                                   ),
                                   PopupMenuButton<String>(
-                                    icon: Icon(Icons.more_vert_rounded, color: c.textSecondary),
+                                    icon: Icon(
+                                      Icons.more_vert_rounded,
+                                      color: c.textSecondary,
+                                    ),
                                     onSelected: (action) async {
                                       final workerId = a['worker_id'] as String;
                                       if (action == 'report') {
-                                        await showReportSheet(context, targetType: 'user', targetId: workerId);
-                                      } else if (await confirmAndBlock(context, userId: workerId) && mounted) {
-                                        setState(() { _future = _load(); });
+                                        await showReportSheet(
+                                          context,
+                                          targetType: 'user',
+                                          targetId: workerId,
+                                        );
+                                      } else if (await confirmAndBlock(
+                                            context,
+                                            userId: workerId,
+                                          ) &&
+                                          mounted) {
+                                        setState(() {
+                                          _future = _load();
+                                        });
                                       }
                                     },
                                     itemBuilder: (_) => [
-                                      PopupMenuItem(value: 'report', child: Text(context.tr('report'))),
-                                      PopupMenuItem(value: 'block', child: Text(context.tr('block_user'))),
+                                      PopupMenuItem(
+                                        value: 'report',
+                                        child: Text(context.tr('report')),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'block',
+                                        child: Text(context.tr('block_user')),
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -231,9 +338,18 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                 const SizedBox(height: AppSpacing.sm),
                                 Row(
                                   children: [
-                                    Icon(Icons.phone_rounded, size: 16, color: c.textTertiary),
+                                    Icon(
+                                      Icons.phone_rounded,
+                                      size: 16,
+                                      color: c.textTertiary,
+                                    ),
                                     const SizedBox(width: 4),
-                                    Text(phone, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                    Text(
+                                      phone,
+                                      style: AppText.bodySmall.copyWith(
+                                        color: c.textSecondary,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -241,29 +357,46 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                 const SizedBox(height: AppSpacing.sm),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_city_rounded, size: 16, color: c.textTertiary),
+                                    Icon(
+                                      Icons.location_city_rounded,
+                                      size: 16,
+                                      color: c.textTertiary,
+                                    ),
                                     const SizedBox(width: 4),
-                                    Text(city, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                    Text(
+                                      city,
+                                      style: AppText.bodySmall.copyWith(
+                                        color: c.textSecondary,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
                               if (bio != null && bio.isNotEmpty) ...[
                                 const SizedBox(height: AppSpacing.sm),
-                                Text(bio, style: AppText.bodySmall.copyWith(color: c.textSecondary)),
+                                Text(
+                                  bio,
+                                  style: AppText.bodySmall.copyWith(
+                                    color: c.textSecondary,
+                                  ),
+                                ),
                               ],
                               if (skills.isNotEmpty) ...[
                                 const SizedBox(height: AppSpacing.sm),
                                 Wrap(
                                   spacing: AppSpacing.xs,
                                   runSpacing: AppSpacing.xs,
-                                  children: skills.map((s) => PillBadge(label: s)).toList(),
+                                  children: skills
+                                      .map((s) => PillBadge(label: s))
+                                      .toList(),
                                 ),
                               ],
                               const SizedBox(height: AppSpacing.md),
-                              NeuButton(
-                                label: context.tr('hire'),
-                                height: 44,
-                                onPressed: full ? null : () => _hire(a['worker_id'] as String),
+                              SlideToConfirm(
+                                label: context.tr('slide_to_hire'),
+                                enabled: !full,
+                                onConfirmed: () =>
+                                    _hire(a['worker_id'] as String),
                               ),
                             ],
                           ),

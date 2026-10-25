@@ -51,7 +51,11 @@ class LangController extends ChangeNotifier {
 }
 
 class LangScope extends InheritedNotifier<LangController> {
-  const LangScope({super.key, required LangController controller, required super.child}) : super(notifier: controller);
+  const LangScope({
+    super.key,
+    required LangController controller,
+    required super.child,
+  }) : super(notifier: controller);
 
   static Lang of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<LangScope>();
@@ -60,7 +64,10 @@ class LangScope extends InheritedNotifier<LangController> {
 
   static LangController controllerOf(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<LangScope>();
-    assert(scope != null, 'LangScope.controllerOf() called with no LangScope ancestor');
+    assert(
+      scope != null,
+      'LangScope.controllerOf() called with no LangScope ancestor',
+    );
     return scope!.notifier!;
   }
 }

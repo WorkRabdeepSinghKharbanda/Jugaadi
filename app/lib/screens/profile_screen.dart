@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../api_client.dart';
 import '../config.dart';
 import '../core/i18n/lang.dart';
+import '../core/theme/theme_controller.dart';
 import '../core/i18n/strings.dart';
 import '../core/safety.dart';
 import '../core/theme/tokens.dart';
@@ -38,7 +39,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<Map<String, dynamic>> _load() async {
-    final data = await ApiClient(Config.apiBaseUrl).get('/profile/me') as Map<String, dynamic>;
+    final data =
+        await ApiClient(Config.apiBaseUrl).get('/profile/me')
+            as Map<String, dynamic>;
     _profile = data;
     _contactController.text = (data['contact_phone'] as String?) ?? '';
     _useCustomNumber = _contactController.text.isNotEmpty;
@@ -46,10 +49,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _bioController.text = (data['bio'] as String?) ?? '';
     _selectedSkills
       ..clear()
-      ..addAll((data['worker_skills'] as List<dynamic>?)?.map((s) => s['skill'] as String) ?? const []);
+      ..addAll(
+        (data['worker_skills'] as List<dynamic>?)?.map(
+              (s) => s['skill'] as String,
+            ) ??
+            const [],
+      );
     try {
       final userId = Supabase.instance.client.auth.currentUser!.id;
-      _reviews = await ApiClient(Config.apiBaseUrl).get('/profiles/$userId/reviews') as List<dynamic>;
+      _reviews =
+          await ApiClient(Config.apiBaseUrl).get('/profiles/$userId/reviews')
+              as List<dynamic>;
     } catch (_) {
       // not critical — the reviews section just stays empty
     }
@@ -81,8 +91,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(ctx.tr('logout_dialog_title')),
         content: Text(ctx.tr('logout_dialog_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('log_out'))),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('log_out')),
+          ),
         ],
       ),
     );
@@ -102,8 +118,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(ctx.tr('delete_dialog_title')),
         content: Text(ctx.tr('delete_dialog_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(ctx.tr('cancel'))),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(ctx.tr('delete'))),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('delete')),
+          ),
         ],
       ),
     );
@@ -117,13 +139,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         (route) => false,
       );
     } catch (e) {
-      if (mounted) showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      if (mounted) {
+        showAppToast(context, apiErrorMessage(e), tone: ToastTone.error);
+      }
     }
   }
 
   Future<void> _save() async {
     if (_useCustomNumber && _contactController.text.trim().isEmpty) {
-      showAppToast(context, context.tr('enter_number_or_toggle_off'), tone: ToastTone.error);
+      showAppToast(
+        context,
+        context.tr('enter_number_or_toggle_off'),
+        tone: ToastTone.error,
+      );
       return;
     }
     final profile = _profile!;
@@ -140,9 +168,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'city': profile['city'],
         'lat': profile['lat'],
         'lng': profile['lng'],
-        'contact_phone': _useCustomNumber && _contactController.text.trim().isNotEmpty ? _contactController.text.trim() : null,
-        'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-        'bio': _bioController.text.trim().isEmpty ? null : _bioController.text.trim(),
+        'contact_phone':
+            _useCustomNumber && _contactController.text.trim().isNotEmpty
+            ? _contactController.text.trim()
+            : null,
+        'email': _emailController.text.trim().isEmpty
+            ? null
+            : _emailController.text.trim(),
+        'bio': _bioController.text.trim().isEmpty
+            ? null
+            : _bioController.text.trim(),
         'skills': _selectedSkills.toList(),
         'lang': lang.name,
       });
@@ -179,7 +214,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 ErrorStrip(errorMessage(context, snapshot.error!)),
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: context.tr('retry'), expand: false, onPressed: () => setState(() { _future = _load(); })),
+                NeuButton(
+                  label: context.tr('retry'),
+                  expand: false,
+                  onPressed: () => setState(() {
+                    _future = _load();
+                  }),
+                ),
               ],
             );
           }
@@ -187,7 +228,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final verified = profile['is_verified'] == true;
           final avgRating = _reviews.isEmpty
               ? null
-              : _reviews.map((r) => (r as Map<String, dynamic>)['rating'] as int).reduce((a, b) => a + b) / _reviews.length;
+              : _reviews
+                        .map(
+                          (r) => (r as Map<String, dynamic>)['rating'] as int,
+                        )
+                        .reduce((a, b) => a + b) /
+                    _reviews.length;
 
           if (!_editing) {
             return Column(
@@ -195,7 +241,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text(profile['full_name'] as String? ?? '-', style: AppText.headline)),
+                    Expanded(
+                      child: Text(
+                        profile['full_name'] as String? ?? '-',
+                        style: AppText.headline,
+                      ),
+                    ),
                     if (verified) const PillBadge.verified(),
                   ],
                 ),
@@ -207,7 +258,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(width: 4),
                       Text(
                         '${avgRating.toStringAsFixed(1)} · ${_reviews.length} review${_reviews.length == 1 ? '' : 's'}',
-                        style: AppText.bodySmall.copyWith(color: c.textSecondary),
+                        style: AppText.bodySmall.copyWith(
+                          color: c.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -217,22 +270,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _Row(icon: Icons.phone_rounded, label: context.tr('login_number'), value: profile['phone'] as String? ?? '-'),
+                      _Row(
+                        icon: Icons.phone_rounded,
+                        label: context.tr('login_number'),
+                        value: profile['phone'] as String? ?? '-',
+                      ),
                       const SizedBox(height: AppSpacing.md),
                       _Row(
                         icon: Icons.call_outlined,
                         label: context.tr('number_shown_to_hires'),
-                        value: (profile['contact_phone'] as String?) ?? context.tr('same_as_login_number'),
+                        value:
+                            (profile['contact_phone'] as String?) ??
+                            context.tr('same_as_login_number'),
                       ),
-                      if ((profile['email'] as String?)?.isNotEmpty ?? false) ...[
+                      if ((profile['email'] as String?)?.isNotEmpty ??
+                          false) ...[
                         const SizedBox(height: AppSpacing.md),
-                        _Row(icon: Icons.email_outlined, label: context.tr('email'), value: profile['email'] as String),
+                        _Row(
+                          icon: Icons.email_outlined,
+                          label: context.tr('email'),
+                          value: profile['email'] as String,
+                        ),
                       ],
                       const SizedBox(height: AppSpacing.md),
-                      _Row(icon: Icons.location_city_rounded, label: context.tr('city'), value: profile['city'] as String? ?? '-'),
+                      _Row(
+                        icon: Icons.location_city_rounded,
+                        label: context.tr('city'),
+                        value: profile['city'] as String? ?? '-',
+                      ),
                       if ((profile['bio'] as String?)?.isNotEmpty ?? false) ...[
                         const SizedBox(height: AppSpacing.md),
-                        _Row(icon: Icons.info_outline_rounded, label: context.tr('about'), value: profile['bio'] as String),
+                        _Row(
+                          icon: Icons.info_outline_rounded,
+                          label: context.tr('about'),
+                          value: profile['bio'] as String,
+                        ),
                       ],
                     ],
                   ),
@@ -243,13 +315,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   spacing: AppSpacing.sm,
                   runSpacing: AppSpacing.sm,
                   children: _selectedSkills.isEmpty
-                      ? [Text(context.tr('no_skills_yet'), style: AppText.bodySmall.copyWith(color: c.textTertiary))]
-                      : _selectedSkills.map((s) => Chip(label: Text(s))).toList(),
+                      ? [
+                          Text(
+                            context.tr('no_skills_yet'),
+                            style: AppText.bodySmall.copyWith(
+                              color: c.textTertiary,
+                            ),
+                          ),
+                        ]
+                      : _selectedSkills
+                            .map((s) => Chip(label: Text(s)))
+                            .toList(),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 SectionHeader(context.tr('reviews')),
                 if (_reviews.isEmpty)
-                  Text(context.tr('no_reviews_yet'), style: AppText.bodySmall.copyWith(color: c.textTertiary))
+                  Text(
+                    context.tr('no_reviews_yet'),
+                    style: AppText.bodySmall.copyWith(color: c.textTertiary),
+                  )
                 else
                   for (final r in _reviews.cast<Map<String, dynamic>>()) ...[
                     NeuCard(
@@ -262,7 +346,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: List.generate(
                                   5,
                                   (i) => Icon(
-                                    i < (r['rating'] as int) ? Icons.star_rounded : Icons.star_outline_rounded,
+                                    i < (r['rating'] as int)
+                                        ? Icons.star_rounded
+                                        : Icons.star_outline_rounded,
                                     color: c.accent,
                                     size: 16,
                                   ),
@@ -270,12 +356,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const Spacer(),
                               Text(
-                                (r['reviewer'] as Map<String, dynamic>?)?['full_name'] as String? ?? '-',
-                                style: AppText.bodySmall.copyWith(color: c.textSecondary),
+                                (r['reviewer']
+                                            as Map<
+                                              String,
+                                              dynamic
+                                            >?)?['full_name']
+                                        as String? ??
+                                    '-',
+                                style: AppText.bodySmall.copyWith(
+                                  color: c.textSecondary,
+                                ),
                               ),
                             ],
                           ),
-                          if ((r['comment'] as String?)?.isNotEmpty ?? false) ...[
+                          if ((r['comment'] as String?)?.isNotEmpty ??
+                              false) ...[
                             const SizedBox(height: AppSpacing.sm),
                             Text(r['comment'] as String, style: AppText.body),
                           ],
@@ -285,16 +380,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: AppSpacing.sm),
                   ],
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: context.tr('edit_profile'), icon: Icons.edit_outlined, onPressed: () => setState(() => _editing = true)),
+                NeuButton(
+                  label: context.tr('edit_profile'),
+                  icon: Icons.edit_outlined,
+                  onPressed: () => setState(() => _editing = true),
+                ),
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(
                   label: context.tr('blocked_users'),
                   icon: Icons.block_rounded,
                   variant: NeuButtonVariant.ghost,
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BlockedUsersScreen())),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const BlockedUsersScreen(),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                NeuButton(label: context.tr('log_out'), icon: Icons.logout_rounded, variant: NeuButtonVariant.ghost, onPressed: _logout),
+                NeuButton(
+                  label: context.tr('log_out'),
+                  icon: Icons.logout_rounded,
+                  variant: NeuButtonVariant.ghost,
+                  onPressed: _logout,
+                ),
                 const SizedBox(height: AppSpacing.md),
                 NeuButton(
                   label: context.tr('delete_account'),
@@ -312,19 +420,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
               NeuCard(
                 child: Row(
                   children: [
-                    Icon(Icons.translate_rounded, size: 20, color: c.textSecondary),
+                    Icon(
+                      Icons.translate_rounded,
+                      size: 20,
+                      color: c.textSecondary,
+                    ),
                     const SizedBox(width: AppSpacing.md),
-                    Expanded(child: Text(context.tr('app_language'), style: AppText.body)),
+                    Expanded(
+                      child: Text(
+                        context.tr('app_language'),
+                        style: AppText.body,
+                      ),
+                    ),
                     DropdownButton<Lang>(
                       value: context.lang,
                       dropdownColor: c.surfaceHigh,
                       underline: const SizedBox.shrink(),
                       items: Lang.values
-                          .map((l) => DropdownMenuItem(value: l, child: Text(context.tr('language_${l.name}'))))
+                          .map(
+                            (l) => DropdownMenuItem(
+                              value: l,
+                              child: Text(context.tr('language_${l.name}')),
+                            ),
+                          )
                           .toList(),
                       onChanged: (l) {
-                        if (l != null) LangScope.controllerOf(context).setLang(l);
+                        if (l != null) {
+                          LangScope.controllerOf(context).setLang(l);
+                        }
                       },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              NeuCard(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.light_mode_outlined,
+                      size: 20,
+                      color: c.textSecondary,
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Text(
+                        context.tr('light_theme'),
+                        style: AppText.body,
+                      ),
+                    ),
+                    Switch(
+                      value: !ThemeScope.of(context).isDark,
+                      onChanged: (v) => ThemeScope.of(context).setDark(!v),
                     ),
                   ],
                 ),
@@ -339,11 +486,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(context.tr('share_different_number'), style: AppText.body),
+                          Text(
+                            context.tr('share_different_number'),
+                            style: AppText.body,
+                          ),
                           const SizedBox(height: 2),
                           Text(
                             context.tr('share_different_number_desc'),
-                            style: AppText.bodySmall.copyWith(color: c.textTertiary),
+                            style: AppText.bodySmall.copyWith(
+                              color: c.textTertiary,
+                            ),
                           ),
                         ],
                       ),
@@ -366,22 +518,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
               const SizedBox(height: AppSpacing.md),
-              NeuTextField(label: context.tr('email'), controller: _emailController, icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+              NeuTextField(
+                label: context.tr('email'),
+                controller: _emailController,
+                icon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
+              ),
               const SizedBox(height: AppSpacing.md),
-              NeuTextField(label: context.tr('about'), controller: _bioController, icon: Icons.info_outline_rounded, maxLines: 3),
+              NeuTextField(
+                label: context.tr('about'),
+                controller: _bioController,
+                icon: Icons.info_outline_rounded,
+                maxLines: 3,
+              ),
               const SizedBox(height: AppSpacing.lg),
               SectionHeader(context.tr('skills')),
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
                 children: kSkillOptions
-                    .map((skill) => FilterChip(
-                          label: Text(skill),
-                          selected: _selectedSkills.contains(skill),
-                          onSelected: (selected) => setState(() {
-                            selected ? _selectedSkills.add(skill) : _selectedSkills.remove(skill);
-                          }),
-                        ))
+                    .map(
+                      (skill) => FilterChip(
+                        label: Text(skill),
+                        selected: _selectedSkills.contains(skill),
+                        onSelected: (selected) => setState(() {
+                          selected
+                              ? _selectedSkills.add(skill)
+                              : _selectedSkills.remove(skill);
+                        }),
+                      ),
+                    )
                     .toList(),
               ),
               if (_selectedSkills.any((s) => !kSkillOptions.contains(s))) ...[
@@ -391,7 +557,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   runSpacing: AppSpacing.sm,
                   children: _selectedSkills
                       .where((s) => !kSkillOptions.contains(s))
-                      .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _selectedSkills.remove(s))))
+                      .map(
+                        (s) => Chip(
+                          label: Text(s),
+                          onDeleted: () =>
+                              setState(() => _selectedSkills.remove(s)),
+                        ),
+                      )
                       .toList(),
                 ),
               ],
@@ -408,7 +580,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  NeuButton(label: context.tr('add'), expand: false, height: 48, radius: AppRadius.sm, onPressed: _addCustomSkill),
+                  NeuButton(
+                    label: context.tr('add'),
+                    expand: false,
+                    height: 48,
+                    radius: AppRadius.sm,
+                    onPressed: _addCustomSkill,
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -426,7 +604,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: NeuButton(label: context.tr('save'), loading: _saving, onPressed: _save)),
+                  Expanded(
+                    child: NeuButton(
+                      label: context.tr('save'),
+                      loading: _saving,
+                      onPressed: _save,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -455,7 +639,10 @@ class _Row extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label.toUpperCase(), style: AppText.label.copyWith(color: c.textTertiary)),
+              Text(
+                label.toUpperCase(),
+                style: AppText.label.copyWith(color: c.textTertiary),
+              ),
               const SizedBox(height: 2),
               Text(value, style: AppText.body),
             ],

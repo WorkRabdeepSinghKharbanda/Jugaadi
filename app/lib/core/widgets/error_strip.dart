@@ -16,12 +16,23 @@ class ErrorStrip extends StatelessWidget {
       variant: NeuVariant.flat,
       color: warning ? c.warning.withValues(alpha: 0.12) : c.dangerSoft,
       radius: AppRadius.sm,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm + 4,
+      ),
       child: Row(
         children: [
-          Icon(warning ? Icons.wifi_tethering_error_rounded : Icons.error_outline_rounded, color: fg, size: 20),
+          Icon(
+            warning
+                ? Icons.wifi_tethering_error_rounded
+                : Icons.error_outline_rounded,
+            color: fg,
+            size: 20,
+          ),
           const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(message, style: AppText.bodySmall.copyWith(color: fg))),
+          Expanded(
+            child: Text(message, style: AppText.bodySmall.copyWith(color: fg)),
+          ),
         ],
       ),
     );

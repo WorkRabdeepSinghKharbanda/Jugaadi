@@ -17,18 +17,31 @@ const _kCardSize = 1080.0;
 /// unlike the usual RepaintBoundary screenshot approach.
 Future<Uint8List> _renderJobCard(Map<String, dynamic> job, Lang lang) async {
   final recorder = ui.PictureRecorder();
-  final canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, _kCardSize, _kCardSize));
+  final canvas = Canvas(
+    recorder,
+    const Rect.fromLTWH(0, 0, _kCardSize, _kCardSize),
+  );
   const c = AppColors.dark;
 
-  canvas.drawRect(const Rect.fromLTWH(0, 0, _kCardSize, _kCardSize), Paint()..color = c.bg);
+  canvas.drawRect(
+    const Rect.fromLTWH(0, 0, _kCardSize, _kCardSize),
+    Paint()..color = c.bg,
+  );
 
   final gradientPaint = Paint()
-    ..shader = LinearGradient(colors: [c.accent, c.accentDeep], begin: Alignment.topLeft, end: Alignment.bottomRight)
-        .createShader(const Rect.fromLTWH(0, 0, _kCardSize, 260));
+    ..shader = LinearGradient(
+      colors: [c.accent, c.accentDeep],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ).createShader(const Rect.fromLTWH(0, 0, _kCardSize, 260));
   canvas.drawRect(const Rect.fromLTWH(0, 0, _kCardSize, 260), gradientPaint);
 
   final logoBytes = await rootBundle.load('assets/icon/icon.png');
-  final logoCodec = await ui.instantiateImageCodec(logoBytes.buffer.asUint8List(), targetWidth: 140, targetHeight: 140);
+  final logoCodec = await ui.instantiateImageCodec(
+    logoBytes.buffer.asUint8List(),
+    targetWidth: 140,
+    targetHeight: 140,
+  );
   final logo = (await logoCodec.getNextFrame()).image;
   final logoRect = const Rect.fromLTWH(60, 60, 140, 140);
   canvas.save();
@@ -41,9 +54,25 @@ Future<Uint8List> _renderJobCard(Map<String, dynamic> job, Lang lang) async {
   );
   canvas.restore();
 
-  void text(String value, {required double x, required double y, required double size, Color? color, FontWeight weight = FontWeight.w500, double maxWidth = _kCardSize - 120}) {
+  void text(
+    String value, {
+    required double x,
+    required double y,
+    required double size,
+    Color? color,
+    FontWeight weight = FontWeight.w500,
+    double maxWidth = _kCardSize - 120,
+  }) {
     final painter = TextPainter(
-      text: TextSpan(text: value, style: TextStyle(color: color ?? c.textPrimary, fontSize: size, fontWeight: weight, height: 1.25)),
+      text: TextSpan(
+        text: value,
+        style: TextStyle(
+          color: color ?? c.textPrimary,
+          fontSize: size,
+          fontWeight: weight,
+          height: 1.25,
+        ),
+      ),
       textDirection: TextDirection.ltr,
       maxLines: 3,
       ellipsis: '…',
@@ -51,33 +80,94 @@ Future<Uint8List> _renderJobCard(Map<String, dynamic> job, Lang lang) async {
     painter.paint(canvas, Offset(x, y));
   }
 
-  text(tr(lang, 'share_open_position_badge').toUpperCase(), x: 220, y: 95, size: 28, color: c.onAccent, weight: FontWeight.w700);
-  text('Jugaadi', x: 220, y: 135, size: 34, color: c.onAccent, weight: FontWeight.w800);
+  text(
+    tr(lang, 'share_open_position_badge').toUpperCase(),
+    x: 220,
+    y: 95,
+    size: 28,
+    color: c.onAccent,
+    weight: FontWeight.w700,
+  );
+  text(
+    'Jugaadi',
+    x: 220,
+    y: 135,
+    size: 34,
+    color: c.onAccent,
+    weight: FontWeight.w800,
+  );
 
   double y = 320;
-  text(job['title'] as String? ?? '', x: 60, y: y, size: 56, weight: FontWeight.w800, maxWidth: _kCardSize - 120);
+  text(
+    job['title'] as String? ?? '',
+    x: 60,
+    y: y,
+    size: 56,
+    weight: FontWeight.w800,
+    maxWidth: _kCardSize - 120,
+  );
   y += 140;
 
-  text('${tr(lang, 'share_skill_label')}: ${job['skill_needed'] ?? '-'}', x: 60, y: y, size: 34, color: c.textSecondary);
+  text(
+    '${tr(lang, 'share_skill_label')}: ${job['skill_needed'] ?? '-'}',
+    x: 60,
+    y: y,
+    size: 34,
+    color: c.textSecondary,
+  );
   y += 56;
 
   final address = (job['address_text'] as String?) ?? '';
   if (address.isNotEmpty) {
-    text('${tr(lang, 'share_location_label')}: $address', x: 60, y: y, size: 34, color: c.textSecondary);
+    text(
+      '${tr(lang, 'share_location_label')}: $address',
+      x: 60,
+      y: y,
+      size: 34,
+      color: c.textSecondary,
+    );
     y += 56;
   }
 
   if (job['daily_wage'] != null) {
-    text('${tr(lang, 'share_wage_label')}: ₹${job['daily_wage']}/${tr(lang, 'share_per_day')}', x: 60, y: y, size: 34, color: c.textSecondary);
+    text(
+      '${tr(lang, 'share_wage_label')}: ₹${job['daily_wage']}/${tr(lang, 'share_per_day')}',
+      x: 60,
+      y: y,
+      size: 34,
+      color: c.textSecondary,
+    );
     y += 56;
   }
 
-  text('${job['start_date']} → ${job['end_date']}', x: 60, y: y, size: 34, color: c.textSecondary);
+  text(
+    '${job['start_date']} → ${job['end_date']}',
+    x: 60,
+    y: y,
+    size: 34,
+    color: c.textSecondary,
+  );
 
   // Footer CTA band
-  canvas.drawRect(const Rect.fromLTWH(0, _kCardSize - 160, _kCardSize, 160), Paint()..color = c.surfaceHigh);
-  text(tr(lang, 'share_cta_line'), x: 60, y: _kCardSize - 128, size: 30, weight: FontWeight.w700);
-  text(_kDownloadUrl, x: 60, y: _kCardSize - 84, size: 30, color: c.accent, weight: FontWeight.w700);
+  canvas.drawRect(
+    const Rect.fromLTWH(0, _kCardSize - 160, _kCardSize, 160),
+    Paint()..color = c.surfaceHigh,
+  );
+  text(
+    tr(lang, 'share_cta_line'),
+    x: 60,
+    y: _kCardSize - 128,
+    size: 30,
+    weight: FontWeight.w700,
+  );
+  text(
+    _kDownloadUrl,
+    x: 60,
+    y: _kCardSize - 84,
+    size: 30,
+    color: c.accent,
+    weight: FontWeight.w700,
+  );
 
   final picture = recorder.endRecording();
   final image = await picture.toImage(_kCardSize.toInt(), _kCardSize.toInt());
@@ -86,7 +176,9 @@ Future<Uint8List> _renderJobCard(Map<String, dynamic> job, Lang lang) async {
 }
 
 String jobShareText(Map<String, dynamic> job, Lang lang) {
-  final wage = job['daily_wage'] != null ? ' · ₹${job['daily_wage']}/${tr(lang, 'share_per_day')}' : '';
+  final wage = job['daily_wage'] != null
+      ? ' · ₹${job['daily_wage']}/${tr(lang, 'share_per_day')}'
+      : '';
   return '${tr(lang, 'share_open_position_badge')}: ${job['title']}\n'
       '${tr(lang, 'share_skill_label')}: ${job['skill_needed']}$wage\n\n'
       '${tr(lang, 'share_cta_line')}\n'

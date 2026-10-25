@@ -41,19 +41,43 @@ class NeuButton extends StatelessWidget {
     };
     final decoration = BoxDecoration(
       gradient: isPrimary ? c.accentGradient : null,
-      color: isPrimary ? null : (variant == NeuButtonVariant.danger ? c.dangerSoft : c.surface),
+      color: isPrimary
+          ? null
+          : (variant == NeuButtonVariant.danger ? c.dangerSoft : c.surface),
       borderRadius: BorderRadius.circular(radius),
-      border: isPrimary ? null : Border.all(color: variant == NeuButtonVariant.danger ? c.danger.withValues(alpha: 0.4) : c.outline),
-      boxShadow: !_enabled ? AppShadows.none : (isPrimary ? AppShadows.accentGlow(c) : AppShadows.raised(c)),
+      border: isPrimary
+          ? null
+          : Border.all(
+              color: variant == NeuButtonVariant.danger
+                  ? c.danger.withValues(alpha: 0.4)
+                  : c.outline,
+            ),
+      boxShadow: !_enabled
+          ? AppShadows.none
+          : (isPrimary ? AppShadows.accentGlow(c) : AppShadows.raised(c)),
     );
 
     final content = loading
-        ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: fg))
+        ? SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2.5, color: fg),
+          )
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[Icon(icon, color: fg, size: 22), const SizedBox(width: AppSpacing.sm)],
-              Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppText.button.copyWith(color: fg))),
+              if (icon != null) ...[
+                Icon(icon, color: fg, size: 22),
+                const SizedBox(width: AppSpacing.sm),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.button.copyWith(color: fg),
+                ),
+              ),
             ],
           );
 
@@ -109,10 +133,25 @@ class NeuIconButton extends StatelessWidget {
           duration: AppDurations.of(context),
           width: 48,
           height: 48,
-          decoration: BoxDecoration(color: c.surface, shape: BoxShape.circle, border: Border.all(color: c.outline), boxShadow: _enabled ? AppShadows.raised(c) : AppShadows.none),
+          decoration: BoxDecoration(
+            color: c.surface,
+            shape: BoxShape.circle,
+            border: Border.all(color: c.outline),
+            boxShadow: _enabled ? AppShadows.raised(c) : AppShadows.none,
+          ),
           child: loading
-              ? Padding(padding: const EdgeInsets.all(AppSpacing.md - 2), child: CircularProgressIndicator(strokeWidth: 2.5, color: c.accent))
-              : Icon(icon, color: _enabled ? (color ?? c.textPrimary) : c.textTertiary, size: 22),
+              ? Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md - 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: c.accent,
+                  ),
+                )
+              : Icon(
+                  icon,
+                  color: _enabled ? (color ?? c.textPrimary) : c.textTertiary,
+                  size: 22,
+                ),
         ),
       ),
     );

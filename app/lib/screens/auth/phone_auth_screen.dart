@@ -56,9 +56,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Jugaadi', style: AppText.display.copyWith(color: context.colors.accent)),
+            Text(
+              'Jugaadi',
+              style: AppText.display.copyWith(color: context.colors.accent),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            Text(context.tr('tagline'), style: AppText.body.copyWith(color: context.colors.textSecondary)),
+            Text(
+              context.tr('tagline'),
+              style: AppText.body.copyWith(color: context.colors.textSecondary),
+            ),
             const SizedBox(height: AppSpacing.xxl),
             NeuTextField(
               label: context.tr('phone_number'),
@@ -72,7 +78,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ErrorStrip(_error!),
               const SizedBox(height: AppSpacing.lg),
             ],
-            NeuButton(label: context.tr('send_otp'), icon: Icons.arrow_forward_rounded, loading: _loading, onPressed: _sendOtp),
+            NeuButton(
+              label: context.tr('send_otp'),
+              icon: Icons.arrow_forward_rounded,
+              loading: _loading,
+              onPressed: _sendOtp,
+            ),
           ],
         ),
       ),

@@ -72,7 +72,12 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
             ErrorStrip(_error!),
             const SizedBox(height: AppSpacing.lg),
           ],
-          NeuButton(label: context.tr('verify'), icon: Icons.check_rounded, loading: _loading, onPressed: _verify),
+          NeuButton(
+            label: context.tr('verify'),
+            icon: Icons.check_rounded,
+            loading: _loading,
+            onPressed: _verify,
+          ),
         ],
       ),
     );
